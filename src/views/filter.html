@@ -1,0 +1,66 @@
+<head>
+    <!--A supprimer lors du passage en .hbs-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+</head>
+
+<div class="container-fluid d-flex flex-column align-items-center w-75 my-3">
+
+    <div class="container">
+        <div class="text-center m-3">
+            Vous cherchez un film précis ? 
+            Un genre, une année, ou des émotions particulières à explorer ? 
+            Affinez vos recherches ici pour trouver exactement ce que vous voulez regarder.
+        </div>
+        <hr>
+        <div class="d-flex justify-content-left">
+    
+            <!-- Section à faire glisser depuis le coté gauche de la page -->
+            <!-- <label for="filterSelection">Filtres:</label>
+            <div id="filterSelection">
+                <label for="filterHumorSelection">Humeurs:</label>
+                <div id="filterHumorSelection">
+                    looping label and input balise for every humors with {{{humors}}}
+                     <label for="fearHumor">Peur</label>
+                     <input id="fearHumor" type="checkbox">
+                </div>
+
+                <label for="filterGenreSelection">Genres:</label>
+                <div id="filterGenreSelection">
+                    looping label and input balise for every humors with {{{humors}}}
+                    <label for="horrorGenre">Horreur</label>
+                    <input id="horrorGenre" type="checkbox">
+                </div>
+            </div>
+
+            <div>
+                <label for="runtimeScale">Durée du film en minutes:</label>
+                <input id="runtimeScale" type="range" min="30" max="240" step="5">
+                Afficher la valeur actuelle avec du JS
+            </div>
+        
+            <div>
+                <label for="releasedDateScale">Date de sortie du film:</label>
+                <input id="releasedDateScale" type="range" min="1950" max="2024" step="1">
+            </div>
+        
+            <div>
+                <label for="AvgNoteScale">Note globale du film:</label>
+                <input id="AvgNoteScale" type="range" min="0" max="10" step="0.1">
+            </div> -->
+        
+            <button type="button" class="btn btn-block btn-dark m-1">Filtres</button>
+            <button type="button" class="btn btn-block btn-light m-1">Supprimer tous les filtres</button>
+        </div>
+    </div>
+
+    <div id="FilterMoviesDisplay" class="container m-5 border rounded-5 border-3">
+        Tous les films issues des filtres à afficher :
+        <!-- Boucle avec le {{{body}}} qui renvoie sur moviesDisplay. -->
+    </div>
+
+    <div class="container d-flex justify-content-center align-items-center">
+        <button class="btn btn-light border rounded-left"> < </button>
+        <p class="text-center bg-light mb-0 p-2 border rounded-1">Naviguer à travers les films</p>
+        <button class="btn btn-light border rounded-right"> > </button>
+    </div>
+</div>
