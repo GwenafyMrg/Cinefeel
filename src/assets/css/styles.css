@@ -1,12 +1,49 @@
 .switchButton {
-    width: 100px;
-    height: 60px;
     font-size: small;
+    align-self: self-end;
+    position: absolute;
+    bottom: 2%;
 }
 
 .movieCard p {
     font-size: small;
+    margin: 2px;
+    padding: 2px;
+    width: 80%;
+    border: 1px solid lightblue;
+    border-radius: 5px;
+    opacity: 80%;
+    position: relative;
 }
+
+.movieCard h3 {
+    width: 90%;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    border-bottom: 2px solid black;
+    border-radius: 10px;
+}
+
+.movieCard .infoMovie {
+
+    display: grid;
+    grid-template-areas: "genre genre"
+                        "dir dir"
+                        "runtime date";
+    justify-items: center;
+    column-gap: 3px;
+    row-gap: 2px;
+}
+
+.infoMovie p {
+    width: 100%;
+    text-indent: 2px;
+}
+
+#movieGenre{grid-area: genre;}
+#movieDir{grid-area: dir;}
+#movieRuntime{grid-area: runtime;}
+#movieReleasedDate{grid-area: date;}
 
 .gridMovies {
     display: grid;

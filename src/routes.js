@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, "assets")));
 app.get("/", (req, res) => {
     const movies = [
         {
-            titre : "Avengers",
+            titre : "Spider-man into the spiderverse",
             image : "images/interstellar.jpg",
             genres : "Superhéros - Action - Si-Fi",
             emotions : "enjouée - excitée - curieux",
