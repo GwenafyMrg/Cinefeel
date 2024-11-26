@@ -1,0 +1,55 @@
+.switchButton {
+    width: 100px;
+    height: 60px;
+    font-size: small;
+}
+
+.movieCard p {
+    font-size: small;
+}
+
+.gridMovies {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/*Gérer l'animation des cartes: */
+
+/* Styles de base */
+.card-container {
+    display: grid; /* Utilise Grid pour superposer les cartes */
+    place-items: center; /* Centre les éléments horizontalement et verticalement */
+    perspective: 1000px; /* Nécessaire pour l'effet de rotation 3D */
+}
+
+/* Styles des cartes */
+.movieCard {
+    grid-area: 1 / 1; /* Superpose les cartes sur la même cellule */
+    backface-visibility: hidden; /* Cache l'arrière lors du retournement */
+    transition: transform 0.8s ease-in-out;
+    display: flex;
+    width: auto;
+    height: 450px;
+
+    border: 5px solid white;
+    border-radius: 20px;
+    outline: 1px solid black;
+}
+
+/* Position initiale des cartes */
+#SimpleMovieCard {
+    transform: rotateY(0deg); /* Position initiale */
+}
+
+#DetailedMovieCard {
+    transform: rotateY(180deg); /* Masqué au début */
+}
+
+/* Classe active pour le retournement */
+.flipped #SimpleMovieCard {
+    transform: rotateY(-180deg);
+}
+
+.flipped #DetailedMovieCard {
+    transform: rotateY(0deg);
+}

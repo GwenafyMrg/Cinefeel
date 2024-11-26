@@ -1,0 +1,32 @@
+<div class="card-container p-2">
+
+    {{!-- First Face --}}
+    <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column justify-content-between align-items-center">
+        <h3 class="text-center bg-warning fs-2">{{titre}}</h3>
+        <img src="{{image}}" alt="Poster_du_film" class="w-75 border border-1">
+
+        <div class="container-fluid d-flex justify-content-around my-3">
+            <p class="bg-info h-100">{{emotions}}</p>
+            <button class="switchButton btn btn-block btn-warning border rounded-circle ms-2">Retourner</button>
+        </div>
+    </div>
+
+    <br>
+    {{!-- Second Face --}}
+    <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column justify-content-between align-items-center">
+        <h3 class="text-center bg-warning fs-2">{{titre}}</h3>
+        <img src="{{image}}" alt="Poster_du_film" class="image-fluid w-50 border border-1">
+
+        <div class="container-fluid my-3">
+            <p class="text-center bg-info">{{genres}}</p>
+            <p class="px-2 bg-info">Réalisateur: {{realisateur}}</p>
+            <div class="d-flex flex-row align-items-between">
+                <div>
+                    <p class="px-2 bg-info">Durée: {{runtime}}</p>
+                    <p class="px-2 bg-info">Date de sortie: {{releasedDate}}</p>
+                </div>
+                <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
+            </div>
+        </div>
+    </div>
+</div>
