@@ -3,9 +3,9 @@
     {{!-- First Face --}}
     <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
         
-        <h3>{{titre}}</h3>  
+        <h3>{{title}}</h3>  
 
-        <img src="{{image}}" alt="{{smTitle}}_poster" class="w-75 mh-75 border border-2 my-3">
+        <img src="{{poster_url}}" alt="{{smTitle}}_poster" class="w-75 mh-75 border border-2 my-3">
 
         <p class="bg-info">{{emotions}}</p>
         <button class="switchButton btn btn-block btn-warning border rounded-circle">Retourner</button>
@@ -17,14 +17,14 @@
     <br>
     {{!-- Second Face --}}
     <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
-        <h3>{{titre}}</h3>
+        <h3>{{title}}</h3>
         <img src="{{image}}" alt="{{smTitle}}_poster" class="w-50 mh-50 border border-2 my-4">
 
         <div class="infoMovie">
             <p id="movieGenre" class="bg-info">{{genres}}</p>
             <p id="movieDir" class="bg-info">Réalisateur: {{realisateur}}</p>
             <p id="movieRuntime" class="bg-info">Durée: {{runtime}}</p>
-            <p id="movieReleasedDate" class="bg-info">Date de sortie: {{releasedDate}}</p>
+            <p id="movieReleasedDate" class="bg-info">Date de sortie: {{released_date}}</p>
         </div>
         <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
     </div>  

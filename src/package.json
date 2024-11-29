@@ -1,12 +1,15 @@
 {
   "dependencies": {
     "express": "^4.21.1",
-    "express-handlebars": "^8.0.1"
+    "express-handlebars": "^8.0.1",
+    "mariadb": "^3.4.0",
+    "mysql2": "^3.11.5",
+    "node": "^20.18.1",
+    "sequelize": "^6.37.5"
   },
   "name": "src",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -65,7 +65,7 @@
     backface-visibility: hidden; /* Cache l'arrière lors du retournement */
     transition: transform 0.8s ease-in-out;
     display: flex;
-    width: auto;
+    width: 100%;
     height: 450px;
 
     border: 5px solid white;
