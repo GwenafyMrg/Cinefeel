@@ -21,8 +21,24 @@
         <img src="{{image}}" alt="{{smTitle}}_poster" class="w-50 mh-50 border border-2 my-4">
 
         <div class="infoMovie">
-            <p id="movieGenre" class="bg-info">{{genres}}</p>
-            <p id="movieDir" class="bg-info">Réalisateur: {{realisateur}}</p>
+            <p id="movieGenre" class="bg-info">
+                {{#if this.Genres}}
+                    {{#each this.Genres}}
+                        - {{this.libelle}}
+                    {{/each}}
+                {{else}}
+                    Aucun genre associé...
+                {{/if}}
+            </p>
+            <p id="movieDir" class="bg-info">
+                {{#if this.Directors}}
+                    {{#each this.Directors}}
+                        Réalisateur: {{this.Fname}} {{this.name}}
+                    {{/each}}
+                {{else}}
+                    Aucun réalisateur associé à ce film.
+                {{/if}}
+            </p>
             <p id="movieRuntime" class="bg-info">Durée: {{runtime}}</p>
             <p id="movieReleasedDate" class="bg-info">Date de sortie: {{released_date}}</p>
         </div>

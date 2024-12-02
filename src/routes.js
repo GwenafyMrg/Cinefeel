@@ -20,6 +20,8 @@ sequelize.authenticate()
         console.error("La connexion a échouée...");
 });
 
+//-----------------------------------Créations des modèles de BDD: -------------------------------//
+
 const Movie = sequelize.define("movie", {
     id_movie : {
         type: DataTypes.INTEGER,
@@ -50,6 +52,93 @@ const Movie = sequelize.define("movie", {
         tableName: 'movie',  
         timestamps: false,    // Utilise les champs `createdAt` et `updatedAt`.
 });
+
+const Genre = sequelize.define("genre", {
+    id_genre : {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    libelle : {
+        type: DataTypes.STRING,
+        allowNull : false
+    }
+},  {
+        tableName: "genre",
+        timestamps: false
+});
+
+const movieGenre = sequelize.define("movieGenre", {
+    id_movie: {
+        type: DataTypes.INTEGER,
+        references : {              //Définir une clé étrangère, à qui fait elle référence ?
+            model: Movie,           //id_movie de movieGenre fait référence au modèle Movie.
+            key: "id_movie"         //id_movie de movieGenre fait référence au champ id_movie du modèle Movie.
+        }
+    },
+    id_genre: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Genre,
+            key: "id_genre"
+        }
+    }
+}, {
+    tableName: "movieGenre",
+    timestamps: false
+});
+
+const Director = sequelize.define("director", {
+    id_director: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    Fname: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    nationality: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    birth_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    }
+}, {
+    tableName: "director",
+    timestamps: false
+});
+
+const movieDir = sequelize.define("movieDir", {
+    id_movie : {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Movie,
+            through: 'id_movie'
+        }
+    },
+    id_director : {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Director,
+            through: 'id_director'
+        }
+    }
+}, {
+    tableName: "movieDir",
+    timestamps: false
+});
+
+//Jointure entre les modéles de BDD :
+//<model>.belongsToMany(<model_à_joindre>, {through: <model_pivot>, foreignKey: <model_pivot_pk>, otherKey: <model_à_joindre_pk>, options: <>})
+Movie.belongsToMany(Genre, {through: movieGenre, foreignKey: 'id_movie', otherKey: "id_genre", as: "Genres"});
+Movie.belongsToMany(Director, {through: movieDir, foreignKey: 'id_movie', otherKey: 'id_director', as: 'Directors'})
 
 sequelize.sync({force: false})
     .then(() => {
@@ -82,7 +171,21 @@ app.use(express.static(path.join(__dirname, "assets")));
 //Définiton des routes :
 app.get("/", async (req, res) => {
     try {
-        query = await Movie.findAll();
+        query = await Movie.findAll({
+            include: [{
+                model: Genre,               //Modéle/Table à inclure.
+                as: "Genres",               //Modifier le nom de l'attribut dans dataValues.
+                attributes: ['libelle'],    //Champs du Modèle/Table à inclure.
+                through: { attributes: []}  //Exclure les informations de la table pivot (movieGenre).
+            },
+            {
+                model: Director, 
+                as: 'Directors',
+                attributes: ['name','Fname'],
+                through: { attributes: []}
+            }]
+        });
+        console.log(query);
         res.render("home", {movies : query});
     } catch (err){
         console.error("Erreur lors de l'affichage des donneés.");
