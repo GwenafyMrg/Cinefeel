@@ -6,6 +6,8 @@ const {Sequelize, DataTypes} = require('sequelize');
 
 const path = require('path');
 
+const funct = require('./functions');
+
 //-----------------------------------Définition du serveur BDD (mariaDB) :-------------------------------//
 const sequelize = new Sequelize('cinefeel','test','test', {
     dialect: 'mysql',
@@ -152,14 +154,21 @@ sequelize.sync({force: false})
 
 const app = express();
 app.engine('handlebars', engine({
+    //Chemin des répertoire:
     defaultLayout : "main",
     layoutsDir : "views/layouts",
     partialsDir : "views/partials",
+    //
     runtimeOptions: {
         //permet à Handlebars d'accéder aux propriétés des objets hérités (comme les instances Sequelize).
         allowProtoPropertiesByDefault: true,
         //permet l'accès aux méthodes du prototype
         allowProtoMethodsByDefault: true
+    },
+    //Helpers ?
+    helpers: {
+        convertRuntime: funct.convertRuntime,
+        convertDateFormat: funct.convertDateFormat
     }
 }));
 

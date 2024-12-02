@@ -39,8 +39,8 @@
                     Aucun réalisateur associé à ce film.
                 {{/if}}
             </p>
-            <p id="movieRuntime" class="bg-info">Durée: {{runtime}}</p>
-            <p id="movieReleasedDate" class="bg-info">Date de sortie: {{released_date}}</p>
+            <p id="movieRuntime" class="bg-info">Durée: {{convertRuntime runtime}}</p>
+            <p id="movieReleasedDate" class="bg-info">Date de sortie: {{convertDateFormat released_date}}</p>
         </div>
         <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
     </div>  
