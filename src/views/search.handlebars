@@ -1,13 +1,19 @@
-<div class="container-fluid d-flex flex-column align-items-center w-75 my-3">
+<div class="container-fluid d-flex flex-column align-items-center my-3">
 
-    <div class="container text-left m-3">
-        Voici les résultats de votre recherche.<br>
-        Si le film que vous cherchez ne s'y trouve pas, utilisez l'option de filtrage pour élargir votre recherche.
+    <div class="text-left w-75 m-3">
+        {{#if research}}
+            Voici les résultats de la recherche sur "{{research}}" :<br>
+            Si le film que vous cherchez ne s'y trouve pas, utilisez <a href="/moviesList">l'option de filtrage</a> pour élargir votre recherche.
+        {{else}}
+            Nous vous invitons à entrer un <b>titre de film</b> ou <b>un réalisateur</b> dans la barre de navigation afin de lancer une recherche.<br>
+            Toutefois, si vous souhaitez disposer de filtres pour votre recherche, rendez-vous dans la <a href="/moviesList">liste de films</a>.
+        {{/if}}
     </div>
 
-    <div id="searchMoviesDisplay" class="container m-5 border rounded-5 border-3">
-        Tous les films issues de votre recherche à afficher :
-        <!-- Boucle avec le {{{body}}} qui renvoie sur moviesDisplay. -->
+    <div id="searchMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+        {{#each result}}
+            {{> movieDisplay}}
+        {{/each}}
     </div>
 
     <div class="container d-flex justify-content-center align-items-center">

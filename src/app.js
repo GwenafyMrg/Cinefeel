@@ -2,7 +2,8 @@
 
 const express = require('express');
 const {engine} = require('express-handlebars');
-const {Sequelize, DataTypes} = require('sequelize');
+const {Sequelize, DataTypes, Op} = require('sequelize');
+const bodyParser = require('body-parser');
 
 const path = require('path');
 
@@ -176,6 +177,7 @@ app.set("view engine", "handlebars");
 app.set("views", "./views");
 
 app.use(express.static(path.join(__dirname, "assets")));
+app.use(bodyParser.urlencoded({ extends: true}));
 
 //Définiton des routes :
 app.get("/", async (req, res) => {
@@ -206,8 +208,48 @@ app.get("/moviesList", (req, res) => {
     res.render("filter");
 });
 
-app.get("/search", (req, res) => {
+app.get("/search", (req,res) => {
     res.render("search");
+})
+
+app.post("/search", async (req, res) => {
+
+    const value = req.body.researchValue;
+    //Insensible à la casse, pas besoin de toLowerCase();
+
+    try {
+        const query = await Movie.findAll({
+
+            //Search by Title, Last name or First Name of Director.
+            where: {
+                [Op.or] : [
+                    {title : { [Op.substring] : value}},
+                    {'$Directors.name$' : { [Op.substring] : value }},
+                    {'$Directors.Fname$' : {[Op.substring] : value}}
+                ]
+            },
+            include: [
+                {
+                    model: Genre,
+                    as: "Genres",
+                    attributes: ["libelle"],
+                    through: { attributes: []}
+                },
+                {
+                    model: Director,
+                    as: "Directors",
+                    attributes : ["name","Fname"],
+                    through: { attributes : []}
+                }
+            ]
+        });
+        console.log(query);
+        res.render("search", {result : query, research : value});
+    }
+    catch{
+        console.error("Erreur lors de la recherche des donneés.");
+        res.status(500).send("Une erreur s'est produite lors de la recherche.");
+    }
 });
 
 app.get("/login", (req, res) => {

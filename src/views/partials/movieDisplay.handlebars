@@ -5,9 +5,10 @@
         
         <h3>{{title}}</h3>  
 
-        <img src="{{poster_url}}" alt="{{smTitle}}_poster" class="w-75 mh-75 border border-2 my-3">
+        <img src="{{poster_url}}?raw=true" alt="{{poster_url}}_poster" class="moviePoster border border-2 my-3">
 
-        <p class="bg-info">{{emotions}}</p>
+        <p id="movieNote" class="bg-info">Note : {{avg_note}}</p>
+        <p id="movieEmotions" class="bg-info">Une liste de 5 émotions.{{emotions}}</p>
         <button class="switchButton btn btn-block btn-warning border rounded-circle">Retourner</button>
         
     </div>
@@ -18,7 +19,7 @@
     {{!-- Second Face --}}
     <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
         <h3>{{title}}</h3>
-        <img src="{{image}}" alt="{{smTitle}}_poster" class="w-50 mh-50 border border-2 my-4">
+        <img src="{{poster_url}}?raw=true" alt="{{poster_url}}_poster" class="w-50 mh-50 border border-2 my-4">
 
         <div class="infoMovie">
             <p id="movieGenre" class="bg-info">

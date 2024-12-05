@@ -11,17 +11,28 @@
 <body>
     <div class="container-fluid bg-primary">
 
-        <nav id="navbar" class="container bg-secondary d-flex row m-auto py-3 justify-content-around">
-            <div class="col-sm-2">
-                <img src="" alt="Website_logo">
+        <nav id="navbar" class="container bg-secondary row m-auto py-3 align-items-center justify-content-between">
+           
+            {{!-- Logo --}}
+            <div class="col-2">
+                <img src="images/logo.png" alt="Website_logo" onclick="window.location.href='/'">
             </div>
-            <button class="btn btn-block btn-info col-sm-2" onclick="window.location.href='../moviesList'">Liste de films</button>
-            <input type="text" placeholder="Rechercher un film" class="col-sm-4" >
-            <div class="d-flex col-sm-2 bg-info d-flex justify-content-between">
+           
+            {{!-- Liste de films --}}
+            <button class="btn btn-block btn-info col-2" onclick="window.location.href='../moviesList'">Liste de films</button>
+            
+            {{!-- Search Section --}}
+            <form id="searchForm" method="POST" action="/search" class="col-5 d-flex align-items-center justify-content-between bg-info p-1">
+                <input id="searchBar" name="researchValue" type="text" class="w-75" placeholder="Rechercher par un titre ou un réalisateur">
+                <button type="submit">Rechercher</button>
+            </form>
+
+            {{!-- Section profil --}}
+            <div class="d-flex col-2 bg-info d-flex justify-content-between">
                 <details class="d-flex flex-column">
-                    <summary></summary>
-                    <a href="../my-movies" lass="border-3">Vos films</a>
-                    <a href="../my-favorites" lass="border-3">Vos favoris</a>
+                    <summary>Profil</summary>
+                    <a href="../my-movies" class="border-3">Vos films</a>
+                    <a href="../my-favorites" class="border-3">Vos favoris</a>
                     <a href="../my-badges">Vos badges</a>
                     <hr>
                     {{!-- <a href="../">Profil</a>
@@ -38,6 +49,7 @@
     <main>
         {{{body}}}
     </main>
+
     <footer class="bg-primary">
         <p>Voici le pied de page</p>
     </footer>

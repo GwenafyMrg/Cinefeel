@@ -5,6 +5,11 @@
     bottom: 2%;
 }
 
+.moviePoster {
+    max-height: 75%;
+    height: 60%;
+}
+
 .movieCard p {
     font-size: small;
     margin: 2px;
@@ -18,6 +23,10 @@
 
 .movieCard h3 {
     width: 90%;
+    max-height: 1.5em;
+    overflow:hidden; /* Cache ce qui dépasse */
+    text-overflow:ellipsis; /* "..." */
+    white-space: nowrap;
     text-align: center;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     border-bottom: 2px solid black;
