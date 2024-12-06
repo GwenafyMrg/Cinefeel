@@ -169,7 +169,8 @@ app.engine('handlebars', engine({
     //Helpers ?
     helpers: {
         convertRuntime: funct.convertRuntime,
-        convertDateFormat: funct.convertDateFormat
+        convertDateFormat: funct.convertDateFormat,
+        normalizeString: funct.normalizeString,
     }
 }));
 
@@ -196,7 +197,7 @@ app.get("/", async (req, res) => {
                 through: { attributes: []}
             }]
         });
-        console.log(query);
+        // console.log(query);
         res.render("home", {movies : query});
     } catch (err){
         console.error("Erreur lors de l'affichage des donneés.");
@@ -204,9 +205,41 @@ app.get("/", async (req, res) => {
     }
 });
 
-app.get("/moviesList", (req, res) => {
-    res.render("filter");
+app.get("/moviesList", async (req, res) => {
+
+    const genresList = await Genre.findAll();
+    res.render("filter", { genresList : genresList});
 });
+
+app.post("/moviesList", async (req,res) => {
+
+    const selectedGenres = req.body.genres;//Dictionnaire {name, value}
+    selectedValues = Object.keys(selectedGenres); //Récupération des clés (name) uniquement
+    // console.log(selectedValues);
+
+    const queryFilter = await Movie.findAll({
+
+        where : {
+            '$Genres.libelle$': { [Op.in]: selectedValues }
+        },
+        include : [{
+            model: Genre,
+            as : "Genres",
+            attributes: ["libelle"],
+            through : { attributes : []}
+        },
+        {
+            model: Director,
+            as: "Directors",
+            attributes: ["name","Fname"],
+            through: { attributes: []}
+        }
+        ]
+    });
+    // console.log(queryFilter);
+
+    res.render("filter", {genresList : await Genre.findAll(), FilteredMovies : queryFilter});
+})
 
 app.get("/search", (req,res) => {
     res.render("search");

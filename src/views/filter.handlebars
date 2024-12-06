@@ -1,4 +1,4 @@
-<div class="container-fluid d-flex flex-column align-items-center w-75 my-3">
+<div class="container-fluid d-flex flex-column align-items-center my-3">
 
     <div class="container">
         <div class="text-center m-3">
@@ -7,50 +7,70 @@
             Affinez vos recherches ici pour trouver exactement ce que vous voulez regarder.
         </div>
         <hr>
-        <div class="d-flex justify-content-left">
-    
-            <!-- Section à faire glisser depuis le coté gauche de la page -->
-            <!-- <label for="filterSelection">Filtres:</label>
-            <div id="filterSelection">
-                <label for="filterHumorSelection">Humeurs:</label>
-                <div id="filterHumorSelection">
-                    looping label and input balise for every humors with {{{humors}}}
-                     <label for="fearHumor">Peur</label>
-                     <input id="fearHumor" type="checkbox">
-                </div>
-
-                <label for="filterGenreSelection">Genres:</label>
-                <div id="filterGenreSelection">
-                    looping label and input balise for every humors with {{{humors}}}
-                    <label for="horrorGenre">Horreur</label>
-                    <input id="horrorGenre" type="checkbox">
-                </div>
-            </div>
-
-            <div>
-                <label for="runtimeScale">Durée du film en minutes:</label>
-                <input id="runtimeScale" type="range" min="30" max="240" step="5">
-                Afficher la valeur actuelle avec du JS
-            </div>
-        
-            <div>
-                <label for="releasedDateScale">Date de sortie du film:</label>
-                <input id="releasedDateScale" type="range" min="1950" max="2024" step="1">
-            </div>
-        
-            <div>
-                <label for="AvgNoteScale">Note globale du film:</label>
-                <input id="AvgNoteScale" type="range" min="0" max="10" step="0.1">
-            </div> -->
-        
+        <form name="filterForm" action="/moviesList" method="post">
             <button type="button" class="btn btn-block btn-dark m-1">Filtres</button>
-            <button type="button" class="btn btn-block btn-light m-1">Supprimer tous les filtres</button>
-        </div>
+            <button type="reset" class="btn btn-block btn-light m-1">Supprimer tous les filtres</button>
+            <hr>
+            <div id="FilterDiv" class="container container-fluid d-flex justify-content-around align-items-center m-2">
+                <!-- Section à faire glisser depuis le coté gauche de la page -->
+                {{!-- <div id="humorFilter" class="filter">
+                    <label for="humorSelect">Emotions:</label>
+                    <select name="humorSelect" id="humorSelect">
+                        <option value="allHumors" selected>Toutes</option>
+                        <option value="fear">Peur</option>
+                        <option value="happy">Joie</option>
+                        <option value="peaceful">Apaisé</option>
+                        {{#each humors}}
+                            <option value="{{humorValue}}">{{humor}}</option>
+                        {{/each}}
+                    </select>
+                </div> --}}
+
+                <div id="genreFilter" class="filter">
+                    {{!-- <label for="genreSelect">Genres:</label>
+                    <select name="genreSelect" id="genreSelect">
+                        <option value="allGenres" selected>Tous</option>
+                        {{#each genres}}
+                            <option value="{{normalizeString libelle}}">{{libelle}}</option>   
+                        {{/each}}
+                    </select> --}}
+                    <button name="accessGenreOptions" type="button" class="btn btn-block btn-light">Genres</button>
+                    <div id="genreOptions" class="">
+                        {{#each genresList}}
+                            <div class="container border border-2 m-1">
+                                <label for="{{normalizeString this.libelle}}Option">{{this.libelle}}</label>
+                                <input id="{{normalizeString this.libelle}}Option" type="checkbox" name="genres[{{this.libelle}}]">
+                            </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+
+                {{!-- <div id="runtimeFilter" class="filter">
+                    <label for="runtimeScale">Durée du film en minutes:</label>
+                    <input id="runtimeScale" type="range" min="0" max="300" step="10">
+                </div>
+            
+                <div id="releasedDateFilter" class="filter">
+                    <label for="releasedDateScale">Date de sortie du film:</label>
+                    <input id="releasedDateScale" type="range" min="1950" max="2024" step="1">
+                </div>
+            
+                <div id="noteFilter" class="filter">
+                    <label for="AvgNoteScale">Note globale du film:</label>
+                    <input id="AvgNoteScale" type="range" min="0" max="10" step="0.5">
+                </div> --}}
+            </div>
+            <div>
+                <button type="submit" class="btn btn-block btn-dark">Appliquer les filtres</button>
+            </div>
+        </form>
     </div>
 
-    <div id="FilterMoviesDisplay" class="container m-5 border rounded-5 border-3">
-        Tous les films issues des filtres à afficher :
-        <!-- Boucle avec le {{{body}}} qui renvoie sur moviesDisplay. -->
+    <div id="FilterMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+        {{#each FilteredMovies}}
+            {{> movieDisplay}}
+        {{/each}}
     </div>
 
     <div class="container d-flex justify-content-center align-items-center">

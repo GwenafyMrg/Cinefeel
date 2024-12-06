@@ -1,3 +1,4 @@
+
 function convertDateFormat(date){
 
     const [year, mouth, day] = date.split('-');
@@ -17,7 +18,21 @@ function convertRuntime(runtime){
     }
 }
 
+function normalizeString(text){
+
+    normalized = text.toLowerCase();
+    normalized = normalized.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return normalized;
+}
+
+function test(){
+    form = document.getElementsByName("filterForm");
+    console.log(form);
+}
+
+
 module.exports = {
     convertDateFormat,
-    convertRuntime
+    convertRuntime,
+    normalizeString,
 };
