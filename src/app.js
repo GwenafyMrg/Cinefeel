@@ -1,157 +1,23 @@
 //-----------------------------------Importation des modules node:---------------------------------------//
 
+//Modules prédéfinis.
 const express = require('express');
 const {engine} = require('express-handlebars');
-const {Sequelize, DataTypes, Op} = require('sequelize');
+const {Op} = require('sequelize');
 const bodyParser = require('body-parser');
-
 const path = require('path');
 
-const funct = require('./functions');
+//Modules de sécurité.
+const sanitizeHtml = require('sanitize-html');  //Injection SQL
+const bcrypt = require('bcrypt');               //Haché les mots de passe   .
 
-//-----------------------------------Définition du serveur BDD (mariaDB) :-------------------------------//
-const sequelize = new Sequelize('cinefeel','test','test', {
-    dialect: 'mysql',
-    host : 'localhost'
-});
+//Import de module locaux.
+const {Movie, Director, Genre} = require('./models');
+const funct = require('./assets/functions');
+const sanitize = require('sanitize-html');
+const { send } = require('process');
 
-sequelize.authenticate()
-    .then(() => {
-        console.log("La connexion avec la BDD est établie");
-    })
-    .catch(() => {
-        console.error("La connexion a échouée...");
-});
-
-//-----------------------------------Créations des modèles de BDD: -------------------------------//
-
-const Movie = sequelize.define("movie", {
-    id_movie : {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement : true
-    },
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    poster_url: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    runtime: {
-        type: DataTypes.SMALLINT,
-        allowNull: false
-    },
-    released_date: {
-        type: DataTypes.DATEONLY,
-        allowNull: true
-    },
-    avg_note: {
-        type: DataTypes.DOUBLE,
-        allowNull: false
-    }
-}, {
-        tableName: 'movie',  
-        timestamps: false,    // Utilise les champs `createdAt` et `updatedAt`.
-});
-
-const Genre = sequelize.define("genre", {
-    id_genre : {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-    libelle : {
-        type: DataTypes.STRING,
-        allowNull : false
-    }
-},  {
-        tableName: "genre",
-        timestamps: false
-});
-
-const movieGenre = sequelize.define("movieGenre", {
-    id_movie: {
-        type: DataTypes.INTEGER,
-        references : {              //Définir une clé étrangère, à qui fait elle référence ?
-            model: Movie,           //id_movie de movieGenre fait référence au modèle Movie.
-            key: "id_movie"         //id_movie de movieGenre fait référence au champ id_movie du modèle Movie.
-        }
-    },
-    id_genre: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: Genre,
-            key: "id_genre"
-        }
-    }
-}, {
-    tableName: "movieGenre",
-    timestamps: false
-});
-
-const Director = sequelize.define("director", {
-    id_director: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    Fname: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    nationality: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    birth_date: {
-        type: DataTypes.DATEONLY,
-        allowNull: true
-    }
-}, {
-    tableName: "director",
-    timestamps: false
-});
-
-const movieDir = sequelize.define("movieDir", {
-    id_movie : {
-        type: DataTypes.INTEGER,
-        references: {
-            model: Movie,
-            through: 'id_movie'
-        }
-    },
-    id_director : {
-        type: DataTypes.INTEGER,
-        references: {
-            model: Director,
-            through: 'id_director'
-        }
-    }
-}, {
-    tableName: "movieDir",
-    timestamps: false
-});
-
-//Jointure entre les modéles de BDD :
-//<model>.belongsToMany(<model_à_joindre>, {through: <model_pivot>, foreignKey: <model_pivot_pk>, otherKey: <model_à_joindre_pk>, options: <>})
-Movie.belongsToMany(Genre, {through: movieGenre, foreignKey: 'id_movie', otherKey: "id_genre", as: "Genres"});
-Movie.belongsToMany(Director, {through: movieDir, foreignKey: 'id_movie', otherKey: 'id_director', as: 'Directors'})
-
-sequelize.sync({force: false})
-    .then(() => {
-        console.log("Synchronisée.");
-    })
-    .catch((err) => {
-        console.error("Erreur : ", err);
-});
-
-//-----------------------------------Définitionn de l'application Web :-------------------------------//
+//-----------------------------------Définition de l'application Web :-------------------------------//
 
 const app = express();
 app.engine('handlebars', engine({
@@ -178,22 +44,22 @@ app.set("view engine", "handlebars");
 app.set("views", "./views");
 
 app.use(express.static(path.join(__dirname, "assets")));
-app.use(bodyParser.urlencoded({ extends: true}));
+app.use(bodyParser.urlencoded({ extended: true}));
 
-//Définiton des routes :
+//-----------------------------------Définition des routes:-------------------------------//
 app.get("/", async (req, res) => {
     try {
         query = await Movie.findAll({
             include: [{
-                model: Genre,               //Modéle/Table à inclure.
-                as: "Genres",               //Modifier le nom de l'attribut dans dataValues.
-                attributes: ['libelle'],    //Champs du Modèle/Table à inclure.
-                through: { attributes: []}  //Exclure les informations de la table pivot (movieGenre).
+                model: Genre,                   //Modéle/Table à inclure.
+                as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
+                attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
+                through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
             },
             {
                 model: Director, 
                 as: 'Directors',
-                attributes: ['name','Fname'],
+                attributes: ['director_lastname','director_firstname'],
                 through: { attributes: []}
             }]
         });
@@ -220,18 +86,18 @@ app.post("/moviesList", async (req,res) => {
     const queryFilter = await Movie.findAll({
 
         where : {
-            '$Genres.libelle$': { [Op.in]: selectedValues }
+            '$Genres.genre_libelle$': { [Op.in]: selectedValues }
         },
         include : [{
             model: Genre,
             as : "Genres",
-            attributes: ["libelle"],
+            attributes: ["genre_libelle"],
             through : { attributes : []}
         },
         {
             model: Director,
             as: "Directors",
-            attributes: ["name","Fname"],
+            attributes: ["director_lastname","director_firstname"],
             through: { attributes: []}
         }
         ]
@@ -256,22 +122,22 @@ app.post("/search", async (req, res) => {
             //Search by Title, Last name or First Name of Director.
             where: {
                 [Op.or] : [
-                    {title : { [Op.substring] : value}},
-                    {'$Directors.name$' : { [Op.substring] : value }},
-                    {'$Directors.Fname$' : {[Op.substring] : value}}
+                    {movie_title : { [Op.substring] : value}},
+                    {'$Directors.director_lastname$' : { [Op.substring] : value }},
+                    {'$Directors.director_firstname$' : {[Op.substring] : value}}
                 ]
             },
             include: [
                 {
                     model: Genre,
                     as: "Genres",
-                    attributes: ["libelle"],
+                    attributes: ["genre_libelle"],
                     through: { attributes: []}
                 },
                 {
                     model: Director,
                     as: "Directors",
-                    attributes : ["name","Fname"],
+                    attributes : ["director_lastname","director_firstname"],
                     through: { attributes : []}
                 }
             ]
@@ -293,6 +159,73 @@ app.get("/create-account", (req, res) => {
     res.render("createAccount");
 });
 
+app.post("/create-account", async (req,res) => {
+
+    try{
+        //Voir pour mettre la partit récup + insertion dans une fonction pour séparer le code.
+        let username = req.body.username;
+        let email = req.body.email;
+        const password = req.body.password; //Ne doit pas être modifié !
+        let msgError = "";
+
+        //Managing username input:
+        if(username.length > 25 || email.length > 40 || password.length > 25){
+            msgError = "La taille des champs n'a pas été respectée !";
+        }
+        else{
+            username = username.trim();
+            const safeUsername = sanitizeHtml(username, {
+                allowedTags: ['b','i','em','strong'],
+                allowedAttributes: []
+            });
+            console.log(safeUsername);
+
+            if(!safeUsername){
+                msgError = "Impossible de créer un compte.<br>Votre nom d'utilisateur semble suspect.";
+            }
+            else{
+                //Managing email input:
+                const safeEmail = email.trim(); //L'input de type "email" se charge déjà de la bonne syntaxe.
+                console.log(safeEmail);
+
+                //Managing password input:
+                let safePassword = password;
+                safePassword = safePassword.trim();
+                safePassword = sanitizeHtml(safePassword, {
+                    allowedTags: [],
+                    allowedAttributes: []
+                });
+
+                if(safePassword != password){
+                    msgError = "Impossible de créer votre compte.<br>Votre mot de passe semble suspect.";
+                }
+                else{//Si le mot de passe sécurisé correspond au mot de passe initial.
+                    const hashedPw = await bcrypt.hash(safePassword,11);
+                    console.log(hashedPw);
+                    
+                    try{
+                        //Insérer les informations dans la BDD.
+                    }
+                    catch{
+                        console.log("Une erreur est survenue lors de la création de votre compte utilisateur.");
+                        res.status(500).send("Une erreur est survenue lors de la création de votre compte utilisateur.");
+                    }
+                }
+            }
+        }
+        if(msgError){//Si une erreur est détécte.
+            res.send(msgError);
+        }
+        else{//Sinon
+            res.render("login"); //Redirection vers la page de connexion.
+        }
+    }
+    catch {
+        console.log("Une erreur est survenue lors de la récupération de vos informations.");
+        res.status(500).send("Une erreur est survenue lors de la récupération de vos informations.");
+    }
+});
+
 app.get("/my-movies", (req, res) => {
     res.render("myMovies");
 });
@@ -312,4 +245,6 @@ app.get("/parameters", (req, res) => {
 //Lancer le serveur :
 app.listen(3000, () => {
     console.log("Server started!");
-})
+});
+
+//Check logical error status.
