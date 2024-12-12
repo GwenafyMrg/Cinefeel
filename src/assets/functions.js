@@ -25,12 +25,6 @@ function normalizeString(text){
     return normalized;
 }
 
-function test(){
-    form = document.getElementsByName("filterForm");
-    console.log(form);
-}
-
-
 module.exports = {
     convertDateFormat,
     convertRuntime,
