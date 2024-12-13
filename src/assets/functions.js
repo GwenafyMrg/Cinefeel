@@ -1,11 +1,17 @@
 
 function convertDateFormat(date){
+    //Convertit le format AAAA-MM-DD au format DD-MM-AAAA.
+    // parameters : string
+    // return : string
 
     const [year, mouth, day] = date.split('-');
     return `${day}-${mouth}-${year}`;
 }
 
 function convertRuntime(runtime){
+    //Convertit un temps en minutes exclusivement à un temps en heures et en minutes.
+    //parameters: integer
+    //return : string
 
     hour = 0, min = 0;
     min = runtime%60;
@@ -19,12 +25,14 @@ function convertRuntime(runtime){
 }
 
 function normalizeString(text){
+    //Normalise une chaine de caractère, passant ses caractères en minuscules et retirant les accents.
 
-    normalized = text.toLowerCase();
-    normalized = normalized.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    normalized = text.toLowerCase();    //Passage minuscule
+    normalized = normalized.normalize("NFD").replace(/[\u0300-\u036f]/g, "");   //Suppression des accents.
     return normalized;
 }
 
+//Exportation des fonctions :
 module.exports = {
     convertDateFormat,
     convertRuntime,

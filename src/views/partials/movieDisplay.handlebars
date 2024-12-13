@@ -1,6 +1,7 @@
+{{!-- Partials > template d'affichage des films --}}
 <div class="card-container m-2">
 
-    {{!-- First Face --}}
+    {{!-- Première face (recto) --}}
     <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
         
         <h3>{{movie_title}}</h3>  
@@ -16,21 +17,28 @@
     {{!-- ---------------------------------------------------------------------------------------------------------- --}}
 
     <br>
-    {{!-- Second Face --}}
+    {{!-- Seconde Face (verso) --}}
     <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
+        
         <h3>{{movie_title}}</h3>
         <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="w-50 mh-50 border border-2 my-4">
 
         <div class="infoMovie">
+
             <p id="movieGenre" class="bg-info">
+                {{!-- Si la structure n'est pas vide --}}
                 {{#if this.Genres}}
+                    {{!-- Pour chaque genre stocké dans la structure Genre :  --}}
                     {{#each this.Genres}}
+                        {{!-- Afficher le genre --}}
                         - {{this.genre_libelle}}
                     {{/each}}
+                {{!-- Si la structure est vide --}}
                 {{else}}
                     Aucun genre associé...
                 {{/if}}
             </p>
+
             <p id="movieDir" class="bg-info">
                 {{#if this.Directors}}
                     {{#each this.Directors}}
@@ -40,8 +48,10 @@
                     Aucun réalisateur associé à ce film.
                 {{/if}}
             </p>
+
             <p id="movieRuntime" class="bg-info">Durée: {{convertRuntime movie_runtime}}</p>
             <p id="movieReleasedDate" class="bg-info">Date de sortie: {{convertDateFormat movie_released_date}}</p>
+        
         </div>
         <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
     </div>  

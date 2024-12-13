@@ -1,15 +1,20 @@
 //-----------------------------------Importation des modules node:---------------------------------------//
-const {Sequelize, DataTypes} = require('sequelize');
+
+const {Sequelize, DataTypes} = require('sequelize');    //Gestion de la BDD.
 
 //-----------------------------------Définition du serveur BDD (mariaDB) :-------------------------------//
-const sequelize = new Sequelize('cinefeel','test','test', {
+
+const sequelize = new Sequelize('cinefeel','test','test', { //Définition des paramètres de connexion.
     dialect: 'mysql',
-    host : 'localhost'
+    host : 'localhost',
+
+    //Afficher les logs (requête test/par défaut).
+    logging: false
 });
 
-sequelize.authenticate()
+sequelize.authenticate()    //Tentative de connexion avec le BDD.
     .then(() => {
-        console.log("La connexion avec la BDD est établie");
+        console.log("La connexion avec la BDD est établie !");
     })
     .catch(() => {
         console.error("La connexion a échouée...");
@@ -17,15 +22,15 @@ sequelize.authenticate()
 
 //-----------------------------------Créations des modèles de BDD: -------------------------------//
 
-const Movie = sequelize.define("movie", {
-    movie_id_movie : {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement : true
+const Movie = sequelize.define("movie", {   //Définit le modèle Movie
+    movie_id_movie : {              //Nom du champ.
+        type: DataTypes.INTEGER,    //Type de donnée du champ.
+        primaryKey: true,           //Est-il une clé primaire ?
+        autoIncrement : true        //Est-il auto-incrémenté ?
     },
-    movie_title: {
-        type: DataTypes.STRING,
-        allowNull: false
+    movie_title: {                  
+        type: DataTypes.STRING, 
+        allowNull: false            //Peut-il être de type null ?
     },
     movie_poster_url: {
         type: DataTypes.STRING,
@@ -44,11 +49,11 @@ const Movie = sequelize.define("movie", {
         allowNull: false
     }
 }, {
-        tableName: 'movie',  
-        timestamps: false,    // Utilise les champs `createdAt` et `updatedAt`.
+        tableName: 'movie',     //Nom de la table dans la BDD.
+        timestamps: false,      //Utiliser les champs `createdAt` et `updatedAt` ?
 });
 
-const Genre = sequelize.define("genre", {
+const Genre = sequelize.define("genre", {   //Définit la modèle Genre.
     genre_id_genre : {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -63,19 +68,19 @@ const Genre = sequelize.define("genre", {
         timestamps: false
 });
 
-const movieGenre = sequelize.define("movieGenre", {
+const movieGenre = sequelize.define("movieGenre", { //Définit le modèle movieGenre
     id_movie: {
         type: DataTypes.INTEGER,
-        references : {              //Définir une clé étrangère, à qui fait elle référence ?
-            model: Movie,           //id_movie de movieGenre fait référence au modèle Movie.
-            key: "movie_id_movie"   //id_movie de movieGenre fait référence au champ id_movie du modèle Movie.
+        references : {              //Définir une clé étrangère :
+            model: Movie,           //Quel modèle fait-on référence ?
+            key: "movie_id_movie"   //Quel champ est une clé étrangère pour ce modèle ?
         }
     },
     id_genre: {
         type: DataTypes.INTEGER,
-        references: {
-            model: Genre,
-            key: "genre_id_genre"
+        references: {               //Définit la clé étrangère :
+            model: Genre,           //Définir une clé étrangère pour relier movieGenre à Genre.
+            key: "genre_id_genre"   //Définir le champ genre_id_genre comme clé étrangère de movieGenre.
         }
     }
 }, {
@@ -83,7 +88,7 @@ const movieGenre = sequelize.define("movieGenre", {
     timestamps: false
 });
 
-const Director = sequelize.define("director", {
+const Director = sequelize.define("director", { //Définit le modèle Director.
     director_id_director: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -110,7 +115,7 @@ const Director = sequelize.define("director", {
     timestamps: false
 });
 
-const movieDir = sequelize.define("movieDir", {
+const movieDir = sequelize.define("movieDir", { //Définit le modèle movieDir.
     id_movie : {
         type: DataTypes.INTEGER,
         references: {
@@ -130,7 +135,7 @@ const movieDir = sequelize.define("movieDir", {
     timestamps: false
 });
 
-const User = sequelize.define("user", {
+const User = sequelize.define("user", { //Définit le modèle User.
     user_id_user : {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -159,7 +164,7 @@ const User = sequelize.define("user", {
     }
 );
 
-const UserOpinion = sequelize.define("userOpinion", {
+const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle userOpinion.
     id_user : {
         type: DataTypes.INTEGER,
         references : {
@@ -193,7 +198,7 @@ const UserOpinion = sequelize.define("userOpinion", {
     }
 );
 
-//-------------------------------Jointure entre les modèles de BDD : -------------------------------//
+//------------------------------- Jointure entre les modèles de BDD : -------------------------------//
 
 //<model>.belongsToMany(<model_à_joindre>, {
     // through: <model_pivot>, 
@@ -202,15 +207,15 @@ const UserOpinion = sequelize.define("userOpinion", {
     // as: <nom_model_à_joindre>
 // });
 
-//Lié la table Movie avec la table Genre.
+//Création d'une relation plusieurs à plusieurs entre les films et les genres.
 Movie.belongsToMany(Genre, {
-    through: movieGenre, 
-    foreignKey: 'id_movie', 
-    otherKey: "id_genre", 
-    as: "Genres"
+    through: movieGenre,        //Quel modèle/table fait la jonction entre les deux ?
+    foreignKey: 'id_movie',     //Qui est la clé étrangère relié à Movie ?
+    otherKey: "id_genre",       //Qui est la clé étrangère relié à Genre ?
+    as: "Genres"                //Renommer le modèle.
 });
 
-//Lié la table Movie avec la table Director.
+//Création d'une relation plusieurs à plusieurs entre les films et les réalisateurs.
 Movie.belongsToMany(Director, {
     through: movieDir, 
     foreignKey: 'id_movie', 
@@ -218,23 +223,25 @@ Movie.belongsToMany(Director, {
     as: 'Directors'
 });
 
-//Lié la table Movie avec la table User.
+//Création d'une relation plusieurs à plusieurs entre les films et les utilisateurs..
 Movie.belongsToMany(User, {
-    through: UserOpinion,
+    through: UserOpinion,       //Utilisationde du modèle userOpinion pour associer des avis à des films.
     foreignKey: "id_user",
     otherKey: "id_movie",
     as: "Users"
 })
 
+//------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
 
-sequelize.sync({force: false})
-    .then(() => {
+sequelize.sync({force: false})              //Tentative de synchrinisation.
+    .then(() => {                           //Cas de réussite.
         console.log("Synchronisée.");
     })
-    .catch((err) => {
+    .catch((err) => {                       //Cas d'échec.
         console.error("Erreur : ", err);
 });
 
+//Exportation des modèles utilisés dans la BDD :
 module.exports = {
     sequelize,
     Movie,
