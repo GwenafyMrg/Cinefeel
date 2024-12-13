@@ -1,3 +1,5 @@
+/* Section à commenter */
+
 .switchButton {
     font-size: small;
     align-self: self-end;
@@ -44,39 +46,40 @@
     row-gap: 2px;
 }
 
-.infoMovie p {
-    width: 100%;
-    text-indent: 2px;
-}
-
 #movieGenre{grid-area: genre;}
 #movieDir{grid-area: dir;}
 #movieRuntime{grid-area: runtime;}
 #movieReleasedDate{grid-area: date;}
+
+.infoMovie p {
+    width: 100%;
+    text-indent: 2px;
+}
 
 .gridMovies {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
 }
 
-/*Gérer l'animation des cartes: */
+/*--------------------------------- Gestion de l'animation des cartes: ---------------------------------------*/
 
-/* Styles de base */
+/* Conteneur des cartes */
 .card-container {
-    display: grid; /* Utilise Grid pour superposer les cartes */
-    place-items: center; /* Centre les éléments horizontalement et verticalement */
-    perspective: 1000px; /* Nécessaire pour l'effet de rotation 3D */
+    display: grid;          /* Utilise Grid pour superposer les cartes */
+    place-items: center;    /* Centre les éléments horizontalement et verticalement */
+    perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
 }
 
-/* Styles des cartes */
+/* Cartes en elle-même */
 .movieCard {
-    grid-area: 1 / 1; /* Superpose les cartes sur la même cellule */
-    backface-visibility: hidden; /* Cache l'arrière lors du retournement */
+    grid-area: 1 / 1;                       /* Superpose les cartes sur la même cellule */
+    backface-visibility: hidden;            /* Cache l'arrière lors du retournement */
     transition: transform 0.8s ease-in-out;
     display: flex;
     width: 100%;
     height: 450px;
 
+    /* Bordure de carte */
     border: 5px solid white;
     border-radius: 20px;
     outline: 1px solid black;
@@ -91,7 +94,7 @@
     transform: rotateY(180deg); /* Masqué au début */
 }
 
-/* Classe active pour le retournement */
+/* Position après retournement */
 .flipped #SimpleMovieCard {
     transform: rotateY(-180deg);
 }
@@ -99,7 +102,3 @@
 .flipped #DetailedMovieCard {
     transform: rotateY(0deg);
 }
-
-/*Gérer les filtres*/
-
-
