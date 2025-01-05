@@ -1,29 +1,30 @@
 {{!-- Contenu de la page de connexion --}}
 <div class="container-fluid bg-primary w-50 mx-auto my-4 py-2">
 
-    <p class="text-center my-2">Connectez-vous et profitez des avantages d'un vrai CinéFeel.</p>
+    <form action="/login" method="POST" name="loginForm">
+    
+        <p class="text-center my-2">Connectez-vous et profitez des avantages d'un vrai CinéFeel.</p>
 
-    {{!-- Entrer l'email : --}}
-    <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
-        <label for="email">Adresse email :</label>
-        <input id="email" type="email" required>
-    </div>
+        {{!-- Entrer l'email : --}}
+        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+            <label for="email">Adresse email :</label>
+            <input id="email" name="email" type="email" maxlength="40" required>
+        </div>
 
-    {{!-- Entrer le mot de passe : --}}
-    <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
-        <label for="password">Mot de passe :</label>
-        <input id="password" type="password" required>
-    </div>
+        {{!-- Entrer le mot de passe : --}}
+        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+            <label for="password">Mot de passe :</label>
+            <input id="password" name="password" type="password" minlength="4" maxlength="25" required>
+        </div>
 
-    {{!-- Boutons interactifs : --}}
-    <div class="d-flex justify-content-between mx-auto my-4 w-75">
-        <button class="btn btn-block btn-warning mx-3" onclick="window.location.href='./'">Retour</button>
-        <button class="btn btn-block btn-info mx-3">Connexion</button>
-    </div>
+        {{!-- Boutons interactifs : --}}
+        <div class="d-flex justify-content-between mx-auto my-4 w-75">
+            <button class="btn btn-block btn-warning mx-3" onclick="window.location.href='./'">Retour</button>
+            <button class="btn btn-block btn-info mx-3">Connexion</button>
+        </div>
+    </form>
 
-</div>
-
-{{!-- Créer un compte utilisateur > s'il n'y en a pas déjà : --}}
+{{!-- Créer un compte utilisateur, s'il n'y en a pas déjà : --}}
 <div class="container-fluid bg-primary w-50 p-2 text-center">
     <button class="btn btn-block btn-success w-50" onclick="window.location.href='./create-account'">Créer un compte</button>
 </div>

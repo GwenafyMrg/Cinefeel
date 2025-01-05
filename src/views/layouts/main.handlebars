@@ -35,16 +35,23 @@
             {{!-- Section profil --}}
             <div class="d-flex col-2 bg-info d-flex justify-content-between">
                 <details class="d-flex flex-column">
-                    <summary>Profil</summary>
+                    {{#if userData}}
+                        <summary>{{userData.username}}</summary>
+                    {{else}}
+                        <summary>Profil</summary>
+                    {{/if}}
                     <a href="../my-movies" class="border-3">Vos films</a>
                     <a href="../my-favorites" class="border-3">Vos favoris</a>
                     <a href="../my-badges">Vos badges</a>
                     <hr>
-                    {{!-- <a href="../">Profil</a>
-                    <a href="../">Déconnexion</a>
-                    <a href="../parameters.html">Paramètres</a> --}}
-                    <a href="../login">Connexion</a>
-                    <a href="../parameters">Paramètres</a>
+                    {{#if userData}}
+                        <a href="../">Profil</a>
+                        <a href="../logout">Déconnexion</a>
+                        <a href="../parameters">Paramètres</a>
+                    {{else}}
+                        <a href="../login">Connexion</a>
+                        <a href="../parameters">Paramètres</a>
+                    {{/if}}
                 </details>
                 <img src="" alt="Profil_picture" class="border rounded-circle">
             </div> 
