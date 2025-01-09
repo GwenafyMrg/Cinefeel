@@ -24,6 +24,10 @@
             <input id="password" name="password" type="password" minlength="4" maxlength="25" required>
         </div>
         
+        {{#if error}}
+            <p class="text-center text-danger">{{error}}</p>
+        {{/if}}
+        
         {{!-- Boutons interactifs --}}
         <div class="d-flex justify-content-between mx-auto my-4 w-75">
             <button type="button" class="btn btn-block btn-danger mx-3" onclick="window.location.href='./login'">Retour</button>

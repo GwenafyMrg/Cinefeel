@@ -263,16 +263,16 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                 }
             }
             else{//L'email n'est pas dans la liste des utilisateurs : 
-                msgError = "L'email transmis n'est associé à aucun compte utilisateur.";
+                msgError = "L'email transmis n'est associé à aucun compte utilisateur !";
             }
         }
         else{ //Si le mot de passe initial est différent du mot de passe sécurisé :
             //On s'arrête ici car le mot de passe entré par l'utilisateur sera différent et ne pourra pas être correctement comparé.
-            msgError = "Votre mot de passe de connexion semble suspect. Veuillez réessayer";
+            msgError = "Votre mot de passe de connexion semble suspect... Veuillez réessayer.";
         }
     }
     if(msgError){//Une erreur est relevée :
-        res.send(msgError);
+        res.render("login", {error : msgError});
     }
     else{//Succès de la connexion :
         if(req.session.user){
@@ -349,7 +349,7 @@ app.post("/create-account", async (req,res) => {    //Chemin de création de com
 
             //Erreur en cas de nom d'utilisateur suspect.
             if(!safeUsername){
-                msgError = "Impossible de créer un compte.<br>Votre nom d'utilisateur semble suspect.";
+                msgError = "Impossible de créer un compte. Votre nom d'utilisateur semble suspect...";
             }
             else{
                 //Gestion de l'email :
@@ -362,7 +362,7 @@ app.post("/create-account", async (req,res) => {    //Chemin de création de com
                 //Si le mot de passe initial est différent du mot de passe sécurisé
                 if(safePassword != passwordInputCA){
                     //On empêche la création du compte car le mot de passe entré par l'utilisateur sera différent.
-                    msgError = "Impossible de créer votre compte.<br>Votre mot de passe semble suspect.";
+                    msgError = "Impossible de créer votre compte. Votre mot de passe semble suspect...";
                 }
                 else{//Si le mot de passe sécurisé correspond au mot de passe initial.
                     const hashedPw = await bcrypt.hash(safePassword,11);
@@ -390,7 +390,8 @@ app.post("/create-account", async (req,res) => {    //Chemin de création de com
         //Fin de traitement des données.
 
         if(msgError){//Si une erreur est détécté.
-            res.send(msgError);
+            res.render("createAccount", {error : msgError});
+            // res.send(msgError);
         }
         else{//Sinon
             if(req.session.user){
