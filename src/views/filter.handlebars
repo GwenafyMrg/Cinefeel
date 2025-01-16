@@ -9,7 +9,7 @@
         <hr>
         <form name="filterForm" action="/moviesList" method="post">
             <button type="button" class="btn btn-block btn-dark m-1">Filtres</button>
-            <button type="reset" class="btn btn-block btn-light m-1">Supprimer tous les filtres</button>
+            <button id="resetFilters" type="reset" class="btn btn-block btn-light m-1">Supprimer tous les filtres</button>
             <hr>
             <div id="FilterDiv" class="container container-fluid d-flex justify-content-around align-items-center m-2">
                 <!-- Section à faire glisser depuis le coté gauche de la page -->
@@ -26,37 +26,75 @@
                     </select>
                 </div> --}}
 
+                
                 <div id="genreFilter" class="filter">
-                    {{!-- <label for="genreSelect">Genres:</label>
+                    {{!-- ------------------------------------
+                    <label for="genreSelect">Genres:</label>
                     <select name="genreSelect" id="genreSelect">
                         <option value="allGenres" selected>Tous</option>
                         {{#each genres}}
                             <option value="{{normalizeString libelle}}">{{libelle}}</option>   
                         {{/each}}
-                    </select> --}}
-                    <button name="accessGenreOptions" type="button" class="btn btn-block btn-light">Genres</button>
+                    </select>
+                    ---------------------------------- --}}
+
+                    <button name="accessGenreOptions" type="button" class="btn btn-block btn-light">Genres :</button>
                     <div id="genreOptions" class="">
+
+                        <h1>COMMENTER LA SECTION</h1>
+                        {{!-- Commenter --}}
                         {{#each genresList}}
                             <div class="container border border-2 m-1">
                                 <label for="{{normalizeString this.genre_libelle}}Option">{{this.genre_libelle}}</label>
-                                <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]">
+                                {{#if this.selected}}
+                                    <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]" checked>
+                                {{else}}
+                                    <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]">
+                                {{/if}}
                             </div>
                         {{/each}}
                     </div>
                 </div>
+               
 
+                <div id="runtimeFilter" class="filter">
+                    <p>Durée des films :</p>
+                    <label for="runtimeMinScale">Durée minimale : <span id="runtimeMinDisplay">...</span> </label><br>
+                    {{#if currentFilters.minRuntime}}
+                        <input id="runtimeMinScale" name="runtimeMinScale" type="range" min="20" max="300" step="10" value="{{currentFilters.minRuntime}}">
+                    {{else}}
+                        <input id="runtimeMinScale" name="runtimeMinScale" type="range" min="20" max="300" step="10" value="20">
+                    {{/if}}
+                    <br>
 
-                {{!-- <div id="runtimeFilter" class="filter">
-                    <label for="runtimeScale">Durée du film en minutes:</label>
-                    <input id="runtimeScale" type="range" min="0" max="300" step="10">
+                    <label for="runtimeMaxScale">Durée maximale : <span id="runtimeMaxDisplay">...</span> </label><br>
+                    {{#if currentFilters.maxRuntime}}
+                        <input id="runtimeMaxScale" name="runtimeMaxScale" type="range" min="20" max="300" step="10" value="{{currentFilters.maxRuntime}}">
+                    {{else}}
+                        <input id="runtimeMaxScale" name="runtimeMaxScale" type="range" min="20" max="300" step="10" value="300">
+                    {{/if}}
                 </div>
-            
+
                 <div id="releasedDateFilter" class="filter">
-                    <label for="releasedDateScale">Date de sortie du film:</label>
-                    <input id="releasedDateScale" type="range" min="1950" max="2024" step="1">
+                    <p>Années de sortie :</p>
+                    <label for="dateMinScale">Sorti après : <span id="dateMinDisplay">...</span> </label><br>
+                    {{#if currentFilters.minReleasedDate}}
+                        <input id="dateMinScale" name="dateMinScale" type="range" min="1950" max="2024" step="1" value="{{currentFilters.minReleasedDate}}">
+                    {{else}}
+                        <input id="dateMinScale" name="dateMinScale" type="range" min="1950" max="2024" step="1" value="1950">
+                    {{/if}}
+                    <br>
+
+                    <label for="dateMaxScale">Sorti avant : <span id="dateMaxDisplay">...</span> </label><br>
+                    {{#if currentFilters.maxReleasedDate}}
+                        <input id="dateMaxScale" name="dateMaxScale" type="range" min="1951" max="2025" step="1" value="{{currentFilters.maxReleasedDate}}">
+                    {{else}}
+                        <input id="dateMaxScale" name="dateMaxScale" type="range" min="1951" max="2025" step="1" value="2025">
+                    {{/if}}
                 </div>
+
             
-                <div id="noteFilter" class="filter">
+                {{!-- <div id="noteFilter" class="filter">
                     <label for="AvgNoteScale">Note globale du film:</label>
                     <input id="AvgNoteScale" type="range" min="0" max="10" step="0.5">
                 </div> --}}
@@ -67,8 +105,8 @@
         </form>
     </div>
 
-    <div id="FilterMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
-        {{#each FilteredMovies}}
+    <div id="filterMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+        {{#each filteredMovies}}
             {{> movieDisplay}}
         {{/each}}
     </div>

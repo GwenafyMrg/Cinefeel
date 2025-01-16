@@ -39,6 +39,7 @@ app.engine('handlebars', engine({       //Définition des paramètres de l'appli
         convertRuntime: funct.convertRuntime,
         convertDateFormat: funct.convertDateFormat,
         normalizeString: funct.normalizeString,
+        arrayContains : funct.arrayContains,
     }
 }));
 
@@ -91,48 +92,151 @@ app.get("/", async (req, res) => {              //Chemin d'origine
 app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films obtenu par requête GET. 
 
     const genresList = await Genre.findAll();   //Récupérer tous les genres sans filtrage;
+    genresList.forEach(genre => {
+        if("selected" in genre){
+            genre.selected = false;
+        }
+    });
+
     if(req.session.user){
-        res.render("filter", {userData : req.session.user, genresList : genresList});
+        res.render("filter", {
+            userData : req.session.user, 
+            genresList : genresList,
+            currentFilters : null,
+        });
     }
     else{
-        res.render("filter", { genresList : genresList});
+        res.render("filter", { 
+            genresList : genresList,
+            currentFilters : null,
+        });
     }
 });
 
 app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films obtenu par requête POST.
 
-    const selectedGenres = req.body.genres;         //Dictionnaire {name, value}
-    selectedValues = Object.keys(selectedGenres);   //Récupération des clés (name) uniquement
-    // console.log(selectedValues);
+    try {
+        const selectedGenres = req.body.genres;         // Récupération des genres sélectionnés
+        const minRuntime = req.body.runtimeMinScale;    // Récupération de la Durée minimale 
+        const maxRuntime = req.body.runtimeMaxScale;    // Récupération de la Durée maximale
+        const minYear = req.body.dateMinScale;          // Récupération de la Date de sortie minimale
+        const maxYear = req.body.dateMaxScale;          // Récupération de la Date de sortie maximale
+        // console.log(selectedGenres);
+        // console.log(minRuntime);
+        // console.log(maxDate);
 
-    const queryFilter = await Movie.findAll({       //Récupérer tous les genres 
+        // Construire dynamiquement la clause WHERE
+        const whereClause = {};
+        const savedFilters = {};
 
-        where : {                                                   //Où
-            '$Genres.genre_libelle$': { [Op.in]: selectedValues }   //Le genre est inclus dans le dico contenu dans selectedValues
-        },
-        include : [{
-            model: Genre,
-            as : "Genres",
-            attributes: ["genre_libelle"],
-            through : { attributes : []}
-        },
-        {
-            model: Director,
-            as: "Directors",
-            attributes: ["director_lastname","director_firstname"],
-            through: { attributes: []}
+        // Ajouter le filtre par genres si sélectionné
+        //----------------------------------
+        //Résultat attendu incorrecte (n'affiche pas tous les genres originaux)
+        //----------------------------------
+        if (selectedGenres) {
+            const selectedValues = Object.keys(selectedGenres); // Récupération des clés (noms des genres) uniquement
+            whereClause["$Genres.genre_libelle$"] = { [Op.in]: selectedValues };
+            
+            //Add savedFilters !!!
+            savedFilters.genreArray = selectedValues;
         }
-        ]
-    });
-    // console.log(queryFilter);
+        //----------------------------------
+        //----------------------------------
 
-    if(req.session.user){
-        res.render("filter", {userData : req.session.user, genresList : await Genre.findAll(), FilteredMovies : queryFilter});
+        // Ajouter le filtre par durée si spécifié:
+        if (minRuntime || maxRuntime) {
+
+            //Vérifie si des clauses AND existe déjà, sinon initialise un tableau.
+            if(!whereClause[Op.and]){
+                whereClause[Op.and] = [];
+            }
+            //Ajoute les conditions sur la durée du film : minRuntime <= movie_runtime <= maxRuntime
+            if (minRuntime) {
+                whereClause[Op.and].push({ movie_runtime: { [Op.gte]: minRuntime } });
+                savedFilters.minRuntime = minRuntime;
+            }
+            if (maxRuntime) {
+                whereClause[Op.and].push({ movie_runtime: { [Op.lte]: maxRuntime } });
+                savedFilters.maxRuntime = maxRuntime;
+            }
+        }
+
+        //Ajouter le filtre par date de sortie si spécifié:
+        if(minYear || maxYear){
+
+            //Vérifie si des clauses AND existe déjà, sinon initialise un tableau.
+            if(!whereClause[Op.and]){
+                whereClause[Op.and] = [];
+            }
+            //Ajout des filtres sur la date de sortie du film : fullMinDate <= movie_release_date <= fullMaxDate
+            if(minYear){
+                const fullMinDate = minYear + "-01-01"; //Reconstition d'une date minimale complète pour préciser la requête.
+                whereClause[Op.and].push({movie_released_date : {[Op.gte]: fullMinDate} });
+                savedFilters.minReleasedDate = minYear;
+            }
+            if(maxYear){
+                const fullMaxDate = maxYear + "-12-31"; //Reconstition d'une date maximale complète pour préciser la requête.
+                whereClause[Op.and].push({movie_released_date : {[Op.lte]: fullMaxDate} });
+                savedFilters.maxReleasedDate = maxYear;
+            }
+        }
+
+        // console.log(whereClause);
+        console.log(savedFilters);
+
+        // Effectuer la requête avec les clauses dynamiques
+        const queryFilter = await Movie.findAll({
+            where: whereClause,
+            include: [
+                {
+                    model: Genre,
+                    as: "Genres",
+                    attributes: ["genre_libelle"],
+                    through: { attributes: [] },
+                },
+                {
+                    model: Director,
+                    as: "Directors",
+                    attributes: ["director_lastname", "director_firstname"],
+                    through: { attributes: [] },
+                },
+            ],
+        });
+
+        // console.log(queryFilter);
+
+        // Rendu de la vue avec les résultats
+        const genresList = await Genre.findAll(); // Liste des genres pour le formulaire
+
+        // Marquer les genres sélectionnés dans genresList
+        genresList.forEach(genre => {
+            // Vérifie si ce genre est dans les genres sélectionnés
+            genre.selected = savedFilters.genreArray && savedFilters.genreArray.includes(genre.genre_libelle);
+        });
+        // console.log(genresList);
+
+        if (req.session.user) {
+            // res.render("filter", {userData : req.session.user, filteredMovies : queryFilter});
+            res.render("filter", {
+                userData: req.session.user, 
+                genresList,
+                filteredMovies: queryFilter,
+                currentFilters : savedFilters,
+            });
+        } else {
+            // res.render("filter", {filteredMovies : queryFilter});
+            res.render("filter", {
+                genresList, 
+                filteredMovies: queryFilter,
+                currentFilters : savedFilters,
+            });
+        }
+
+    } catch (error) {
+        console.error("Erreur lors du filtrage :", error);
+        res.status(500).send("Une erreur est survenue lors du filtrage des films.");
     }
-    else{
-        res.render("filter", {genresList : await Genre.findAll(), FilteredMovies : queryFilter});
-    }
-})
+});
 
 app.get("/search", (req,res) => {           //Chemin de recherche des films par requête GET.
     
