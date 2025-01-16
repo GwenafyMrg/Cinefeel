@@ -39,7 +39,6 @@ app.engine('handlebars', engine({       //Définition des paramètres de l'appli
         convertRuntime: funct.convertRuntime,
         convertDateFormat: funct.convertDateFormat,
         normalizeString: funct.normalizeString,
-        arrayContains : funct.arrayContains,
     }
 }));
 
@@ -89,27 +88,35 @@ app.get("/", async (req, res) => {              //Chemin d'origine
     }
 });
 
+//Route pour la recherche de film par filtre (+ réinitialisation)
 app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films obtenu par requête GET. 
 
-    const genresList = await Genre.findAll();   //Récupérer tous les genres sans filtrage;
-    genresList.forEach(genre => {
-        if("selected" in genre){
-            genre.selected = false;
-        }
-    });
+    try{
+        const genresList = await Genre.findAll();   //Récupérer tous les genres sans filtrage.
+        //Réinitialiser le filtre des genres :
+        genresList.forEach(genre => {               //Pour chaque genre :
+            if("selected" in genre){                //Si l'attribut "selected" existe dans les données de "genre".
+                genre.selected = false;
+            }
+        });
 
-    if(req.session.user){
-        res.render("filter", {
-            userData : req.session.user, 
-            genresList : genresList,
-            currentFilters : null,
-        });
+        if(req.session.user){
+            res.render("filter", {
+                userData : req.session.user, 
+                genresList : genresList,
+                currentFilters : null,
+            });
+        }
+        else{
+            res.render("filter", { 
+                genresList : genresList,
+                currentFilters : null,
+            });
+        }
     }
-    else{
-        res.render("filter", { 
-            genresList : genresList,
-            currentFilters : null,
-        });
+    catch(err){
+        console.log("Erreur de redirection.");
+        res.send("Erreur de redirection.");
     }
 });
 
@@ -305,15 +312,17 @@ app.get("/login", (req, res) => {   //Chemin de connexion initial (GET).
 
 app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
 
-    const emailInputLog = req.body.email;
-    const passwordInputLog = req.body.password;
-    let msgError = "";                  //Définition d'un message d'erreur potentiel.
+    const emailInputLog = req.body.email;       //Récupération de l'email transmis
+    const passwordInputLog = req.body.password; //Récupération du mot de passe transmis
+    let msgError = "";                          //Initialisation d'un message d'erreur potentiel.
 
-    //Sécuriser les entrées utilisateurs.
-    if(emailInputLog.length > 40 || passwordInputLog.length > 25){ //Gestion de la taille des entrées.
+    //-------------------------------Sécuriser les entrées utilisateurs---------------------------------
+    //Gestion de la taille des entrées.
+    if(emailInputLog.length > 40 || passwordInputLog.length > 25){
         msgError = "La taille des champs n'a pas été respectée !";
     }
-    else{ //Début de traitement des données.
+    //Début de traitement des données.
+    else{
 
         //Gestion de l'email :
         const safeEmail = emailInputLog.trim(); //L'input de type "email" se charge déjà de la bonne syntaxe.
@@ -388,6 +397,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
     }
 });
 
+//Route de deconnection de compte :
 app.get("/logout", (req, res) => {
 
     try {
@@ -402,7 +412,8 @@ app.get("/logout", (req, res) => {
     res.redirect("/");  //Redirige vers l'URL de l'accueil.
 });
 
-app.get("/create-account", (req, res) => {  //Chemin de création de compte.
+//Chemin de création de compte :
+app.get("/create-account", (req, res) => {
     if(req.session.user){
         res.render("createAccount", {userData : req.session.user});
     }
@@ -411,7 +422,8 @@ app.get("/create-account", (req, res) => {  //Chemin de création de compte.
     }
 });
 
-app.post("/create-account", async (req,res) => {    //Chemin de création de compte par POST.
+//Chemin de création de compte par POST :
+app.post("/create-account", async (req,res) => { 
 
     //Récupérer les adresses emails existantes.
     const existingEmail = await User.findAll({

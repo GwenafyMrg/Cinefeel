@@ -34,14 +34,6 @@ function normalizeString(text){
     return normalized;
 }
 
-function arrayContains(array, value){
-    let rep = false;
-    if(array){
-        rep = array.includes(value);
-    }
-    return rep;
-}
-
 function cleanPassword(pw){
     
     let safePassword = pw;
@@ -59,5 +51,4 @@ module.exports = {
     convertRuntime,
     normalizeString,
     cleanPassword,
-    arrayContains,
 };

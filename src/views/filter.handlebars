@@ -26,74 +26,80 @@
                     </select>
                 </div> --}}
 
-                
+                {{!-- Affichage des genres : --}}
                 <div id="genreFilter" class="filter">
-                    {{!-- ------------------------------------
-                    <label for="genreSelect">Genres:</label>
-                    <select name="genreSelect" id="genreSelect">
-                        <option value="allGenres" selected>Tous</option>
-                        {{#each genres}}
-                            <option value="{{normalizeString libelle}}">{{libelle}}</option>   
-                        {{/each}}
-                    </select>
-                    ---------------------------------- --}}
-
                     <button name="accessGenreOptions" type="button" class="btn btn-block btn-light">Genres :</button>
-                    <div id="genreOptions" class="">
 
-                        <h1>COMMENTER LA SECTION</h1>
-                        {{!-- Commenter --}}
-                        {{#each genresList}}
+                    <div id="genreOptions" class="">
+                        {{!-- Pour chaque élément/genre dans genresList --}}
+                        {{#each genresList}} 
                             <div class="container border border-2 m-1">
+                                {{!-- Création du label du genre de manière dynamique (normalisation des identifiants) --}}
                                 <label for="{{normalizeString this.genre_libelle}}Option">{{this.genre_libelle}}</label>
+                                {{!-- Si le genre est séléctionné --}}
                                 {{#if this.selected}}
+                                    {{!-- coché le bouton  --}}
                                     <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]" checked>
                                 {{else}}
+                                    {{!-- décoché le bouton --}}
                                     <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]">
                                 {{/if}}
                             </div>
+                            {{!-- Fin de la boucle --}}
                         {{/each}}
                     </div>
                 </div>
                
-
+                {{!-- Affichage des durées : --}}
                 <div id="runtimeFilter" class="filter">
                     <p>Durée des films :</p>
+                    {{!-- Gestion de la durée minimale --}}
                     <label for="runtimeMinScale">Durée minimale : <span id="runtimeMinDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré  --}}
                     {{#if currentFilters.minRuntime}}
                         <input id="runtimeMinScale" name="runtimeMinScale" type="range" min="20" max="300" step="10" value="{{currentFilters.minRuntime}}">
                     {{else}}
+                        {{!-- Sinon --}}
                         <input id="runtimeMinScale" name="runtimeMinScale" type="range" min="20" max="300" step="10" value="20">
                     {{/if}}
                     <br>
 
+                    {{!-- Gestion de la durée maximale --}}
                     <label for="runtimeMaxScale">Durée maximale : <span id="runtimeMaxDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré  --}}
                     {{#if currentFilters.maxRuntime}}
                         <input id="runtimeMaxScale" name="runtimeMaxScale" type="range" min="20" max="300" step="10" value="{{currentFilters.maxRuntime}}">
+                    {{!-- Sinon --}}
                     {{else}}
                         <input id="runtimeMaxScale" name="runtimeMaxScale" type="range" min="20" max="300" step="10" value="300">
                     {{/if}}
                 </div>
 
+                {{!-- Affichage des dates de sortie : --}}
                 <div id="releasedDateFilter" class="filter">
                     <p>Années de sortie :</p>
                     <label for="dateMinScale">Sorti après : <span id="dateMinDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré pour la date de sortie minimale --}}
                     {{#if currentFilters.minReleasedDate}}
                         <input id="dateMinScale" name="dateMinScale" type="range" min="1950" max="2024" step="1" value="{{currentFilters.minReleasedDate}}">
+                    {{!-- Sinon --}}
                     {{else}}
                         <input id="dateMinScale" name="dateMinScale" type="range" min="1950" max="2024" step="1" value="1950">
                     {{/if}}
                     <br>
 
                     <label for="dateMaxScale">Sorti avant : <span id="dateMaxDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré pour la date de sortie maximale --}}
                     {{#if currentFilters.maxReleasedDate}}
                         <input id="dateMaxScale" name="dateMaxScale" type="range" min="1951" max="2025" step="1" value="{{currentFilters.maxReleasedDate}}">
+                    {{!-- Sinon --}}
                     {{else}}
                         <input id="dateMaxScale" name="dateMaxScale" type="range" min="1951" max="2025" step="1" value="2025">
                     {{/if}}
                 </div>
 
-            
+                {{!-- Affichage du filtre des notes : --}}
+
                 {{!-- <div id="noteFilter" class="filter">
                     <label for="AvgNoteScale">Note globale du film:</label>
                     <input id="AvgNoteScale" type="range" min="0" max="10" step="0.5">
@@ -106,7 +112,9 @@
     </div>
 
     <div id="filterMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+        {{!-- Pour chaque filtre obtenu suite à la recherche par filtre : --}}
         {{#each filteredMovies}}
+            {{!-- Générer le partial --}}
             {{> movieDisplay}}
         {{/each}}
     </div>

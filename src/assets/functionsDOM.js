@@ -39,34 +39,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-//------------------------------------Page des filtres :-----------------------------------------
+//------------------------------Concernant la page des filtres :-----------------------------------
 
-//Gérer l'affichage de la valeur maximale indiquée par la jauge de durée :
+//Au chargement de la page :
 document.addEventListener("DOMContentLoaded", function () {
 
-    //----------------------Durée du film à filtrer :-------------------------
+    //----------------------Redirection lors de la suppression des filtres :-------------------------
+    document.getElementById("resetFilters").addEventListener("click", () => {
+        window.location.href = "/moviesList";
+    });
+
+    //----------------------Gestion de l'affichage pour la durée du film :-------------------------
     
     //Balises de durée Min :
-    const runtimeMinScale = document.getElementById("runtimeMinScale");
-    const runtimeMinDisplay = document.getElementById("runtimeMinDisplay");
-
+    const runtimeMinScale = document.getElementById("runtimeMinScale");     //Récupération de l'objet de valeur
+    const runtimeMinDisplay = document.getElementById("runtimeMinDisplay"); //Récupération de l'objet d'affichage
     //Balises de durée Max :
     const runtimeMaxScale = document.getElementById("runtimeMaxScale");
     const runtimeMaxDisplay = document.getElementById("runtimeMaxDisplay");
 
-    //Utilisation de l'event "click" et non "input" pour ne pas surcharger les actions de recherche.
-    //"input" --> pour chaque changement de valeur.
-    //Gestion de l'affichage des valeurs pour le curseur runtimeMin :
-    runtimeMinDisplay.textContent = convertRuntime(runtimeMinScale.value);
-    runtimeMinScale.addEventListener("input", function() {
+    //---------------
+    //Utilisation de l'event "input" et non "click" pour ne pas surcharger les actions de recherche.
+    //"input" --> agit pour chaque changement de valeur.
+    //---------------
 
-        let runtimeMinValue = runtimeMinScale.value;
-        runtimeMinDisplay.textContent = convertRuntime(runtimeMinValue);
+    //Gestion pour la durée minimale :
+    runtimeMinDisplay.textContent = convertRuntime(runtimeMinScale.value);  //Initialisation de l'affichage.
+    runtimeMinScale.addEventListener("input", function() {                  //Pour chaque changement.
+        let runtimeMinValue = runtimeMinScale.value;                        //Récupération de la valeur actuelle
+        runtimeMinDisplay.textContent = convertRuntime(runtimeMinValue);    //Actualisation de l'affchage
     });
-    //Gestion de l'affichage des valeurs pour le curseur runtimeMax :
+
+    //Gestion pour la durée maximale.
     runtimeMaxDisplay.textContent = convertRuntime(runtimeMaxScale.value);
     runtimeMaxScale.addEventListener("input", function() {
-
         let runtimeMaxValue = runtimeMaxScale.value;
         runtimeMaxDisplay.textContent = convertRuntime(runtimeMaxValue);
     });
@@ -75,27 +81,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //Balise de date de sortie Min:
     dateMinScale = document.getElementById("dateMinScale");
-    dateMinDisplay = document.getElementById("dateMinDisplay")
-
+    dateMinDisplay = document.getElementById("dateMinDisplay");
     //Balise de date de sortie Max:
     dateMaxScale = document.getElementById("dateMaxScale");
-    dateMaxDisplay = document.getElementById("dateMaxDisplay")
+    dateMaxDisplay = document.getElementById("dateMaxDisplay");
 
-    //Gestion de l'affichage des valeurs pour le curseur dateMin :
+    //Gestion pour la date de sortie minimale :
     dateMinDisplay.textContent = dateMinScale.value;
     dateMinScale.addEventListener("input", function() {
         dateMinValue = dateMinScale.value;
         dateMinDisplay.textContent = dateMinValue;
     });
-    //Gestion de l'affichage des valeurs pour le curseur dateMax :
+    //Gestion pour la date de sortie maximale :
     dateMaxDisplay.textContent = dateMaxScale.value;
     dateMaxScale.addEventListener("input", function() {
         dateMaxValue = dateMaxScale.value;
         dateMaxDisplay.textContent = dateMaxValue;
-    });
-
-    document.getElementById("resetFilters").addEventListener("click", () => {
-        window.location.href = "/moviesList";
-    });
-      
+    });   
 });
