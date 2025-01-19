@@ -65,16 +65,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //Gestion pour la durée minimale :
     runtimeMinDisplay.textContent = convertRuntime(runtimeMinScale.value);  //Initialisation de l'affichage.
-    runtimeMinScale.addEventListener("input", function() {                  //Pour chaque changement.
-        let runtimeMinValue = runtimeMinScale.value;                        //Récupération de la valeur actuelle
-        runtimeMinDisplay.textContent = convertRuntime(runtimeMinValue);    //Actualisation de l'affchage
+    runtimeMinScale.addEventListener("input", function() {                  //Pour chaque changement.                //Récupération de la valeur actuelle
+        runtimeMinDisplay.textContent = convertRuntime(runtimeMinScale.value);    //Actualisation de l'affchage
     });
 
     //Gestion pour la durée maximale.
     runtimeMaxDisplay.textContent = convertRuntime(runtimeMaxScale.value);
     runtimeMaxScale.addEventListener("input", function() {
-        let runtimeMaxValue = runtimeMaxScale.value;
-        runtimeMaxDisplay.textContent = convertRuntime(runtimeMaxValue);
+        runtimeMaxDisplay.textContent = convertRuntime(runtimeMaxScale.value);
     });
 
     //----------------------Année de sortie du film à filtrer :-------------------------
@@ -89,13 +87,24 @@ document.addEventListener("DOMContentLoaded", function () {
     //Gestion pour la date de sortie minimale :
     dateMinDisplay.textContent = dateMinScale.value;
     dateMinScale.addEventListener("input", function() {
-        dateMinValue = dateMinScale.value;
-        dateMinDisplay.textContent = dateMinValue;
+        dateMinDisplay.textContent = dateMinScale.value;
     });
     //Gestion pour la date de sortie maximale :
     dateMaxDisplay.textContent = dateMaxScale.value;
     dateMaxScale.addEventListener("input", function() {
-        dateMaxValue = dateMaxScale.value;
-        dateMaxDisplay.textContent = dateMaxValue;
+        dateMaxDisplay.textContent = dateMaxScale.value;
     });   
+});
+
+//------------------------------Concernant la page des avis :-----------------------------------
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const noteDisplay = document.getElementById("noteDisplay");
+    const noteInput = document.getElementById("noteInput");
+    noteDisplay.textContent = noteInput.value;
+
+    noteInput.addEventListener("input", function() {
+        noteDisplay.textContent = noteInput.value;
+    });
 });

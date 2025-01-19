@@ -29,7 +29,7 @@ const Movie = sequelize.define("movie", {   //Définit le modèle Movie
         autoIncrement : true        //Est-il auto-incrémenté ?
     },
     movie_title: {                  
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING,     //STRING limite la taille par défaut à 255.
         allowNull: false            //Peut-il être de type null ?
     },
     movie_poster_url: {
@@ -164,39 +164,123 @@ const User = sequelize.define("user", { //Définit le modèle User.
     }
 );
 
-const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle userOpinion.
-    id_user : {
+const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle UserOpinion.
+    opinion_id_user : {
         type: DataTypes.INTEGER,
         references : {
             model: "user",
             key: "user_id_user"
         }
     },
-    id_movie : {
+    opinion_id_movie : {
         type: DataTypes.INTEGER,
         references : {
             model : "movie",
             key : "movie_id_movie"
         }
     },
-    note : {
+    opinion_note : {
         type: DataTypes.DOUBLE,
         allowNull: false
     },
-    comment : {
-        type: DataTypes.STRING,
+    opinion_comment : {
+        type: DataTypes.STRING(500),       
         allowNull: true
     },
-    fav : {
+    opinion_fav : {
         type: DataTypes.BOOLEAN,
         allowNull: true,
         defaultValue: 0
     }},
     {
         tableName: "userOpinion",
-        timestamps: true
+        timestamps: false
     }
 );
+
+const Vote = sequelize.define("vote", {     //Définit le modèle Vote
+    id_user : {
+        type : DataTypes.INTEGER,
+        references : {
+            model: "user",
+            key: "user_id_user"
+        }
+    },
+    id_movie : {
+        type : DataTypes.INTEGER,
+        references : {
+            model : "movie",
+            key : "movie_id_movie"
+        }
+    },
+    id_emotion : {
+        type : DataTypes.INTEGER,
+        references : {
+            model : "emotion",
+            key: "emotion_id_emotion"
+        }
+    }},
+    {
+        tableName: "vote",
+        timestamps : false
+});
+
+const Emotion = sequelize.define("emotion", {   //Définit le modèle Emotion
+    emotion_id_emotion : {
+        type : DataTypes.INTEGER,
+        primaryKey : true,
+        autoIncrement: true
+    },
+    emotion_name : {
+        type : DataTypes.STRING,
+        allowNull : false
+    }}, {
+        tableName : "emotion",
+        timestamps : false
+});
+
+const UserBadge = sequelize.define("userBadge", {   //Définit le modèle userBadge
+    id_user : {
+        type: DataTypes.INTEGER,
+        references: {
+            model: "user",
+            key: "user_id_user"
+        }
+    },
+    id_badge : {
+        type: DataTypes.INTEGER,
+        references : {
+            model: "badge",
+            key: "badge_id_badge"
+        }
+    }},
+    {
+        tableName: "userBadge",
+        timestamps: false           //Voir basculer à true pour plus d'info sur l'obtention des badges.
+});
+
+const Badge = sequelize.define("badge", {   //Définit le modèle Badge
+    badge_id_badge : {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    badge_distinction : {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    badge_url : {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    badge_serial_nb : {
+        type: DataTypes.TINYINT,
+        allowNull: true
+    }},
+    {
+        tableName: "badge",
+        timestamps: false
+});
 
 //------------------------------- Jointure entre les modèles de BDD : -------------------------------//
 
@@ -207,6 +291,22 @@ const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle us
     // as: <nom_model_à_joindre>
 // });
 
+//Création d'une relation plusieurs à plusieurs entre les films et les réalisateurs.
+Movie.belongsToMany(Director, {
+    through: movieDir,          //Quel modèle/table fait la jonction entre les deux ?
+    foreignKey: 'id_movie',     //Qui est la clé étrangère relié à Movie ?
+    otherKey: 'id_director',    //Qui est la clé étrangère relié à Genre ?
+    as: 'Directors'             //Renommer le modèle.
+});
+
+//Création d'une relation plusieurs à plusieurs entre les films et les utilisateurs.
+Movie.belongsToMany(User, {
+    through: UserOpinion,       //Utilisation du modèle userOpinion pour associer des avis à des films.
+    foreignKey: "opinion_id_user",
+    otherKey: "opinion_id_movie",
+    as: "Users"
+});
+
 //Création d'une relation plusieurs à plusieurs entre les films et les genres.
 Movie.belongsToMany(Genre, {
     through: movieGenre,        //Quel modèle/table fait la jonction entre les deux ?
@@ -215,21 +315,29 @@ Movie.belongsToMany(Genre, {
     as: "Genres"                //Renommer le modèle.
 });
 
-//Création d'une relation plusieurs à plusieurs entre les films et les réalisateurs.
-Movie.belongsToMany(Director, {
-    through: movieDir, 
-    foreignKey: 'id_movie', 
-    otherKey: 'id_director',
-    as: 'Directors'
+//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les émotions.
+User.belongsToMany(Emotion, {
+    through: Vote,               //Utilisation du modèle Vote pour relier un vote utilisateur et une émotion.
+    foreignKey: "id_user",
+    otherKey: "id_emotion",
+    as: "Emotions"
 });
 
-//Création d'une relation plusieurs à plusieurs entre les films et les utilisateurs..
-Movie.belongsToMany(User, {
-    through: UserOpinion,       //Utilisationde du modèle userOpinion pour associer des avis à des films.
+//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les films.
+User.belongsToMany(Movie, {
+    through: UserOpinion,        //Utilisation du modèle userOpinion pour associer des avis à des films.
+    foreignKey: "opinion_id_user",
+    otherKey: "opinion_id_movie",
+    as: "Movies"
+});
+
+//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les films.
+User.belongsToMany(Badge, {
+    through: UserBadge,
     foreignKey: "id_user",
-    otherKey: "id_movie",
-    as: "Users"
-})
+    otherKey: "id_badge",
+    as: "Badges"
+});
 
 //------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
 
@@ -248,4 +356,7 @@ module.exports = {
     Genre,
     Director,
     User,
+    UserOpinion,
+    Emotion,
+    Badge,
 };

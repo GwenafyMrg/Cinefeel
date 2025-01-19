@@ -3,6 +3,7 @@
 //Modules généraux
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
+const Handlebars = require('handlebars');
 const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
@@ -13,7 +14,7 @@ const sanitizeHtml = require('sanitize-html');              //Protéger contre l
 const bcrypt = require('bcrypt');                           //Hacher les mots de passe  
 
 //Import de module locaux.
-const {Movie, Director, Genre, User} = require('./models'); //Importation des modèles de BDD
+const {Movie, Director, Genre, User, UserOpinion, Emotion} = require('./models'); //Importation des modèles de BDD
 const funct = require('./assets/functions');                //Importer les fonctions personnelles
 
 //-----------------------------------Définition de l'application Web :-------------------------------//
@@ -41,6 +42,16 @@ app.engine('handlebars', engine({       //Définition des paramètres de l'appli
         normalizeString: funct.normalizeString,
     }
 }));
+
+//>>>>EXPLICATION NECESSAIRE :
+Handlebars.registerHelper("ifnot", function(value, options){
+    if(!value){
+        return options.fn(this);
+    }
+    else{
+        return options.inverse(this);
+    }
+});
 
 app.set("view engine", "handlebars");                       //Définir les extensions de fichier à rechercher lors d'un rendu
 app.set("views", "./views");                                //Configuration du répertoire des templates.
@@ -362,6 +373,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                         const authenticateUser = users[i];
                         //Création de la session utilisateur.
                         req.session.user = {
+                            id: authenticateUser.user_id_user,
                             username: authenticateUser.user_username,
                             email: authenticateUser.user_email,
                             admin: authenticateUser.user_admin,
@@ -521,6 +533,114 @@ app.post("/create-account", async (req,res) => {
     catch {
         console.log("Une erreur est survenue lors de la récupération de vos informations.");
         res.status(422).send("Une erreur est survenue lors de la récupération de vos informations.");
+    }
+});
+
+app.get("/shareReview", async (req,res) => {
+
+    const movieID = req.query.movie;
+    console.log(movieID);
+
+    if(movieID){
+        try{
+            const movieQuery = await Movie.findAll({
+                where : {
+                    movie_id_movie : {[Op.eq] : movieID}
+                },
+                include: [
+                    {
+                        model: Genre,
+                        as: "Genres",
+                        attributes: ["genre_libelle"],
+                        through: { attributes: []}
+                    },
+                    {
+                        model: Director,
+                        as: "Directors",
+                        attributes : ["director_lastname","director_firstname"],
+                        through: { attributes : []}
+                    }
+                ]
+            });
+            //Voir pour passer au raw: true ou le noter dans le CR.
+            // console.log(movieQuery);
+    
+            const emotionQuery = await Emotion.findAll();
+            // console.log(emotionQuery);
+    
+            if(req.session.user){
+                res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery});
+            }
+            else{
+                res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery});
+            }
+        }
+        catch(err){
+            console.log("Impossible d'accéder au film que vous souhaitez.");
+            res.status(500).send("Impossible d'accéder au film que vous souhaitez.");
+        }
+    }
+    else{
+        console.log("Chemin d'accès anormal.");
+        res.status(404).send("Le chemin d'accès utilisé est incorrecte...");
+    }
+});
+
+app.post("/shareReview", async(req,res) => {
+
+    try{
+        //TAF >>>>>VERIFIER LA RECUPERATION
+        const noteReview = parseInt(req.body.note,10);
+        let favReview = req.body.fav;
+        let commentReview = req.body.comment;
+        // console.log(noteReview);
+
+        //Traitement de la valeur de favReview pour correspondre avec le modèle de la BDD.
+        favReview = favReview ? true : false;
+        // console.log(favReview);
+
+        //Traitement du commentaire :
+        if(commentReview == ""){
+            commentReview = null;
+        }
+        else{
+            commentReview = commentReview.trim();           //Supprimer les espaces de trop.
+            commentReview = sanitizeHtml(commentReview, {   //Limiter les balises HTML :
+                allowedTags: ['b','i','em','strong', 'br'], //Balises autorisées.
+                allowedAttributes: []                       //Attributs de balises autorisés.
+            });
+        }
+        // console.log(commentReview);
+
+        try{
+            const userID = parseInt(req.session.user.id,10);
+            // console.log("id user:", userID);
+            const movieID = parseInt(req.body.movie, 10);
+            // console.log("id movie :", movieID);
+
+            await UserOpinion.create(
+                {
+                    opinion_id_user : userID,
+                    opinion_id_movie : movieID,
+                    opinion_note : noteReview,
+                    opinion_fav : favReview,
+                    opinion_comment : commentReview,
+                }
+            );
+            console.log("Avis de l'utilisateur", userID, "enregistré pour le film", movieID);
+            //------------------------
+            //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
+            //------------------------
+            res.render("home", {userData : req.session.user, movies : query})
+        }
+        catch(err){
+            console.error("Erreur lors de l'enregistrement de l'avis :", err);
+            res.status(500).send("Erreur lors de l'enregistrement de l'avis.");
+        }
+    }
+    catch(err){
+        console.log("Erreur lors de la récupération des informations de votre avis.", err);
+        res.status(500).send("Erreur lors de la récupération des informations de votre avis.");
     }
 });
 

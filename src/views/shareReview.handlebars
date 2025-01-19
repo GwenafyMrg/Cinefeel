@@ -1,0 +1,56 @@
+<div class="container-fluid d-flex">
+    <div class="w-25">
+        {{#each movie}}
+            {{> movieDisplay}}
+        {{/each}}
+    </div>
+    <div class="w-75 d-flex flex-column my-1">
+        <p>Écrivez votre commentaire ici :</p>
+        <form name="reviewForm" action="/shareReview" method="post" class="card d-flex flex-column align-self-center justify-content-evenly w-75 p-2">
+
+            <input type="hidden" name="movie" value="{{movie.[0].movie_id_movie}}">
+
+            {{#ifnot userData}}
+                <p class="text-danger text-center">Créer un compte utilisateur afin de partager votre avis avec la communauté.</p>
+            {{/ifnot}}
+
+            <div class="d-flex justify-content-between m-3">
+                <div>
+                    <button type="reset">Effacer</button>
+                </div>
+                <div>
+                    <label for="noteInput">Note : <span id="noteDisplay"></span> /10</label>
+                    <input id="noteInput" name="note" type="range" min="0" max="10" value="0">
+
+                    <label for="favInput">Favori :</label>
+                    <input id="favInput" name="fav" type="checkbox">
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap">
+                {{#each emotionsList}}
+                    <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
+                        <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
+                        <input id="{{normalizeString this.emotion_name}}Option" type="checkbox">
+                    </div>
+                {{/each}}
+            </div>
+
+            <div class="m-3">
+                <label for="commentInput">Ajouter un commentaire à la suite de votre visionnage :</label><br>
+                <textarea id="commentInput" name="comment"></textarea>
+            </div>
+
+            {{#if userData}}
+                <button type="submit">Publier</button>
+            {{else}}
+                <button type="submit" disabled>Publier</button>
+            {{/if}}
+        </form>
+    </div>
+</div>
+<hr>
+<div class="container-fluid d-flex flex-column align-items-center">
+    Liste des commentaires pour ce film...
+    <div class="feedbackDisplay"></div>
+</div>

@@ -3,14 +3,18 @@
 
     {{!-- Première face (recto) --}}
     <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
-        
+    
         <h3>{{movie_title}}</h3>  
 
         <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="moviePoster border border-2 my-3">
 
         <p id="movieNote" class="bg-info">Note : {{movie_avg_note}}</p>
         <p id="movieEmotions" class="bg-info">Une liste de 5 émotions.{{emotions_a_mettre}}</p>
-        <button class="switchButton btn btn-block btn-warning border rounded-circle">Retourner</button>
+        
+        <div class="w-100">
+            <button id="addReviewTo{{movie_id_movie}}" class="btn btn-block btn-success border rounded-circle" onclick="window.location.href='/shareReview?movie={{movie_id_movie}}'">Partager un avis</button>
+            <button class="switchButton btn btn-block btn-warning border rounded-circle ms-5">Retourner</button>
+        </div>
         
     </div>
 
@@ -54,5 +58,5 @@
         
         </div>
         <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
-    </div>  
+    </div>      
 </div>
