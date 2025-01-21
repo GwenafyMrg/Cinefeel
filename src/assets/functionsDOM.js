@@ -107,4 +107,21 @@ document.addEventListener("DOMContentLoaded", function() {
     noteInput.addEventListener("input", function() {
         noteDisplay.textContent = noteInput.value;
     });
+
+    //--------------------------TAF COMMENTER------------------------------
+    // Sélection de la div contenant les checkboxes
+    const emotionsContainer = document.getElementById('emotionsContainer');
+
+    // Ajout d'un gestionnaire d'événements pour surveiller les changements sur les checkboxes
+    emotionsContainer.addEventListener('change', (event) => {
+        const emotionsCheckboxes = emotionsContainer.querySelectorAll('input[type="checkbox"]');
+        const checkedCheckboxes = Array.from(emotionsCheckboxes).filter(checkbox => checkbox.checked);
+
+        // Si plus de 3 checkboxes sont cochées, décocher la case qui vient d'être cochée
+        if (checkedCheckboxes.length > 3) {
+            event.target.checked = false;
+            //MODIFIER LE POP-UP D'ALERTE.
+            alert('Vous ne pouvez voter que pour 3 émotions au maximum.');
+        }
+    });
 });

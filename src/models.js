@@ -357,6 +357,7 @@ module.exports = {
     Director,
     User,
     UserOpinion,
+    Vote,
     Emotion,
     Badge,
 };

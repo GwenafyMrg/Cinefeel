@@ -27,11 +27,11 @@
                 </div>
             </div>
 
-            <div class="d-flex flex-wrap">
+            <div id="emotionsContainer" class="d-flex flex-wrap">
                 {{#each emotionsList}}
                     <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
                         <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
-                        <input id="{{normalizeString this.emotion_name}}Option" type="checkbox">
+                        <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox">
                     </div>
                 {{/each}}
             </div>
