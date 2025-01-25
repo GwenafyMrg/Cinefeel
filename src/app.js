@@ -561,6 +561,10 @@ app.get("/shareReview", async (req,res) => {
     const movieID = req.query.movie;
     console.log(movieID);
 
+    //------------------
+    //>>>>>>Check la structure du code
+    //------------------
+
     if(movieID){
         try{
             const movieQuery = await Movie.findAll({
@@ -588,11 +592,58 @@ app.get("/shareReview", async (req,res) => {
             const emotionQuery = await Emotion.findAll();
             // console.log(emotionQuery);
     
-            if(req.session.user){
-                res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery});
+            try {
+                const opinions = await UserOpinion.findAll({
+                    where : {
+                        opinion_id_movie : {[Op.eq] : movieID}
+                    },
+                    include : [
+                        {
+                            model: User,
+                            as: "User", // Doit correspondre à l'alias défini dans belongsTo
+                            attributes: ["user_username"], // Colonnes spécifiques à inclure
+                        }
+                    ]
+                });
+                // console.log(opinions);
+                
+                console.log(movieID);
+                const votes = await Vote.findAll({
+                    where : {
+                        id_movie : {[Op.eq] : movieID}
+                    },
+                    include : [
+                        {
+                            model : Emotion,
+                            as : "Emotion",
+                            attributes : ["emotion_name"],
+                        }
+                    ]
+                });
+                // console.log(votes);
+
+                votes.forEach(vote => {
+                    opinions.forEach(opinion => {
+                        if(opinion.opinion_id_user === vote.id_user){
+                            if(!opinion.vote){
+                                opinion.vote = [];
+                            }
+                            opinion.vote.push({emotion : vote.Emotion.emotion_name});
+                        }
+                    });
+                });
+                // console.log(votes);
+                console.log(opinions);
+
+                if(req.session.user){
+                    res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery, reviews: opinions});
+                }
+                else{
+                    res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery, reviews : opinions});
+                }
             }
-            else{
-                res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery});
+            catch (err) {
+                console.error("Impossible de charger la section des commentaires.", err);
             }
         }
         catch(err){

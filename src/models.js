@@ -339,6 +339,42 @@ User.belongsToMany(Badge, {
     as: "Badges"
 });
 
+//Nouvelle section ajouté à la suite de problème de jointure entre User et UserOpinion 
+//Relation à retirer éventuellement ???
+
+// Un utilisateur peut avoir plusieurs opinions
+User.hasMany(UserOpinion, {
+    foreignKey: "opinion_id_user", // clé étrangère dans UserOpinion pointant vers User
+    as: "Opinions", // alias pour accéder aux opinions depuis un utilisateur
+});
+
+// Une opinion appartient à un utilisateur
+UserOpinion.belongsTo(User, {
+    foreignKey: "opinion_id_user", // clé étrangère dans UserOpinion pointant vers User
+    as: "User", // alias pour accéder à l'utilisateur depuis une opinion
+});
+
+//-----------------Pour les votes :
+User.hasMany(Vote, {
+    foreignKey: "id_user", 
+    as: "Vote", 
+});
+
+Vote.belongsTo(User, {
+    foreignKey: "id_user",
+    as: "User",
+});
+
+Emotion.hasMany(Vote, {
+    foreignKey: "id_emotion", 
+});
+
+Vote.belongsTo(Emotion, {
+    foreignKey: "id_emotion",
+    as: "Emotion",
+});
+
+//------------------------
 //------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
 
 sequelize.sync({force: false})              //Tentative de synchrinisation.

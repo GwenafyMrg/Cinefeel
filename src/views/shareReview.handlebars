@@ -51,6 +51,13 @@
 </div>
 <hr>
 <div class="container-fluid d-flex flex-column align-items-center">
-    Liste des commentaires pour ce film...
-    <div class="feedbackDisplay"></div>
+    <div class="feedbackDisplay">
+        {{#if reviews}}
+            {{#each reviews}}
+                {{> feedbackDisplay}}
+            {{/each}}
+        {{else}}
+            <p>Aucun commentaire n'a encore été publié pour ce film.</p>
+        {{/if}}
+    </div>
 </div>

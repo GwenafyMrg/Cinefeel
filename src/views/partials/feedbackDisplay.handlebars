@@ -1,0 +1,26 @@
+<div class="reviewCard container-fluid card">
+    <div class="headerReviewCard">
+        <div class="noteDisplay">
+            Note: {{opinion_note}} /10
+        </div>
+        <div class="emotionsDisplay d-flex">
+            Il/Elle a ressenti(e): 
+            {{#each vote}}
+                <p>{{emotion}},</p>
+            {{/each}}
+        </div>
+    </div>
+    <div class="bodyReview">
+        <div class="commentDisplay">
+            Son commentaire: {{opinion_comment}}
+        </div>
+    </div>
+    <div class="footerReview">
+        <div class="authorDisplay">
+            Rédigé par: {{User.user_username}}
+        </div>
+        <div class="dateReview">
+            Date ?
+        </div>
+    </div>
+</div>
