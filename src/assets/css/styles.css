@@ -1,0 +1,104 @@
+/* Section à commenter */
+
+.switchButton {
+    font-size: small;
+    align-self: self-end;
+    position: absolute;
+    bottom: 2%;
+}
+
+.moviePoster {
+    max-height: 75%;
+    height: 60%;
+}
+
+.movieCard p {
+    font-size: small;
+    margin: 2px;
+    padding: 2px;
+    width: 80%;
+    border: 1px solid lightblue;
+    border-radius: 5px;
+    opacity: 80%;
+    position: relative;
+}
+
+.movieCard h3 {
+    width: 90%;
+    max-height: 1.5em;
+    overflow:hidden; /* Cache ce qui dépasse */
+    text-overflow:ellipsis; /* "..." */
+    white-space: nowrap;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    border-bottom: 2px solid black;
+    border-radius: 10px;
+}
+
+.movieCard .infoMovie {
+
+    display: grid;
+    grid-template-areas: "genre genre"
+                        "dir dir"
+                        "runtime date";
+    justify-items: center;
+    column-gap: 3px;
+    row-gap: 2px;
+}
+
+#movieGenre{grid-area: genre;}
+#movieDir{grid-area: dir;}
+#movieRuntime{grid-area: runtime;}
+#movieReleasedDate{grid-area: date;}
+
+.infoMovie p {
+    width: 100%;
+    text-indent: 2px;
+}
+
+.gridMovies {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/*--------------------------------- Gestion de l'animation des cartes: ---------------------------------------*/
+
+/* Conteneur des cartes */
+.card-container {
+    display: grid;          /* Utilise Grid pour superposer les cartes */
+    place-items: center;    /* Centre les éléments horizontalement et verticalement */
+    perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
+}
+
+/* Cartes en elle-même */
+.movieCard {
+    grid-area: 1 / 1;                       /* Superpose les cartes sur la même cellule */
+    backface-visibility: hidden;            /* Cache l'arrière lors du retournement */
+    transition: transform 0.8s ease-in-out;
+    display: flex;
+    width: 100%;
+    height: 450px;
+
+    /* Bordure de carte */
+    border: 5px solid white;
+    border-radius: 20px;
+    outline: 1px solid black;
+}
+
+/* Position initiale des cartes */
+#SimpleMovieCard {
+    transform: rotateY(0deg); /* Position initiale */
+}
+
+#DetailedMovieCard {
+    transform: rotateY(180deg); /* Masqué au début */
+}
+
+/* Position après retournement */
+.flipped #SimpleMovieCard {
+    transform: rotateY(-180deg);
+}
+
+.flipped #DetailedMovieCard {
+    transform: rotateY(0deg);
+}

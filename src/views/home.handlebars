@@ -1,0 +1,36 @@
+{{!-- Contenu de la page d'accueil --}}
+<div class="container-fluid d-flex flex-column align-items-center my-3">
+
+    <div class="text-center w-75">
+
+        <h3>Bienvenue sur <i>Cinéfeel</i>, la plateforme où le cinéma rencontre vos émotions !</h3>
+        <p>
+            <i>Cinéfeel</i>, c’est bien plus qu’un simple site. 
+            C’est un espace interactif conçu pour les passionnés de cinéma, où chaque utilisateur dispose d’un <b>tableau de bord personnalisé.</b> 
+            Vous pouvez y gérer vos visionnages, déposer vos avis et collectionner des badges uniques.
+        </p>
+        <p>
+            L’un des points forts de <i>Cinéfeel</i> est son <b>système révolutionnaire de recommandations émotionnelles</b>. 
+            Ici, on dépasse les simples genres cinématographiques pour vous proposer des films alignés avec vos émotions du moment. 
+            Fini les recherches interminables ! Grâce aux contributions de la communauté, chaque film est évalué non seulement sur son contenu, mais aussi sur l’impact émotionnel qu’il procure.
+        </p>
+        <p>
+            De plus, on vous encourage à relever le défi de <b>collectionner des badges exclusifs</b> en explorant des univers cinématographiques variés. 
+            Plus vous regardez de films, plus vous complétez votre collection et plus votre culture cinématographique s'élargit.
+        </p>
+        <p>
+            Rejoignez <i>Cinéfeel</i> et laissez votre passion du cinéma s’exprimer autrement. 🎥✨
+        </p>   
+
+    </div>
+
+    <div id="moviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+        {{!-- Pour chaque films transmis en paramètre de template --}}
+        {{#each movies}}
+            {{!-- Afficher le partial suivant --}}
+            {{> movieDisplay}}
+        {{/each}}
+    </div>
+
+    <button class="btn btn-block btn-info w-25">Plus de film ! (à modifier)</button>
+</div>

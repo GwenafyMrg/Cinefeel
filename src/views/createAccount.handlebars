@@ -1,0 +1,38 @@
+{{!-- Contenu de la page création de compte --}}
+<div class="container-fluid bg-primary w-50 mx-auto my-4 py-2">
+
+    {{!-- Formulaire de création de compte --}}
+    <form method="post" action="/create-account" name="createAccountForm">
+
+        <p class="text-center my-2">Rejoigner la communauté CinéFeel en créant votre compte !</p>
+
+        {{!-- Nom d'utilisateur --}}
+        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+            <label for="username">Nom d'utilisateur :</label>
+            <input id="username" name="username" type="text" minlength="3" maxlength="25" required>
+        </div>
+
+        {{!-- Email --}}
+        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+            <label for="email">Adresse email :</label>
+            <input id="email" name="email" type="email" maxlength="40" required>
+        </div>
+
+        {{!-- Mot de passe --}}
+        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+            <label for="password">Mot de passe :</label>
+            <input id="password" name="password" type="password" minlength="4" maxlength="25" required>
+        </div>
+        
+        {{#if error}}
+            <p class="text-center text-danger">{{error}}</p>
+        {{/if}}
+        
+        {{!-- Boutons interactifs --}}
+        <div class="d-flex justify-content-between mx-auto my-4 w-75">
+            <button type="button" class="btn btn-block btn-danger mx-3" onclick="window.location.href='./login'">Retour</button>
+            <button type="reset" class="btn btn-block btn-warning mx-3">Réinitialiser</button>
+            <button type="submit" class="btn btn-block btn-info mx-3">Création du compte</button>
+        </div>
+    </form>
+</div>

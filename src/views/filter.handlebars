@@ -1,0 +1,127 @@
+<div class="container-fluid d-flex flex-column align-items-center my-3">
+
+    <div class="container">
+        <div class="text-center m-3">
+            Vous cherchez un film précis ? 
+            Un genre, une année, ou des émotions particulières à explorer ? 
+            Affinez vos recherches ici pour trouver exactement ce que vous voulez regarder.
+        </div>
+        <hr>
+        <form name="filterForm" action="/moviesList" method="post">
+            <button type="button" class="btn btn-block btn-dark m-1">Filtres</button>
+            <button id="resetFilters" type="reset" class="btn btn-block btn-light m-1">Supprimer tous les filtres</button>
+            <hr>
+            <div id="FilterDiv" class="container container-fluid d-flex justify-content-around align-items-center m-2">
+                <!-- Section à faire glisser depuis le coté gauche de la page -->
+                {{!-- <div id="humorFilter" class="filter">
+                    <label for="humorSelect">Emotions:</label>
+                    <select name="humorSelect" id="humorSelect">
+                        <option value="allHumors" selected>Toutes</option>
+                        <option value="fear">Peur</option>
+                        <option value="happy">Joie</option>
+                        <option value="peaceful">Apaisé</option>
+                        {{#each humors}}
+                            <option value="{{humorValue}}">{{humor}}</option>
+                        {{/each}}
+                    </select>
+                </div> --}}
+
+                {{!-- Affichage des genres : --}}
+                <div id="genreFilter" class="filter">
+                    <button name="accessGenreOptions" type="button" class="btn btn-block btn-light">Genres :</button>
+
+                    <div id="genreOptions" class="">
+                        {{!-- Pour chaque élément/genre dans genresList --}}
+                        {{#each genresList}} 
+                            <div class="container border border-2 m-1">
+                                {{!-- Création du label du genre de manière dynamique (normalisation des identifiants) --}}
+                                <label for="{{normalizeString this.genre_libelle}}Option">{{this.genre_libelle}}</label>
+                                {{!-- Si le genre est séléctionné --}}
+                                {{#if this.selected}}
+                                    {{!-- coché le bouton  --}}
+                                    <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]" checked>
+                                {{else}}
+                                    {{!-- décoché le bouton --}}
+                                    <input id="{{normalizeString this.genre_libelle}}Option" type="checkbox" name="genres[{{this.genre_libelle}}]">
+                                {{/if}}
+                            </div>
+                            {{!-- Fin de la boucle --}}
+                        {{/each}}
+                    </div>
+                </div>
+               
+                {{!-- Affichage des durées : --}}
+                <div id="runtimeFilter" class="filter">
+                    <p>Durée des films :</p>
+                    {{!-- Gestion de la durée minimale --}}
+                    <label for="runtimeMinScale">Durée minimale : <span id="runtimeMinDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré  --}}
+                    {{#if currentFilters.minRuntime}}
+                        <input id="runtimeMinScale" name="runtimeMinScale" type="range" min="20" max="300" step="10" value="{{currentFilters.minRuntime}}">
+                    {{else}}
+                        {{!-- Sinon --}}
+                        <input id="runtimeMinScale" name="runtimeMinScale" type="range" min="20" max="300" step="10" value="20">
+                    {{/if}}
+                    <br>
+
+                    {{!-- Gestion de la durée maximale --}}
+                    <label for="runtimeMaxScale">Durée maximale : <span id="runtimeMaxDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré  --}}
+                    {{#if currentFilters.maxRuntime}}
+                        <input id="runtimeMaxScale" name="runtimeMaxScale" type="range" min="20" max="300" step="10" value="{{currentFilters.maxRuntime}}">
+                    {{!-- Sinon --}}
+                    {{else}}
+                        <input id="runtimeMaxScale" name="runtimeMaxScale" type="range" min="20" max="300" step="10" value="300">
+                    {{/if}}
+                </div>
+
+                {{!-- Affichage des dates de sortie : --}}
+                <div id="releasedDateFilter" class="filter">
+                    <p>Années de sortie :</p>
+                    <label for="dateMinScale">Sorti après : <span id="dateMinDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré pour la date de sortie minimale --}}
+                    {{#if currentFilters.minReleasedDate}}
+                        <input id="dateMinScale" name="dateMinScale" type="range" min="1950" max="2024" step="1" value="{{currentFilters.minReleasedDate}}">
+                    {{!-- Sinon --}}
+                    {{else}}
+                        <input id="dateMinScale" name="dateMinScale" type="range" min="1950" max="2024" step="1" value="1950">
+                    {{/if}}
+                    <br>
+
+                    <label for="dateMaxScale">Sorti avant : <span id="dateMaxDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré pour la date de sortie maximale --}}
+                    {{#if currentFilters.maxReleasedDate}}
+                        <input id="dateMaxScale" name="dateMaxScale" type="range" min="1951" max="2025" step="1" value="{{currentFilters.maxReleasedDate}}">
+                    {{!-- Sinon --}}
+                    {{else}}
+                        <input id="dateMaxScale" name="dateMaxScale" type="range" min="1951" max="2025" step="1" value="2025">
+                    {{/if}}
+                </div>
+
+                {{!-- Affichage du filtre des notes : --}}
+
+                {{!-- <div id="noteFilter" class="filter">
+                    <label for="AvgNoteScale">Note globale du film:</label>
+                    <input id="AvgNoteScale" type="range" min="0" max="10" step="0.5">
+                </div> --}}
+            </div>
+            <div>
+                <button type="submit" class="btn btn-block btn-dark">Appliquer les filtres</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="filterMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+        {{!-- Pour chaque filtre obtenu suite à la recherche par filtre : --}}
+        {{#each filteredMovies}}
+            {{!-- Générer le partial --}}
+            {{> movieDisplay}}
+        {{/each}}
+    </div>
+
+    <div class="container d-flex justify-content-center align-items-center">
+        <button class="btn btn-light border rounded-left"> < </button>
+        <p class="text-center bg-light mb-0 p-2 border rounded-1">Naviguer à travers les films</p>
+        <button class="btn btn-light border rounded-right"> > </button>
+    </div>
+</div>

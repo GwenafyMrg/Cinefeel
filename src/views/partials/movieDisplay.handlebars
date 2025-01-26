@@ -1,0 +1,62 @@
+{{!-- Partials > template d'affichage des films --}}
+<div class="card-container m-2">
+
+    {{!-- Première face (recto) --}}
+    <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
+    
+        <h3>{{movie_title}}</h3>  
+
+        <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="moviePoster border border-2 my-3">
+
+        <p id="movieNote" class="bg-info">Note : {{movie_avg_note}}</p>
+        <p id="movieEmotions" class="bg-info">Une liste de 5 émotions.{{emotions_a_mettre}}</p>
+        
+        <div class="w-100">
+            <button id="addReviewTo{{movie_id_movie}}" class="btn btn-block btn-success border rounded-circle" onclick="window.location.href='/shareReview?movie={{movie_id_movie}}'">Partager un avis</button>
+            <button class="switchButton btn btn-block btn-warning border rounded-circle ms-5">Retourner</button>
+        </div>
+        
+    </div>
+
+    {{!-- ---------------------------------------------------------------------------------------------------------- --}}
+
+    <br>
+    {{!-- Seconde Face (verso) --}}
+    <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
+        
+        <h3>{{movie_title}}</h3>
+        <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="w-50 mh-50 border border-2 my-4">
+
+        <div class="infoMovie">
+
+            <p id="movieGenre" class="bg-info">
+                {{!-- Si la structure n'est pas vide --}}
+                {{#if this.Genres}}
+                    {{!-- Pour chaque genre stocké dans la structure Genre :  --}}
+                    {{#each this.Genres}}
+                        {{!-- Afficher le genre --}}
+                        - {{this.genre_libelle}}
+                    {{/each}}
+                {{!-- Si la structure est vide --}}
+                {{else}}
+                    Aucun genre associé...
+                {{/if}}
+            </p>
+
+            <p id="movieDir" class="bg-info">
+                {{#if this.Directors}}
+                    {{#each this.Directors}}
+                        Réalisateur: {{this.director_firstname}} {{this.director_lastname}}
+                    {{/each}}
+                {{else}}
+                    Aucun réalisateur associé à ce film.
+                {{/if}}
+            </p>
+
+            <p id="movieRuntime" class="bg-info">Durée: {{convertRuntime movie_runtime}}</p>
+            <p id="movieReleasedDate" class="bg-info">Date de sortie: {{convertDateFormat movie_released_date}}</p>
+        
+        </div>
+        <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
+    </div>      
+</div>
