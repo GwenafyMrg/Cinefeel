@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+//---------------------------------------------------------------------------------------------
 //------------------------------Concernant la page des filtres :-----------------------------------
 
 //Au chargement de la page :
@@ -96,31 +97,36 @@ document.addEventListener("DOMContentLoaded", function () {
     });   
 });
 
+//---------------------------------------------------------------------------------------------
 //------------------------------Concernant la page des avis :-----------------------------------
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {      //Au chargement de la page :s
 
+    //Actualiser la note choisie :
     const noteDisplay = document.getElementById("noteDisplay");
     const noteInput = document.getElementById("noteInput");
-    noteDisplay.textContent = noteInput.value;
+    noteDisplay.textContent = noteInput.value;      //Initialisation à la valeur par défaut du input :
 
     noteInput.addEventListener("input", function() {
-        noteDisplay.textContent = noteInput.value;
+        noteDisplay.textContent = noteInput.value;  //Actualisation à chaque changement de l'input.
     });
 
-    //--------------------------TAF COMMENTER------------------------------
-    // Sélection de la div contenant les checkboxes
+    // Sélection de la <div> contenant les checkboxes
     const emotionsContainer = document.getElementById('emotionsContainer');
 
     // Ajout d'un gestionnaire d'événements pour surveiller les changements sur les checkboxes
     emotionsContainer.addEventListener('change', (event) => {
+        //Récupérer toutes les cases pouvant être cochées pour les émotions.
         const emotionsCheckboxes = emotionsContainer.querySelectorAll('input[type="checkbox"]');
+        //Récupérer uniquement les cases cochées.
         const checkedCheckboxes = Array.from(emotionsCheckboxes).filter(checkbox => checkbox.checked);
 
         // Si plus de 3 checkboxes sont cochées, décocher la case qui vient d'être cochée
         if (checkedCheckboxes.length > 3) {
             event.target.checked = false;
+            //>>>>>>>>>>>>>>>>>>>>>>>>>>
             //MODIFIER LE POP-UP D'ALERTE.
+            //>>>>>>>>>>>>>>>>>>>>>>>>>>
             alert('Vous ne pouvez voter que pour 3 émotions au maximum.');
         }
     });

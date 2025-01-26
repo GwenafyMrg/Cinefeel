@@ -556,20 +556,21 @@ app.post("/create-account", async (req,res) => {
     }
 });
 
+//Chemin de publication d'un avis :
 app.get("/shareReview", async (req,res) => {
 
-    const movieID = req.query.movie;
-    console.log(movieID);
+    const movieID = req.query.movie;        //Récupération de l'identifiant du film concerné.
+    // console.log(movieID);
 
     //------------------
     //>>>>>>Check la structure du code
     //------------------
 
     if(movieID){
-        try{
-            const movieQuery = await Movie.findAll({
+        try{ 
+            const movieQuery = await Movie.findAll({        //Récupérer les informations du film correspondant
                 where : {
-                    movie_id_movie : {[Op.eq] : movieID}
+                    movie_id_movie : {[Op.eq] : movieID}    //Restriction sur l'identifiant du film.
                 },
                 include: [
                     {
@@ -586,16 +587,16 @@ app.get("/shareReview", async (req,res) => {
                     }
                 ]
             });
-            //Voir pour passer au raw: true ou le noter dans le CR.
+            // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
             // console.log(movieQuery);
     
-            const emotionQuery = await Emotion.findAll();
+            const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
     
             try {
-                const opinions = await UserOpinion.findAll({
+                const opinions = await UserOpinion.findAll({    //Récupérer les avis associées au film.
                     where : {
-                        opinion_id_movie : {[Op.eq] : movieID}
+                        opinion_id_movie : {[Op.eq] : movieID}  //Restriction sur l'identifiant du film.
                     },
                     include : [
                         {
@@ -607,43 +608,45 @@ app.get("/shareReview", async (req,res) => {
                 });
                 // console.log(opinions);
                 
-                console.log(movieID);
-                const votes = await Vote.findAll({
+                const votes = await Vote.findAll({      //Récupérer les votes d'émotions associé au film.
                     where : {
-                        id_movie : {[Op.eq] : movieID}
+                        id_movie : {[Op.eq] : movieID}  //Restriction sur l'identifiant du film.
                     },
                     include : [
                         {
                             model : Emotion,
                             as : "Emotion",
-                            attributes : ["emotion_name"],
+                            attributes : ["emotion_name"],  //Récupération directe du nom des émotions votées.
                         }
                     ]
                 });
                 // console.log(votes);
 
-                votes.forEach(vote => {
-                    opinions.forEach(opinion => {
+                //Associé les avis avec les émotions des mêmes utilisateurs.
+                votes.forEach(vote => {     //Pour chaque votes récupérés :
+                    opinions.forEach(opinion => {   //Pour chaque avis publiés :
+                        //Si l'utilisateur qui a publié l'avis a aussi voté l'émotion concernée :
                         if(opinion.opinion_id_user === vote.id_user){
-                            if(!opinion.vote){
+                            if(!opinion.vote){      //Si l'objet vote n'existe pas, le créer.
                                 opinion.vote = [];
                             }
-                            opinion.vote.push({emotion : vote.Emotion.emotion_name});
+                            opinion.vote.push({emotion : vote.Emotion.emotion_name}); //Ajouter l'émotion votée à l'avis émit.
                         }
                     });
                 });
                 // console.log(votes);
-                console.log(opinions);
+                // console.log(opinions);
 
-                if(req.session.user){
+                if(req.session.user){ //Si l'utilisateur est inscrit :
                     res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery, reviews: opinions});
                 }
-                else{
+                else{   //S'il ne l'est pas :
                     res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery, reviews : opinions});
                 }
             }
             catch (err) {
                 console.error("Impossible de charger la section des commentaires.", err);
+                res.status(500).send("Impossible de charger la section des commentaires.");
             }
         }
         catch(err){
@@ -652,35 +655,38 @@ app.get("/shareReview", async (req,res) => {
         }
     }
     else{
+        //Si on accède à la page shareReview directement depuis l'URL :
         console.log("Chemin d'accès anormal.");
         res.status(404).send("Le chemin d'accès utilisé est incorrecte...");
     }
 });
 
+//Chemin de publication d'un avis par post
 app.post("/shareReview", async(req,res) => {
 
     try{
-        //TAF >>>>>VERIFIER LA RECUPERATION
-        const noteReview = parseInt(req.body.note,10);
+        //TAF >>>>> VERIFIER LA RECUPERATION
+
+        //Récupération des entrées de l'avis utilisateur par le formulaire :
+        const noteReview = parseInt(req.body.note,10);  //Conversion de la note en INT pour la BDD.
         let emotionsChoices = req.body.emotions;
-        let favReview = req.body.fav;
+        let favReview = req.body.fav;                   //favReview vaut 0 ou 1.
         let commentReview = req.body.comment;
-        // console.log(noteReview);
-        console.log(emotionsChoices);
+        // console.log(emotionsChoices);
 
         //Traitement de la valeur de favReview pour correspondre avec le modèle de la BDD.
-        favReview = favReview ? true : false;
+        favReview = favReview ? true : false;   //true si favReview vaut 1, false s'il vaut 0.
         // console.log(favReview);
 
         //Traitement des émotions :
-        emotionsChoices = Object.keys(emotionsChoices);
+        emotionsChoices = Object.keys(emotionsChoices); //Récupération des noms des émotions seulement ({émotions : "on"})
         console.log(emotionsChoices);
 
         //Traitement du commentaire :
-        if(commentReview == ""){
+        if(commentReview == ""){    //S'il est vide :
             commentReview = null;
         }
-        else{
+        else{   //S'il n'est pas vide :
             commentReview = commentReview.trim();           //Supprimer les espaces de trop.
             commentReview = sanitizeHtml(commentReview, {   //Limiter les balises HTML :
                 allowedTags: ['b','i','em','strong', 'br'], //Balises autorisées.
@@ -690,12 +696,12 @@ app.post("/shareReview", async(req,res) => {
         // console.log(commentReview);
 
         try{
-            const userID = parseInt(req.session.user.id,10);
+            const userID = parseInt(req.session.user.id,10); //Forcer le type INT sur l'identifiant user.
             // console.log("id user:", userID);
-            const movieID = parseInt(req.body.movie, 10);
+            const movieID = parseInt(req.body.movie, 10);   //Forcer le type INT sur l'identifiant movie.
             // console.log("id movie :", movieID);
 
-            await UserOpinion.create(
+            await UserOpinion.create(   //Insérer l'avis dans la BDD :
                 {
                     opinion_id_user : userID,
                     opinion_id_movie : movieID,
@@ -705,18 +711,21 @@ app.post("/shareReview", async(req,res) => {
                 }
             );
 
-            //Contraignant de récupérer l'id par le formulaire, cela surcharge le formulaire, on préfère rechercher dans la BDD.
+            //Contraignant de récupérer l'id par le formulaire, cela surcharge le formulaire, on préfèrera volontairement rechercher dans la BDD.
+            //Pour toutes les émotions choisies (3) faire :
             for (emotion of emotionsChoices){
-                const emotionChoiceQuery = await Emotion.findAll({
+                const emotionChoiceQuery = await Emotion.findAll({ //Récupérer l'identifiant de l'émotion associée :
                     attributes: ["emotion_id_emotion"],
                     where : {
                         emotion_name : {[Op.eq] : emotion}
                     }
                 });
+                //---------------->>>>>>>>>>>>>>>>>>
+                //Eviter de récupérer un tableau à la suite du .map() (retour par défaut).
                 const emotionID = emotionChoiceQuery.map(emotion => emotion.dataValues.emotion_id_emotion)[0];
-                // console.log(emotionID);
+                console.log(emotionID);
 
-                await Vote.create(
+                await Vote.create(  //Création d'un enregistrement du vote dans la BDD.
                     {
                         id_user : userID,
                         id_movie : movieID,
@@ -727,10 +736,12 @@ app.post("/shareReview", async(req,res) => {
                 // console.log("Vote de l'émotion ", emotionID, " de l'utilisateur", userID, "enregistré pour le film", movieID);
             }
 
-            console.log("Avis et vote des émotions de l'utilisateur", userID, "enregistré pour le film", movieID);
+            console.log("Avis et votes des émotions de l'utilisateur", userID, "enregistré pour le film", movieID);
+            
             //------------------------
             //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
             //------------------------
+            
             try{
                 const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
                     include: [{
@@ -746,6 +757,8 @@ app.post("/shareReview", async(req,res) => {
                         through: { attributes: []}
                     }]
                 });
+
+                //Retour à l'accueil à la suite de la publication d'avis.
                 res.render("home", {userData : req.session.user, movies : movieQuery})
             }
             catch(err){

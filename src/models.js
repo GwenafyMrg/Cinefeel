@@ -354,27 +354,30 @@ UserOpinion.belongsTo(User, {
     as: "User", // alias pour accéder à l'utilisateur depuis une opinion
 });
 
-//-----------------Pour les votes :
+//-----------------Pour les votes :----------------------
+//Un utilisateur a plusieurs votes
 User.hasMany(Vote, {
     foreignKey: "id_user", 
     as: "Vote", 
 });
 
+//Un vote appartient à un utilisateur
 Vote.belongsTo(User, {
     foreignKey: "id_user",
     as: "User",
 });
 
+//Une emotion a plusieurs votes associés
 Emotion.hasMany(Vote, {
     foreignKey: "id_emotion", 
 });
 
+//Un vote appartient à une émotion
 Vote.belongsTo(Emotion, {
     foreignKey: "id_emotion",
     as: "Emotion",
 });
 
-//------------------------
 //------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
 
 sequelize.sync({force: false})              //Tentative de synchrinisation.
