@@ -4,7 +4,7 @@
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
 const Handlebars = require('handlebars');
-const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
+const {Op, where} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
@@ -72,7 +72,13 @@ app.use(session({
 
 app.get("/", async (req, res) => {              //Chemin d'origine
     try {
-        const query = await Movie.findAll({           //Rechercher tous les films : 
+        const allMoviesQuery = await Movie.findAll({     //Rechercher tous les films : 
+            // where: {
+            //     [Op.or]: [
+            //         { movie_id_movie: { [Op.eq]: 1 } },
+            //         { movie_id_movie: { [Op.eq]: 2 } }
+            //     ]
+            // },            
             include: [{
                 model: Genre,                   //Modéle/Table à inclure.
                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
@@ -86,15 +92,62 @@ app.get("/", async (req, res) => {              //Chemin d'origine
                 through: { attributes: []}
             }]
         });
-        // console.log(query);
+        // console.log(allMoviesQuery);
+
+        //REMARQUE : Utilisation de ce for() pour gérer le code asynchrone.
+        for (const movie of allMoviesQuery) {
+            //Calculer la note moyenne pour chaque film :
+            try {
+                const reviewsBelongsToMovie = await UserOpinion.findAll({
+                    where: {
+                        opinion_id_movie: { [Op.eq]: movie.movie_id_movie }
+                    }
+                });
+                // console.log("Les Avis du film:", reviewsBelongsToMovie);
+
+                let somme = 0;
+                let nbReview = 0;
+                for(const review of reviewsBelongsToMovie){
+                    somme += review.opinion_note;
+                    nbReview += 1;
+                }
+                let avg_note = somme/nbReview;
+                if(!avg_note){
+                    avg_note = 0;
+                }
+                // console.log("Note moyenne:" ,avg_note);
+                movie.movie_avg_note = avg_note;
+
+            } catch (err) {
+                console.error("Erreur lors du calcul de la note moyenne :", err);
+                res.status(500).send("Erreur lors du calcul de la note moyenne :");
+            }
+
+            //Calculer les émotions les plus votées pour chaque film :
+            try{
+                const votesBelongsToMovie = await Vote.findAll({
+                    where : {
+                        id_movie : {[Op.eq] : movie.movie_id_movie}
+                    }
+                });
+                console.log("vote : ", votesBelongsToMovie);
+
+                upVote = [];
+            }
+            catch(err){
+                console.error("Erreur lors du calcul des émotions les plus votées :", err);
+                res.status(500).send("Erreur lors du calcul des émotions les plus votées :");
+            }
+        }        
+
         if(req.session.user){
-            res.render("home", {userData : req.session.user, movies : query});
+            res.render("home", {userData : req.session.user, movies : allMoviesQuery});
         }
         else{
-            res.render("home", {movies : query});   //Retourner le template home.handlebars avec la donnée movies.
+            res.render("home", {movies : allMoviesQuery});   //Retourner le template home.handlebars avec la donnée movies.
         }
     } catch (err){
-        console.error("Erreur lors de l'affichage des donneés.");
+        console.error("Erreur lors de l'affichage des donneés.", err);
         res.status(500).send("Erreur lors de l'affichage des données.");
     }
 });
