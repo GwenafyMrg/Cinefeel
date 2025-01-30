@@ -43,13 +43,15 @@ app.engine('handlebars', engine({       //Définition des paramètres de l'appli
     }
 }));
 
-//>>>>EXPLICATION NECESSAIRE :
+//Définition d'un Helper personnalisé :
 Handlebars.registerHelper("ifnot", function(value, options){
-    if(!value){
-        return options.fn(this);
+    //value --> valeur transmis après le "ifnot" dans le code Handlebars.
+    //options --> décide quel bloc s'éxécute.
+    if(!value){                         //Si le paramètre est falsy :
+        return options.fn(this);        //Exécute le bloc principale "#if"
     }
-    else{
-        return options.inverse(this);
+    else{                               //Sinon :
+        return options.inverse(this);   //Exécute la partie "else"
     }
 });
 
@@ -567,6 +569,7 @@ app.get("/shareReview", async (req,res) => {
     //------------------
 
     if(movieID){
+        //---------------------Afficher le film séléctionné :-------------------
         try{ 
             const movieQuery = await Movie.findAll({        //Récupérer les informations du film correspondant
                 where : {
@@ -593,6 +596,7 @@ app.get("/shareReview", async (req,res) => {
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
     
+            //---------------------Afficher les avis associés au film séléctionné :-------------------
             try {
                 const opinions = await UserOpinion.findAll({    //Récupérer les avis associées au film.
                     where : {
