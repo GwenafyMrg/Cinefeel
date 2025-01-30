@@ -759,7 +759,7 @@ app.post("/shareReview", async(req,res) => {
                 });
 
                 //Retour à l'accueil à la suite de la publication d'avis.
-                res.render("home", {userData : req.session.user, movies : movieQuery})
+                res.render("home", {userData : req.session.user, movies : movieQuery});
             }
             catch(err){
                 console.error("La redirection a échoué.");
@@ -777,8 +777,50 @@ app.post("/shareReview", async(req,res) => {
     }
 });
 
-app.get("/my-movies", (req, res) => {       //Chemin vers les films de l'utilisateur.
-    res.render("myMovies");
+app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'utilisateur.
+
+    if(req.session.user){
+        try{
+            const userID = req.session.user.id;
+
+            const moviesWatchedUser = await Movie.findAll({
+                include: [
+                    {
+                        model: UserOpinion,
+                        as: "UserOpinions",
+                        attributes: [],
+                        where: {
+                            opinion_id_user: userID
+                        }
+                    },
+                    {
+                        model: Genre,
+                        as: "Genres",
+                        attributes: ["genre_libelle"],
+                        through: { attributes: [] }
+                    },
+                    {
+                        model: Director,
+                        as: "Directors",
+                        attributes: ["director_lastname", "director_firstname"],
+                        through: { attributes: [] }
+                    }
+                ]
+            });
+
+            console.log(moviesWatchedUser);
+
+            res.render("myMovies", {userData : req.session.user, watchedMovies : moviesWatchedUser});
+        }
+        catch(err){
+            console.error("Erreur lors de la récupération de vos films.", err);
+            res.status(500).send("Vos films visionnés non pas pu être récupéré correctement...");
+        }
+    }
+    else{
+        console.error("Chemin d'accès non autorisé pour votre statut.");
+        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+    }
 });
 
 app.get("/my-favorites", (req, res) => {    //Chemin vers les films favoris de l'utilisateur.
