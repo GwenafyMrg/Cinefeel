@@ -16,6 +16,7 @@ const bcrypt = require('bcrypt');                           //Hacher les mots de
 //Import de module locaux.
 const {Movie, Director, Genre, User, UserOpinion, Emotion, Vote} = require('./models'); //Importation des modèles de BDD
 const funct = require('./assets/functions');                //Importer les fonctions personnelles
+const { uptime } = require('process');
 
 //-----------------------------------Définition de l'application Web :-------------------------------//
 
@@ -72,13 +73,7 @@ app.use(session({
 
 app.get("/", async (req, res) => {              //Chemin d'origine
     try {
-        const allMoviesQuery = await Movie.findAll({     //Rechercher tous les films : 
-            // where: {
-            //     [Op.or]: [
-            //         { movie_id_movie: { [Op.eq]: 1 } },
-            //         { movie_id_movie: { [Op.eq]: 2 } }
-            //     ]
-            // },            
+        const allMoviesQuery = await Movie.findAll({     //Rechercher tous les films :           
             include: [{
                 model: Genre,                   //Modéle/Table à inclure.
                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
@@ -94,7 +89,7 @@ app.get("/", async (req, res) => {              //Chemin d'origine
         });
         // console.log(allMoviesQuery);
 
-        //REMARQUE : Utilisation de ce for() pour gérer le code asynchrone.
+        //REMARQUE : Utilisation de ce for() pour gérer le code asynchrone. (await)
         for (const movie of allMoviesQuery) {
             //Calculer la note moyenne pour chaque film :
             try {
@@ -123,22 +118,51 @@ app.get("/", async (req, res) => {              //Chemin d'origine
                 res.status(500).send("Erreur lors du calcul de la note moyenne :");
             }
 
-            //Calculer les émotions les plus votées pour chaque film :
+            // Calculer les émotions les plus votées pour chaque film :
             try{
-                const votesBelongsToMovie = await Vote.findAll({
+                const votesForMovie = await Vote.findAll({
                     where : {
                         id_movie : {[Op.eq] : movie.movie_id_movie}
-                    }
+                    },
+                    include : [
+                        {
+                            model: Emotion,
+                            as : "Emotion",
+                            attributes : ["emotion_name"],
+                        }
+                    ]
                 });
-                console.log("vote : ", votesBelongsToMovie);
-
-                upVote = [];
+                // console.log(votesForMovie);
+        
+                if(votesForMovie.length != 0){
+                    let votesCount = []; 
+            
+                    votesForMovie.forEach(vote => {
+                        const emotionName = vote.Emotion.emotion_name;
+            
+                        const existingVote = votesCount.find(item => item.name === emotionName);
+            
+                        if (existingVote) {
+                            existingVote.count++; 
+                        } else {
+                            votesCount.push({ name: emotionName, count: 1 });
+                        }
+                    });
+                    votesCount.sort((a, b) => b.count - a.count);
+                    // console.log("Votes globales:", votesCount);
+            
+                    upVotes = [votesCount[0].name, votesCount[1].name, votesCount[2].name];
+                    // console.log(upVotes);
+                    movie.popularEmotions = upVotes;
+                }
             }
             catch(err){
                 console.error("Erreur lors du calcul des émotions les plus votées :", err);
-                res.status(500).send("Erreur lors du calcul des émotions les plus votées :");
+                res.status(500).send("Erreur lors du calcul des émotions les plus votées.");
             }
-        }        
+        }    
+        // console.log(allMoviesQuery);
+        //--------------------------
 
         if(req.session.user){
             res.render("home", {userData : req.session.user, movies : allMoviesQuery});
@@ -146,6 +170,7 @@ app.get("/", async (req, res) => {              //Chemin d'origine
         else{
             res.render("home", {movies : allMoviesQuery});   //Retourner le template home.handlebars avec la donnée movies.
         }
+
     } catch (err){
         console.error("Erreur lors de l'affichage des donneés.", err);
         res.status(500).send("Erreur lors de l'affichage des données.");
