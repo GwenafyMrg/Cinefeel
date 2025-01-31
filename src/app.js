@@ -74,7 +74,7 @@ app.use(session({
 
 app.get("/", async (req, res) => {              //Chemin d'origine
     try {
-        const query = await Movie.findAll({           //Rechercher tous les films : 
+        const allMoviesQuery = await Movie.findAll({     //Rechercher tous les films :           
             include: [{
                 model: Genre,                   //Modéle/Table à inclure.
                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
@@ -88,15 +88,22 @@ app.get("/", async (req, res) => {              //Chemin d'origine
                 through: { attributes: []}
             }]
         });
-        // console.log(query);
+        // console.log(allMoviesQuery);
+
+        const allMoviesAndData = await funct.getMoviesData(allMoviesQuery);
+        
+        console.log(allMoviesAndData);
+        //--------------------------
+
         if(req.session.user){
-            res.render("home", {userData : req.session.user, movies : query});
+            res.render("home", {userData : req.session.user, movies : allMoviesAndData});
         }
         else{
-            res.render("home", {movies : query});   //Retourner le template home.handlebars avec la donnée movies.
+            res.render("home", {movies : allMoviesQuery});   //Retourner le template home.handlebars avec la donnée movies.
         }
+
     } catch (err){
-        console.error("Erreur lors de l'affichage des donneés.");
+        console.error("Erreur lors de l'affichage des donneés.", err);
         res.status(500).send("Erreur lors de l'affichage des données.");
     }
 });
@@ -222,9 +229,9 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 },
             ],
         });
-
         // console.log(queryFilter);
-
+        const filteredMovies = await funct.getMoviesData(queryFilter);
+        
         // Rendu de la vue avec les résultats
         const genresList = await Genre.findAll(); // Liste des genres pour le formulaire
 
@@ -236,18 +243,18 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         // console.log(genresList);
 
         if (req.session.user) {
-            // res.render("filter", {userData : req.session.user, filteredMovies : queryFilter});
+            // res.render("filter", {userData : req.session.user, filteredMovies : filteredMovies});
             res.render("filter", {
                 userData: req.session.user, 
                 genresList,
-                filteredMovies: queryFilter,
+                filteredMovies: filteredMovies,
                 currentFilters : savedFilters,
             });
         } else {
-            // res.render("filter", {filteredMovies : queryFilter});
+            // res.render("filter", {filteredMovies : filteredMovies});
             res.render("filter", {
                 genresList, 
-                filteredMovies: queryFilter,
+                filteredMovies: filteredMovies,
                 currentFilters : savedFilters,
             });
         }
@@ -299,12 +306,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
                 }
             ]
         });
-        console.log(query);
+        // console.log(query);
+        const researchedMovies = await funct.getMoviesData(query);
+
         if(req.session.user){
-            res.render("search", {userData : req.session.user, result : query, research : value});
+            res.render("search", {userData : req.session.user, result : researchedMovies, research : value});
         }
         else{
-            res.render("search", {result : query, research : value});
+            res.render("search", {result : researchedMovies, research : value});
         }
     }
     catch{
@@ -417,11 +426,13 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     through: { attributes: []}
                 }]
             });
+            const movies = await funct.getMoviesData(movieQuery);
+
             if(req.session.user){
-                res.render("home", {userData : req.session.user, movies : movieQuery});
+                res.render("home", {userData : req.session.user, movies : movies});
             }
             else{
-                res.render("home", {movies : movieQuery});
+                res.render("home", {movies : movies});
             }
         }
         catch(err){
@@ -592,6 +603,7 @@ app.get("/shareReview", async (req,res) => {
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
             // console.log(movieQuery);
+            const movies = await funct.getMoviesData(movieQuery);
     
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
@@ -642,10 +654,10 @@ app.get("/shareReview", async (req,res) => {
                 // console.log(opinions);
 
                 if(req.session.user){ //Si l'utilisateur est inscrit :
-                    res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery, reviews: opinions});
+                    res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions});
                 }
                 else{   //S'il ne l'est pas :
-                    res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery, reviews : opinions});
+                    res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
                 }
             }
             catch (err) {
@@ -761,9 +773,10 @@ app.post("/shareReview", async(req,res) => {
                         through: { attributes: []}
                     }]
                 });
+                const movies = await funct.getMoviesData(movieQuery);
 
                 //Retour à l'accueil à la suite de la publication d'avis.
-                res.render("home", {userData : req.session.user, movies : movieQuery})
+                res.render("home", {userData : req.session.user, movies : movies})
             }
             catch(err){
                 console.error("La redirection a échoué.");
