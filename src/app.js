@@ -4,7 +4,7 @@
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
 const Handlebars = require('handlebars');
-const {Op, where} = require('sequelize');                          //Gestion des clauses de requête SQL
+const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
@@ -16,7 +16,6 @@ const bcrypt = require('bcrypt');                           //Hacher les mots de
 //Import de module locaux.
 const {Movie, Director, Genre, User, UserOpinion, Emotion, Vote} = require('./models'); //Importation des modèles de BDD
 const funct = require('./assets/functions');                //Importer les fonctions personnelles
-const { uptime } = require('process');
 
 //-----------------------------------Définition de l'application Web :-------------------------------//
 
@@ -89,83 +88,13 @@ app.get("/", async (req, res) => {              //Chemin d'origine
         });
         // console.log(allMoviesQuery);
 
-        //REMARQUE : Utilisation de ce for() pour gérer le code asynchrone. (await)
-        for (const movie of allMoviesQuery) {
-            //Calculer la note moyenne pour chaque film :
-            try {
-                const reviewsBelongsToMovie = await UserOpinion.findAll({
-                    where: {
-                        opinion_id_movie: { [Op.eq]: movie.movie_id_movie }
-                    }
-                });
-                // console.log("Les Avis du film:", reviewsBelongsToMovie);
-
-                let somme = 0;
-                let nbReview = 0;
-                for(const review of reviewsBelongsToMovie){
-                    somme += review.opinion_note;
-                    nbReview += 1;
-                }
-                let avg_note = somme/nbReview;
-                if(!avg_note){
-                    avg_note = 0;
-                }
-                // console.log("Note moyenne:" ,avg_note);
-                movie.movie_avg_note = avg_note;
-
-            } catch (err) {
-                console.error("Erreur lors du calcul de la note moyenne :", err);
-                res.status(500).send("Erreur lors du calcul de la note moyenne :");
-            }
-
-            // Calculer les émotions les plus votées pour chaque film :
-            try{
-                const votesForMovie = await Vote.findAll({
-                    where : {
-                        id_movie : {[Op.eq] : movie.movie_id_movie}
-                    },
-                    include : [
-                        {
-                            model: Emotion,
-                            as : "Emotion",
-                            attributes : ["emotion_name"],
-                        }
-                    ]
-                });
-                // console.log(votesForMovie);
+        const allMoviesAndData = await funct.getMoviesData(allMoviesQuery);
         
-                if(votesForMovie.length != 0){
-                    let votesCount = []; 
-            
-                    votesForMovie.forEach(vote => {
-                        const emotionName = vote.Emotion.emotion_name;
-            
-                        const existingVote = votesCount.find(item => item.name === emotionName);
-            
-                        if (existingVote) {
-                            existingVote.count++; 
-                        } else {
-                            votesCount.push({ name: emotionName, count: 1 });
-                        }
-                    });
-                    votesCount.sort((a, b) => b.count - a.count);
-                    // console.log("Votes globales:", votesCount);
-            
-                    upVotes = [votesCount[0].name, votesCount[1].name, votesCount[2].name];
-                    // console.log(upVotes);
-                    movie.popularEmotions = upVotes;
-                }
-            }
-            catch(err){
-                console.error("Erreur lors du calcul des émotions les plus votées :", err);
-                res.status(500).send("Erreur lors du calcul des émotions les plus votées.");
-            }
-        }    
-        // console.log(allMoviesQuery);
+        console.log(allMoviesAndData);
         //--------------------------
 
         if(req.session.user){
-            res.render("home", {userData : req.session.user, movies : allMoviesQuery});
+            res.render("home", {userData : req.session.user, movies : allMoviesAndData});
         }
         else{
             res.render("home", {movies : allMoviesQuery});   //Retourner le template home.handlebars avec la donnée movies.
@@ -298,9 +227,9 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 },
             ],
         });
-
         // console.log(queryFilter);
-
+        const filteredMovies = await funct.getMoviesData(queryFilter);
+        
         // Rendu de la vue avec les résultats
         const genresList = await Genre.findAll(); // Liste des genres pour le formulaire
 
@@ -312,18 +241,18 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         // console.log(genresList);
 
         if (req.session.user) {
-            // res.render("filter", {userData : req.session.user, filteredMovies : queryFilter});
+            // res.render("filter", {userData : req.session.user, filteredMovies : filteredMovies});
             res.render("filter", {
                 userData: req.session.user, 
                 genresList,
-                filteredMovies: queryFilter,
+                filteredMovies: filteredMovies,
                 currentFilters : savedFilters,
             });
         } else {
-            // res.render("filter", {filteredMovies : queryFilter});
+            // res.render("filter", {filteredMovies : filteredMovies});
             res.render("filter", {
                 genresList, 
-                filteredMovies: queryFilter,
+                filteredMovies: filteredMovies,
                 currentFilters : savedFilters,
             });
         }
@@ -375,12 +304,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
                 }
             ]
         });
-        console.log(query);
+        // console.log(query);
+        const researchedMovies = await funct.getMoviesData(query);
+
         if(req.session.user){
-            res.render("search", {userData : req.session.user, result : query, research : value});
+            res.render("search", {userData : req.session.user, result : researchedMovies, research : value});
         }
         else{
-            res.render("search", {result : query, research : value});
+            res.render("search", {result : researchedMovies, research : value});
         }
     }
     catch{
@@ -493,11 +424,13 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     through: { attributes: []}
                 }]
             });
+            const movies = await funct.getMoviesData(movieQuery);
+
             if(req.session.user){
-                res.render("home", {userData : req.session.user, movies : movieQuery});
+                res.render("home", {userData : req.session.user, movies : movies});
             }
             else{
-                res.render("home", {movies : movieQuery});
+                res.render("home", {movies : movies});
             }
         }
         catch(err){
@@ -667,6 +600,7 @@ app.get("/shareReview", async (req,res) => {
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
             // console.log(movieQuery);
+            const movies = await funct.getMoviesData(movieQuery);
     
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
@@ -716,10 +650,10 @@ app.get("/shareReview", async (req,res) => {
                 // console.log(opinions);
 
                 if(req.session.user){ //Si l'utilisateur est inscrit :
-                    res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery, reviews: opinions});
+                    res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions});
                 }
                 else{   //S'il ne l'est pas :
-                    res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery, reviews : opinions});
+                    res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
                 }
             }
             catch (err) {
@@ -835,9 +769,10 @@ app.post("/shareReview", async(req,res) => {
                         through: { attributes: []}
                     }]
                 });
+                const movies = await funct.getMoviesData(movieQuery);
 
                 //Retour à l'accueil à la suite de la publication d'avis.
-                res.render("home", {userData : req.session.user, movies : movieQuery})
+                res.render("home", {userData : req.session.user, movies : movies})
             }
             catch(err){
                 console.error("La redirection a échoué.");
