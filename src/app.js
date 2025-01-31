@@ -823,8 +823,53 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
     }
 });
 
-app.get("/my-favorites", (req, res) => {    //Chemin vers les films favoris de l'utilisateur.
-    res.render("myFav");    
+app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favoris de l'utilisateur.
+
+    if(req.session.user){
+        try{
+            const userID = req.session.user.id;
+
+            const favoritesMoviesUser = await Movie.findAll({
+                include: [
+                    {
+                        model: UserOpinion,
+                        as: "UserOpinions",
+                        attributes: [],
+                        where: {
+                            [Op.and] : {
+                                opinion_id_user: userID,
+                                opinion_fav : 1             //true
+                            }
+                        }
+                    },
+                    {
+                        model: Genre,
+                        as: "Genres",
+                        attributes: ["genre_libelle"],
+                        through: { attributes: [] }
+                    },
+                    {
+                        model: Director,
+                        as: "Directors",
+                        attributes: ["director_lastname", "director_firstname"],
+                        through: { attributes: [] }
+                    }
+                ]
+            });
+
+            console.log(favoritesMoviesUser);
+
+            res.render("myFav", {userData : req.session.user, favoritesMovies : favoritesMoviesUser});
+        }
+        catch(err){
+            console.error("Erreur lors de la récupération de vos films.", err);
+            res.status(500).send("Vos films préférés non pas pu être récupéré correctement...");
+        }
+    }
+    else{
+        console.error("Chemin d'accès non autorisé pour votre statut.");
+        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+    }
 });
 
 app.get("/my-badges", (req, res) => {       //Chemin vers les badges de l'utilisateur.
