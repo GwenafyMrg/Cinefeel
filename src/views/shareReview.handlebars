@@ -1,35 +1,46 @@
+{{!-- Template de soumission d'avis pour un film par un utilisateur --}}
 <div class="container-fluid d-flex">
+    {{!-- Réaffichage du film précédemment séléctionné --}}
     <div class="w-25">
         {{#each movie}}
             {{> movieDisplay}}
         {{/each}}
     </div>
+
+    {{!-- Formulaire d'avis utilisateur --}}
     <div class="w-75 d-flex flex-column my-1">
         <p>Écrivez votre commentaire ici :</p>
         <form name="reviewForm" action="/shareReview" method="post" class="card d-flex flex-column align-self-center justify-content-evenly w-75 p-2">
 
+            {{!-- Balise masquée pour récupérer facilement l'identifiant utilisateur --}}
             <input type="hidden" name="movie" value="{{movie.[0].movie_id_movie}}">
 
+            {{!-- Utilisation d'un helper spécifique pour gérer le cas d'un Invité --}}
             {{#ifnot userData}}
                 <p class="text-danger text-center">Créer un compte utilisateur afin de partager votre avis avec la communauté.</p>
             {{/ifnot}}
 
             <div class="d-flex justify-content-between m-3">
                 <div>
-                    <button type="reset">Effacer</button>
+                    <button type="reset">Effacer</button> {{!-- Réinitiliser les données --}}
                 </div>
                 <div>
+                    {{!-- Note attribuée au film --}}
                     <label for="noteInput">Note : <span id="noteDisplay"></span> /10</label>
                     <input id="noteInput" name="note" type="range" min="0" max="10" value="0">
 
+                    {{!-- Film favori ou non --}}
                     <label for="favInput">Favori :</label>
                     <input id="favInput" name="fav" type="checkbox">
                 </div>
             </div>
 
             <div id="emotionsContainer" class="d-flex flex-wrap">
+                {{!-- Pour chaque emotion : --}}
                 {{#each emotionsList}}
+                    {{!-- Générer un conteneur --}}
                     <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
+                        {{!-- Avec un label et une case à cocher avec le nom de l'émotion --}}
                         <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
                         <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox">
                     </div>
@@ -37,12 +48,15 @@
             </div>
 
             <div class="m-3">
+                {{!-- Zone de texte pour un commentaire plus détaillée --}}
                 <label for="commentInput">Ajouter un commentaire à la suite de votre visionnage :</label><br>
                 <textarea id="commentInput" name="comment"></textarea>
             </div>
 
+            {{!-- Si l'utilisateur a un compte --}}
             {{#if userData}}
                 <button type="submit">Publier</button>
+            {{!-- S'il est juste invité --}}
             {{else}}
                 <button type="submit" disabled>Publier</button>
             {{/if}}

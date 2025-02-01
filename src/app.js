@@ -1,19 +1,19 @@
 //-----------------------------------Importations des modules node:---------------------------------------//
 
-//Modules généraux
+//Modules généraux :
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
-const Handlebars = require('handlebars');
+const Handlebars = require('handlebars');                   //Gestion des helpers pour les templates Handlebars
 const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
 
-//Modules de sécurité.
+//Modules de sécurité : 
 const sanitizeHtml = require('sanitize-html');              //Protéger contre les Injection SQL
 const bcrypt = require('bcrypt');                           //Hacher les mots de passe  
 
-//Import de module locaux.
+//Import de module locaux : 
 const {Movie, Director, Genre, User, UserOpinion, Emotion, Vote} = require('./models'); //Importation des modèles de BDD
 const funct = require('./assets/functions');                //Importer les fonctions personnelles
 
@@ -43,13 +43,15 @@ app.engine('handlebars', engine({       //Définition des paramètres de l'appli
     }
 }));
 
-//>>>>EXPLICATION NECESSAIRE :
+//Définition d'un Helper personnalisé :
 Handlebars.registerHelper("ifnot", function(value, options){
-    if(!value){
-        return options.fn(this);
+    //value --> valeur transmis après le "ifnot" dans le code Handlebars.
+    //options --> décide quel bloc s'éxécute.
+    if(!value){                         //Si le paramètre est falsy :
+        return options.fn(this);        //Exécute le bloc principale "#if"
     }
-    else{
-        return options.inverse(this);
+    else{                               //Sinon :
+        return options.inverse(this);   //Exécute la partie "else"
     }
 });
 
@@ -72,7 +74,7 @@ app.use(session({
 
 app.get("/", async (req, res) => {              //Chemin d'origine
     try {
-        const query = await Movie.findAll({           //Rechercher tous les films : 
+        const allMoviesQuery = await Movie.findAll({     //Rechercher tous les films :           
             include: [{
                 model: Genre,                   //Modéle/Table à inclure.
                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
@@ -86,15 +88,25 @@ app.get("/", async (req, res) => {              //Chemin d'origine
                 through: { attributes: []}
             }]
         });
-        // console.log(query);
+        // console.log(allMoviesQuery);
+
+        //Récupération des données complémentaires dynamiques des films.
+        const allMoviesAndData = await funct.getMoviesData(allMoviesQuery);
+        
+        console.log(allMoviesAndData);
+        //--------------------------
+
         if(req.session.user){
-            res.render("home", {userData : req.session.user, movies : query});
+            //Retourner le template home.handlebars avec la donnée movies et les données de session de l'utilsateur connecté.
+            res.render("home", {userData : req.session.user, movies : allMoviesAndData});
         }
         else{
-            res.render("home", {movies : query});   //Retourner le template home.handlebars avec la donnée movies.
+            //Retourner le template home.handlebars avec la donnée movies.
+            res.render("home", {movies : allMoviesQuery});
         }
+
     } catch (err){
-        console.error("Erreur lors de l'affichage des donneés.");
+        console.error("Erreur lors de l'affichage des donneés.", err);
         res.status(500).send("Erreur lors de l'affichage des données.");
     }
 });
@@ -107,21 +119,21 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
         //Réinitialiser le filtre des genres :
         genresList.forEach(genre => {               //Pour chaque genre :
             if("selected" in genre){                //Si l'attribut "selected" existe dans les données de "genre".
-                genre.selected = false;
+                genre.selected = false;             //Réinitiliser la séléction des genres (état non séléctionné)
             }
         });
 
         if(req.session.user){
             res.render("filter", {
-                userData : req.session.user, 
-                genresList : genresList,
-                currentFilters : null,
+                userData : req.session.user,    //Transmettre les données de session utilisateur.
+                genresList : genresList,        //Transmettre la liste des genres.
+                currentFilters : null,          //Réinitialiser les filtres.
             });
         }
         else{
             res.render("filter", { 
-                genresList : genresList,
-                currentFilters : null,
+                genresList : genresList,        //Transmettre la liste des genres.
+                currentFilters : null,          //Réinitialiser les filtres.
             });
         }
     }
@@ -220,9 +232,9 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 },
             ],
         });
-
         // console.log(queryFilter);
-
+        const filteredMovies = await funct.getMoviesData(queryFilter);
+        
         // Rendu de la vue avec les résultats
         const genresList = await Genre.findAll(); // Liste des genres pour le formulaire
 
@@ -234,18 +246,18 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         // console.log(genresList);
 
         if (req.session.user) {
-            // res.render("filter", {userData : req.session.user, filteredMovies : queryFilter});
+            // res.render("filter", {userData : req.session.user, filteredMovies : filteredMovies});
             res.render("filter", {
                 userData: req.session.user, 
                 genresList,
-                filteredMovies: queryFilter,
+                filteredMovies: filteredMovies,
                 currentFilters : savedFilters,
             });
         } else {
-            // res.render("filter", {filteredMovies : queryFilter});
+            // res.render("filter", {filteredMovies : filteredMovies});
             res.render("filter", {
                 genresList, 
-                filteredMovies: queryFilter,
+                filteredMovies: filteredMovies,
                 currentFilters : savedFilters,
             });
         }
@@ -297,12 +309,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
                 }
             ]
         });
-        console.log(query);
+        // console.log(query);
+        const researchedMovies = await funct.getMoviesData(query);
+
         if(req.session.user){
-            res.render("search", {userData : req.session.user, result : query, research : value});
+            res.render("search", {userData : req.session.user, result : researchedMovies, research : value});
         }
         else{
-            res.render("search", {result : query, research : value});
+            res.render("search", {result : researchedMovies, research : value});
         }
     }
     catch{
@@ -415,11 +429,13 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     through: { attributes: []}
                 }]
             });
+            const movies = await funct.getMoviesData(movieQuery);
+
             if(req.session.user){
-                res.render("home", {userData : req.session.user, movies : movieQuery});
+                res.render("home", {userData : req.session.user, movies : movies});
             }
             else{
-                res.render("home", {movies : movieQuery});
+                res.render("home", {movies : movies});
             }
         }
         catch(err){
@@ -567,6 +583,7 @@ app.get("/shareReview", async (req,res) => {
     //------------------
 
     if(movieID){
+        //---------------------Afficher le film séléctionné :-------------------
         try{ 
             const movieQuery = await Movie.findAll({        //Récupérer les informations du film correspondant
                 where : {
@@ -589,10 +606,12 @@ app.get("/shareReview", async (req,res) => {
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
             // console.log(movieQuery);
+            const movies = await funct.getMoviesData(movieQuery);
     
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
     
+            //---------------------Afficher les avis associés au film séléctionné :-------------------
             try {
                 const opinions = await UserOpinion.findAll({    //Récupérer les avis associées au film.
                     where : {
@@ -638,10 +657,10 @@ app.get("/shareReview", async (req,res) => {
                 // console.log(opinions);
 
                 if(req.session.user){ //Si l'utilisateur est inscrit :
-                    res.render("shareReview", {userData : req.session.user, movie : movieQuery, emotionsList: emotionQuery, reviews: opinions});
+                    res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions});
                 }
                 else{   //S'il ne l'est pas :
-                    res.render("shareReview", {movie : movieQuery, emotionsList: emotionQuery, reviews : opinions});
+                    res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
                 }
             }
             catch (err) {
@@ -757,9 +776,10 @@ app.post("/shareReview", async(req,res) => {
                         through: { attributes: []}
                     }]
                 });
+                const movies = await funct.getMoviesData(movieQuery);
 
                 //Retour à l'accueil à la suite de la publication d'avis.
-                res.render("home", {userData : req.session.user, movies : movieQuery});
+                res.render("home", {userData : req.session.user, movies : movies})
             }
             catch(err){
                 console.error("La redirection a échoué.");
