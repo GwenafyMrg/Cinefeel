@@ -1,19 +1,19 @@
 //-----------------------------------Importations des modules node:---------------------------------------//
 
-//Modules généraux
+//Modules généraux :
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
-const Handlebars = require('handlebars');
+const Handlebars = require('handlebars');                   //Gestion des helpers pour les templates Handlebars
 const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
 
-//Modules de sécurité.
+//Modules de sécurité : 
 const sanitizeHtml = require('sanitize-html');              //Protéger contre les Injection SQL
 const bcrypt = require('bcrypt');                           //Hacher les mots de passe  
 
-//Import de module locaux.
+//Import de module locaux : 
 const {Movie, Director, Genre, User, UserOpinion, Emotion, Vote} = require('./models'); //Importation des modèles de BDD
 const funct = require('./assets/functions');                //Importer les fonctions personnelles
 
@@ -90,16 +90,19 @@ app.get("/", async (req, res) => {              //Chemin d'origine
         });
         // console.log(allMoviesQuery);
 
+        //Récupération des données complémentaires dynamiques des films.
         const allMoviesAndData = await funct.getMoviesData(allMoviesQuery);
         
         console.log(allMoviesAndData);
         //--------------------------
 
         if(req.session.user){
+            //Retourner le template home.handlebars avec la donnée movies et les données de session de l'utilsateur connecté.
             res.render("home", {userData : req.session.user, movies : allMoviesAndData});
         }
         else{
-            res.render("home", {movies : allMoviesQuery});   //Retourner le template home.handlebars avec la donnée movies.
+            //Retourner le template home.handlebars avec la donnée movies.
+            res.render("home", {movies : allMoviesQuery});
         }
 
     } catch (err){
@@ -116,21 +119,21 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
         //Réinitialiser le filtre des genres :
         genresList.forEach(genre => {               //Pour chaque genre :
             if("selected" in genre){                //Si l'attribut "selected" existe dans les données de "genre".
-                genre.selected = false;
+                genre.selected = false;             //Réinitiliser la séléction des genres (état non séléctionné)
             }
         });
 
         if(req.session.user){
             res.render("filter", {
-                userData : req.session.user, 
-                genresList : genresList,
-                currentFilters : null,
+                userData : req.session.user,    //Transmettre les données de session utilisateur.
+                genresList : genresList,        //Transmettre la liste des genres.
+                currentFilters : null,          //Réinitialiser les filtres.
             });
         }
         else{
             res.render("filter", { 
-                genresList : genresList,
-                currentFilters : null,
+                genresList : genresList,        //Transmettre la liste des genres.
+                currentFilters : null,          //Réinitialiser les filtres.
             });
         }
     }
