@@ -1,14 +1,26 @@
-<div class="container-fluid d-flex flex-column align-items-center w-75 my-3">
+<div class="container-fluid d-flex flex-column align-items-center w-100 my-3">
 
-    <div class="container text-left m-3">
+    <div class="container text-left w-75 m-3">
         Retrouvez ici vos films préférés, ceux qui vous ont marqué, ému ou simplement amusé. 
         Tous vos coups de cœur ont leur place dans cet espace, personne ne vous jugera en tant que Cinéfeel bienveillant !
     </div>
 
-    <div id="FavMoviesDisplay" class="container m-5 border rounded-5 border-3">
+    <div id="FavMoviesDisplay" class="container m-3 border rounded-5 border-3">
         Tous les films issues des favoris à afficher :
         <!-- Boucle avec le {{{body}}} qui renvoie sur moviesDisplay. -->
     </div>
+
+    <!-- Boucle avec le {{{body}}} qui renvoie sur moviesDisplay. -->
+    {{#if favoritesMovies}}
+        <div id="moviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+            {{#each favoritesMovies}}
+                {{> movieDisplay}}
+            {{/each}}
+        </div>
+    {{else}}
+        <p>Il semble que vous n'ayez pas encore de film coup de coeur. Snifff...</p>
+        <p>Revenez ici après avoir visionnés un film qui fait désormais parti de vos favoris.</p>
+    {{/if}}
 
     <div class="container d-flex justify-content-center align-items-center">
         <button class="btn btn-light border rounded-left"> < </button>
