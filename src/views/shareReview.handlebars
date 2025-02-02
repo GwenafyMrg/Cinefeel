@@ -19,6 +19,10 @@
             {{#ifnot userData}}
                 <p class="text-danger text-center">Créer un compte utilisateur afin de partager votre avis avec la communauté.</p>
             {{/ifnot}}
+            {{#if noData}}
+                <p>Votre avis n'a pas été sauvegardé !</p>
+                <p class="text-danger text-center">Veuillez enregistrer des émotions ressenties ou un commentaire pour que votre avis soit pris en compte.</p>
+            {{/if}}
 
             <div class="d-flex justify-content-between m-3">
                 <div>
@@ -52,6 +56,11 @@
                 <label for="commentInput">Ajouter un commentaire à la suite de votre visionnage :</label><br>
                 <textarea id="commentInput" name="comment"></textarea>
             </div>
+
+            <details>
+                <summary>Information de publication</summary>
+                 <p>Si vous souhaitez que votre avis soit enregistré, vous devez transmettre un vote d'émotions ou alors un commentaire en plus de votre note.</p>
+            </details>
 
             {{!-- Si l'utilisateur a un compte --}}
             {{#if userData}}
