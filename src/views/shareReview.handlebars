@@ -19,9 +19,9 @@
             {{#ifnot userData}}
                 <p class="text-danger text-center">Créer un compte utilisateur afin de partager votre avis avec la communauté.</p>
             {{/ifnot}}
-            {{#if noData}}
-                <p>Votre avis n'a pas été sauvegardé !</p>
-                <p class="text-danger text-center">Veuillez enregistrer des émotions ressenties ou un commentaire pour que votre avis soit pris en compte.</p>
+            {{#if existingReview}}
+                <p class="text-danger text-center">Vous avez déjà enregistré un avis pour ce film !</p>
+                <p class="text-danger text-center"><b>Il est encore impossible de modifier un avis à l'heure actuelle...</b></p>
             {{/if}}
 
             <div class="d-flex justify-content-between m-3">
@@ -31,30 +31,54 @@
                 <div>
                     {{!-- Note attribuée au film --}}
                     <label for="noteInput">Note : <span id="noteDisplay"></span> /10</label>
-                    <input id="noteInput" name="note" type="range" min="0" max="10" value="0">
+                    {{#ifnot-or-if userData existingReview}}
+                        <input id="noteInput" name="note" type="range" min="0" max="10" value="0" disabled>
+                    {{else}}
+                        <input id="noteInput" name="note" type="range" min="0" max="10" value="0">
+                    {{/ifnot-or-if}}
 
                     {{!-- Film favori ou non --}}
                     <label for="favInput">Favori :</label>
-                    <input id="favInput" name="fav" type="checkbox">
+                    {{#ifnot-or-if userData existingReview}}
+                        <input id="favInput" name="fav" type="checkbox" disabled>
+                    {{else}}
+                        <input id="favInput" name="fav" type="checkbox">
+                    {{/ifnot-or-if}}
                 </div>
             </div>
 
             <div id="emotionsContainer" class="d-flex flex-wrap">
-                {{!-- Pour chaque emotion : --}}
-                {{#each emotionsList}}
-                    {{!-- Générer un conteneur --}}
-                    <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
-                        {{!-- Avec un label et une case à cocher avec le nom de l'émotion --}}
-                        <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
-                        <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox">
-                    </div>
-                {{/each}}
+                {{#ifnot-or-if userData existingReview}}
+                    {{!-- Pour chaque emotion : --}}
+                    {{#each emotionsList}}
+                        {{!-- Générer un conteneur --}}
+                        <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
+                            {{!-- Avec un label et une case à cocher avec le nom de l'émotion --}}
+                            <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
+                            <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox" disabled>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    {{!-- Pour chaque emotion : --}}
+                    {{#each emotionsList}}
+                        {{!-- Générer un conteneur --}}
+                        <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
+                            {{!-- Avec un label et une case à cocher avec le nom de l'émotion --}}
+                            <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
+                            <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox">
+                        </div>
+                    {{/each}}
+                {{/ifnot-or-if}}
             </div>
 
             <div class="m-3">
                 {{!-- Zone de texte pour un commentaire plus détaillée --}}
                 <label for="commentInput">Ajouter un commentaire à la suite de votre visionnage :</label><br>
-                <textarea id="commentInput" name="comment"></textarea>
+                {{#ifnot-or-if userData existingReview}}
+                    <textarea id="commentInput" name="comment" disabled></textarea>
+                {{else}}
+                    <textarea id="commentInput" name="comment"></textarea>
+                {{/ifnot-or-if}}
             </div>
 
             <details>
@@ -62,13 +86,13 @@
                  <p>Si vous souhaitez que votre avis soit enregistré, vous devez transmettre un vote d'émotions ou alors un commentaire en plus de votre note.</p>
             </details>
 
-            {{!-- Si l'utilisateur a un compte --}}
-            {{#if userData}}
-                <button type="submit">Publier</button>
-            {{!-- S'il est juste invité --}}
-            {{else}}
+            {{!-- Si l'utilisateur est invité ou qu'un avis existe déjà en tant qu'utilisateur inscrit --}}
+            {{#ifnot-or-if userData existingReview}}
                 <button type="submit" disabled>Publier</button>
-            {{/if}}
+            {{!-- S'il est inscrit et qu'il n'a pas encore d'avis --}}
+            {{else}}
+                <button type="submit">Publier</button>
+            {{/ifnot-or-if}}
         </form>
     </div>
 </div>

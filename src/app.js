@@ -55,6 +55,15 @@ Handlebars.registerHelper("ifnot", function(value, options){
     }
 });
 
+Handlebars.registerHelper("ifnot-or-if", function(value1, value2, options){
+    if(!value1 || value2){
+       return options.fn(this);
+    }
+    else{
+        return options.inverse(this);
+    }
+});
+
 app.set("view engine", "handlebars");                       //Définir les extensions de fichier à rechercher lors d'un rendu
 app.set("views", "./views");                                //Configuration du répertoire des templates.
 
@@ -575,12 +584,30 @@ app.post("/create-account", async (req,res) => {
 //Chemin de publication d'un avis :
 app.get("/shareReview", async (req,res) => {
 
-    const movieID = req.query.movie;        //Récupération de l'identifiant du film concerné.
-    // console.log(movieID);
-
     //------------------
     //>>>>>>Check la structure du code
     //------------------
+
+    const movieID = req.query.movie;        //Récupération de l'identifiant du film concerné.
+    let existingReview = false;
+
+    if(req.session.user){
+        const userID = req.session.user.id;
+
+        const reviewByCurrentUser = await UserOpinion.findAll({
+            where : {
+                [Op.and] : {
+                    opinion_id_movie : {[Op.eq] : movieID},
+                    opinion_id_user : {[Op.eq] : userID}
+                }
+            }
+        });
+        console.log(reviewByCurrentUser);
+        if(reviewByCurrentUser.length != 0){
+            console.log("un avis est publié ici");
+            existingReview = true;
+        }
+    }
 
     if(movieID){
         //---------------------Afficher le film séléctionné :-------------------
@@ -606,6 +633,7 @@ app.get("/shareReview", async (req,res) => {
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
             // console.log(movieQuery);
+
             const movies = await funct.getMoviesData(movieQuery);
     
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
@@ -657,7 +685,7 @@ app.get("/shareReview", async (req,res) => {
                 // console.log(opinions);
 
                 if(req.session.user){ //Si l'utilisateur est inscrit :
-                    res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions});
+                    res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions, existingReview : existingReview});
                 }
                 else{   //S'il ne l'est pas :
                     res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
