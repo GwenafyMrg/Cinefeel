@@ -55,6 +55,15 @@ Handlebars.registerHelper("ifnot", function(value, options){
     }
 });
 
+Handlebars.registerHelper("ifnot-or-if", function(value1, value2, options){
+    if(!value1 || value2){
+       return options.fn(this);
+    }
+    else{
+        return options.inverse(this);
+    }
+});
+
 app.set("view engine", "handlebars");                       //Définir les extensions de fichier à rechercher lors d'un rendu
 app.set("views", "./views");                                //Configuration du répertoire des templates.
 
@@ -92,17 +101,21 @@ app.get("/", async (req, res) => {              //Chemin d'origine
 
         //Récupération des données complémentaires dynamiques des films.
         const allMoviesAndData = await funct.getMoviesData(allMoviesQuery);
-        
         console.log(allMoviesAndData);
-        //--------------------------
 
-        if(req.session.user){
-            //Retourner le template home.handlebars avec la donnée movies et les données de session de l'utilsateur connecté.
-            res.render("home", {userData : req.session.user, movies : allMoviesAndData});
+        if(allMoviesAndData.error){
+            res.status(500).send("Erreur : " + allMoviesAndData.error);
+            //>>>>>>Envoyé la page d'erreur correspondante 
         }
         else{
-            //Retourner le template home.handlebars avec la donnée movies.
-            res.render("home", {movies : allMoviesQuery});
+            if(req.session.user){
+                //Retourner le template home.handlebars avec la donnée movies et les données de session de l'utilsateur connecté.
+                res.render("home", {userData : req.session.user, movies : allMoviesAndData});
+            }
+            else{
+                //Retourner le template home.handlebars avec la donnée movies.
+                res.render("home", {movies : allMoviesQuery});
+            }
         }
 
     } catch (err){
@@ -245,21 +258,27 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         });
         // console.log(genresList);
 
-        if (req.session.user) {
-            // res.render("filter", {userData : req.session.user, filteredMovies : filteredMovies});
-            res.render("filter", {
-                userData: req.session.user, 
-                genresList,
-                filteredMovies: filteredMovies,
-                currentFilters : savedFilters,
-            });
-        } else {
-            // res.render("filter", {filteredMovies : filteredMovies});
-            res.render("filter", {
-                genresList, 
-                filteredMovies: filteredMovies,
-                currentFilters : savedFilters,
-            });
+        if(filteredMovies.error){
+            res.status(500).send("Erreur détéctée :" + filteredMovies.error);
+            //>>>>>>>Envoyé la page d'erreur
+        }
+        else{
+            if (req.session.user) {
+                // res.render("filter", {userData : req.session.user, filteredMovies : filteredMovies});
+                res.render("filter", {
+                    userData: req.session.user, 
+                    genresList,
+                    filteredMovies: filteredMovies,
+                    currentFilters : savedFilters,
+                });
+            } else {
+                // res.render("filter", {filteredMovies : filteredMovies});
+                res.render("filter", {
+                    genresList, 
+                    filteredMovies: filteredMovies,
+                    currentFilters : savedFilters,
+                });
+            }
         }
 
     } catch (error) {
@@ -312,11 +331,17 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
         // console.log(query);
         const researchedMovies = await funct.getMoviesData(query);
 
-        if(req.session.user){
-            res.render("search", {userData : req.session.user, result : researchedMovies, research : value});
+        if(researchedMovies.error){
+            res.status(500).send("Erreur détéctée :" + researchedMovies.error);
+            //>>>>>>>Envoyé la page d'erreur
         }
         else{
-            res.render("search", {result : researchedMovies, research : value});
+            if(req.session.user){
+                res.render("search", {userData : req.session.user, result : researchedMovies, research : value});
+            }
+            else{
+                res.render("search", {result : researchedMovies, research : value});
+            }
         }
     }
     catch{
@@ -431,11 +456,17 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
             });
             const movies = await funct.getMoviesData(movieQuery);
 
-            if(req.session.user){
-                res.render("home", {userData : req.session.user, movies : movies});
+            if(movies.error){
+                res.status(500).send("Erreur détéctée :" + movies.error);
+                //>>>>>>>Envoyé la page d'erreur
             }
             else{
-                res.render("home", {movies : movies});
+                if(req.session.user){
+                    res.render("home", {userData : req.session.user, movies : movies});
+                }
+                else{
+                    res.render("home", {movies : movies});
+                }
             }
         }
         catch(err){
@@ -575,12 +606,30 @@ app.post("/create-account", async (req,res) => {
 //Chemin de publication d'un avis :
 app.get("/shareReview", async (req,res) => {
 
-    const movieID = req.query.movie;        //Récupération de l'identifiant du film concerné.
-    // console.log(movieID);
-
     //------------------
     //>>>>>>Check la structure du code
     //------------------
+
+    const movieID = req.query.movie;        //Récupération de l'identifiant du film concerné.
+    let existingReview = false;
+
+    if(req.session.user){
+        const userID = req.session.user.id;
+
+        const reviewByCurrentUser = await UserOpinion.findAll({
+            where : {
+                [Op.and] : {
+                    opinion_id_movie : {[Op.eq] : movieID},
+                    opinion_id_user : {[Op.eq] : userID}
+                }
+            }
+        });
+        console.log(reviewByCurrentUser);
+        if(reviewByCurrentUser.length != 0){
+            console.log("un avis est publié ici");
+            existingReview = true;
+        }
+    }
 
     if(movieID){
         //---------------------Afficher le film séléctionné :-------------------
@@ -606,6 +655,7 @@ app.get("/shareReview", async (req,res) => {
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
             // console.log(movieQuery);
+
             const movies = await funct.getMoviesData(movieQuery);
     
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
@@ -656,11 +706,17 @@ app.get("/shareReview", async (req,res) => {
                 // console.log(votes);
                 // console.log(opinions);
 
-                if(req.session.user){ //Si l'utilisateur est inscrit :
-                    res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions});
+                if(movies.error){
+                    res.status(500).send("Erreur détéctée :" + movies.error);
+                    //>>>>>>>Envoyé la page d'erreur
                 }
-                else{   //S'il ne l'est pas :
-                    res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
+                else{
+                    if(req.session.user){ //Si l'utilisateur est inscrit :
+                        res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions, existingReview : existingReview});
+                    }
+                    else{   //S'il ne l'est pas :
+                        res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
+                    }
                 }
             }
             catch (err) {
@@ -684,111 +740,125 @@ app.get("/shareReview", async (req,res) => {
 app.post("/shareReview", async(req,res) => {
 
     try{
-        //TAF >>>>> VERIFIER LA RECUPERATION
-
         //Récupération des entrées de l'avis utilisateur par le formulaire :
         const noteReview = parseInt(req.body.note,10);  //Conversion de la note en INT pour la BDD.
         let emotionsChoices = req.body.emotions;
-        let favReview = req.body.fav;                   //favReview vaut 0 ou 1.
+        let favReview = req.body.fav;                   //favReview vaut "undefined" ou "on".
         let commentReview = req.body.comment;
-        // console.log(emotionsChoices);
 
-        //Traitement de la valeur de favReview pour correspondre avec le modèle de la BDD.
-        favReview = favReview ? true : false;   //true si favReview vaut 1, false s'il vaut 0.
-        // console.log(favReview);
-
-        //Traitement des émotions :
-        emotionsChoices = Object.keys(emotionsChoices); //Récupération des noms des émotions seulement ({émotions : "on"})
-        console.log(emotionsChoices);
-
-        //Traitement du commentaire :
-        if(commentReview == ""){    //S'il est vide :
-            commentReview = null;
+        //Si aucune émotions n'est choisi ou qu'aucun commentaire est fait, l'avis est considéré comme imcomplet :
+        if(!emotionsChoices && commentReview == ""){
+            const movieID = req.body.movie;
+            console.log("Redirection vers la page d'avis en raison du manque d'information.");
+            res.redirect(`/shareReview?movie=${movieID}`);
         }
-        else{   //S'il n'est pas vide :
-            commentReview = commentReview.trim();           //Supprimer les espaces de trop.
-            commentReview = sanitizeHtml(commentReview, {   //Limiter les balises HTML :
-                allowedTags: ['b','i','em','strong', 'br'], //Balises autorisées.
-                allowedAttributes: []                       //Attributs de balises autorisés.
-            });
-        }
-        // console.log(commentReview);
+        //S'il y a assez d'informations pour traiter l'avis :
+        else{
+            //---------Traitement du favori :----------- : (pour correspondre au modèle de la BDD)
+            favReview = favReview ? true : false;   //true si favReview vaut "on", false s'il vaut undefined.
+            // console.log(favReview);
 
-        try{
-            const userID = parseInt(req.session.user.id,10); //Forcer le type INT sur l'identifiant user.
-            // console.log("id user:", userID);
-            const movieID = parseInt(req.body.movie, 10);   //Forcer le type INT sur l'identifiant movie.
-            // console.log("id movie :", movieID);
-
-            await UserOpinion.create(   //Insérer l'avis dans la BDD :
-                {
-                    opinion_id_user : userID,
-                    opinion_id_movie : movieID,
-                    opinion_note : noteReview,
-                    opinion_fav : favReview,
-                    opinion_comment : commentReview,
-                }
-            );
-
-            //Contraignant de récupérer l'id par le formulaire, cela surcharge le formulaire, on préfèrera volontairement rechercher dans la BDD.
-            //Pour toutes les émotions choisies (3) faire :
-            for (emotion of emotionsChoices){
-                const emotionChoiceQuery = await Emotion.findAll({ //Récupérer l'identifiant de l'émotion associée :
-                    attributes: ["emotion_id_emotion"],
-                    where : {
-                        emotion_name : {[Op.eq] : emotion}
-                    }
-                });
-                //---------------->>>>>>>>>>>>>>>>>>
-                //Eviter de récupérer un tableau à la suite du .map() (retour par défaut).
-                const emotionID = emotionChoiceQuery.map(emotion => emotion.dataValues.emotion_id_emotion)[0];
-                console.log(emotionID);
-
-                await Vote.create(  //Création d'un enregistrement du vote dans la BDD.
-                    {
-                        id_user : userID,
-                        id_movie : movieID,
-                        id_emotion : emotionID
-                    }
-                );                
-                //transaction et callback ???
-                // console.log("Vote de l'émotion ", emotionID, " de l'utilisateur", userID, "enregistré pour le film", movieID);
+            //---------Traitement du commentaire :----------- :
+            if(commentReview == ""){    //S'il est vide :
+                commentReview = null;
             }
-
-            console.log("Avis et votes des émotions de l'utilisateur", userID, "enregistré pour le film", movieID);
-            
-            //------------------------
-            //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
-            //------------------------
-            
-            try{
-                const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
-                    include: [{
-                        model: Genre,                   //Modéle/Table à inclure.
-                        as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
-                        attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                        through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
-                    },
-                    {
-                        model: Director, 
-                        as: 'Directors',
-                        attributes: ['director_lastname','director_firstname'],
-                        through: { attributes: []}
-                    }]
+            else{   //S'il n'est pas vide :
+                commentReview = commentReview.trim();           //Supprimer les espaces de trop.
+                commentReview = sanitizeHtml(commentReview, {   //Limiter les balises HTML :
+                    allowedTags: ['b','i','em','strong', 'br'], //Balises autorisées.
+                    allowedAttributes: []                       //Attributs de balises autorisés.
                 });
-                const movies = await funct.getMoviesData(movieQuery);
+            }
+            // console.log(commentReview);
 
-                //Retour à l'accueil à la suite de la publication d'avis.
-                res.render("home", {userData : req.session.user, movies : movies})
+            //---------Enregistrement de l'avis :----------- :
+            try{
+                const userID = parseInt(req.session.user.id,10); //Forcer le type INT sur l'identifiant user.
+                // console.log("id user:", userID);
+                const movieID = parseInt(req.body.movie, 10);   //Forcer le type INT sur l'identifiant movie.
+                // console.log("id movie :", movieID);
+
+                await UserOpinion.create(   //Insérer l'avis dans la BDD :
+                    {
+                        opinion_id_user : userID,
+                        opinion_id_movie : movieID,
+                        opinion_note : noteReview,
+                        opinion_fav : favReview,
+                        opinion_comment : commentReview,
+                    }
+                );
+
+                //---------Traitement des Emotions :----------- :
+                if(emotionsChoices){
+                    emotionsChoices = Object.keys(emotionsChoices); //Récupération des noms des émotions seulement ({émotions : "on"})
+                    // console.log(emotionsChoices);
+
+                    //Contraignant de récupérer l'id par le formulaire, cela surcharge le formulaire, on préfèrera volontairement rechercher dans la BDD.
+                    //Pour toutes les émotions choisies (3 au plus) faire :
+                    for (emotion of emotionsChoices){
+                        const emotionChoiceQuery = await Emotion.findAll({ //Récupérer l'identifiant de l'émotion associée :
+                            attributes: ["emotion_id_emotion"],
+                            where : {
+                                emotion_name : {[Op.eq] : emotion}
+                            }
+                        });
+
+                        //Eviter de récupérer un tableau à la suite du .map() (retour par défaut).
+                        const emotionID = emotionChoiceQuery.map(emotion => emotion.dataValues.emotion_id_emotion)[0];
+                        console.log(emotionID);
+
+                        //---------Enregistrement du/des vote(s) dans la BDD : -----------
+                        await Vote.create(  
+                            {
+                                id_user : userID,
+                                id_movie : movieID,
+                                id_emotion : emotionID
+                            }
+                        );                
+                        //transaction et callback ???
+                        // console.log("Vote de l'émotion ", emotionID, " de l'utilisateur", userID, "enregistré pour le film", movieID);
+                    }
+                    console.log("Avis avec votes des émotions de l'utilisateur", userID, "enregistré pour le film", movieID);
+                }
+                else{
+                    console.log("Avis sans votes de l'utilisateur", userID, "enregistré pour le film", movieID);
+                }
+                
+                //------------------------
+                //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
+                //------------------------
+                
+                try{
+                    const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
+                        include: [{
+                            model: Genre,                   //Modéle/Table à inclure.
+                            as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
+                            attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
+                            through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                        },
+                        {
+                            model: Director, 
+                            as: 'Directors',
+                            attributes: ['director_lastname','director_firstname'],
+                            through: { attributes: []}
+                        }]
+                    });
+                    const movies = await funct.getMoviesData(movieQuery);
+                    //Pas de gestion d'erreur sur la fonction getMoviesData
+                    //S'il y a une erreur le premier catch() s'en chargera.
+
+                    //Retour à l'accueil à la suite de la publication d'avis.
+                    res.render("home", {userData : req.session.user, movies : movies})
+                }
+                catch(err){
+                    console.error("La redirection a échoué.");
+                    res.status(500).send("La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !");
+                }
             }
             catch(err){
-                console.error("La redirection a échoué.");
-                res.status(500).send("La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !");
+                console.error("Erreur lors de l'enregistrement de l'avis :", err);
+                res.status(500).send("Erreur lors de l'enregistrement de l'avis.");
             }
-        }
-        catch(err){
-            console.error("Erreur lors de l'enregistrement de l'avis :", err);
-            res.status(500).send("Erreur lors de l'enregistrement de l'avis.");
         }
     }
     catch(err){

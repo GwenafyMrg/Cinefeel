@@ -17,7 +17,9 @@
     {{!-- Corps de l'avis --}}
     <div class="bodyReview">
         <div class="commentDisplay">
-            Son commentaire: {{opinion_comment}}
+            {{#if opinion_comment}}
+                Son commentaire: {{opinion_comment}}
+            {{/if}}
         </div>
     </div>
 
