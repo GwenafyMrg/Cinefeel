@@ -40,12 +40,13 @@
                     {{else}}
                         <summary>Profil</summary>
                     {{/if}}
-                    <a href="../my-movies" class="border-3">Vos films</a>
-                    <a href="../my-favorites" class="border-3">Vos favoris</a>
-                    <a href="../my-badges">Vos badges</a>
                     <hr>
                     {{#if userData}}
                         <a href="../">Profil</a>
+                        <a href="../my-movies" class="border-3">Vos films</a>
+                        <a href="../my-favorites" class="border-3">Vos favoris</a>
+                        <a href="../my-badges">Vos badges</a>
+                        <hr>
                         <a href="../logout">Déconnexion</a>
                         <a href="../parameters">Paramètres</a>
                     {{else}}

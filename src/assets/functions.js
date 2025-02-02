@@ -1,5 +1,8 @@
-//Modules de sécurité.
-const sanitizeHtml = require('sanitize-html');              //Protéger contre les Injection SQL
+const sanitizeHtml = require('sanitize-html');              //Module de sécurité contre les Injection SQL
+const {UserOpinion, Vote, Emotion} = require('../models');  //Importations des modèles nécessaires
+const {Op} = require('sequelize');                          //Objet opération pour les Requêtes SQL
+
+//--------------------------Fonctions Helpers pour HandleBars : ---------------------
 
 function convertDateFormat(date){
     //Convertit le format AAAA-MM-DD au format DD-MM-AAAA.
@@ -34,7 +37,10 @@ function normalizeString(text){
     return normalized;
 }
 
+//--------------------------Fonctions Utilitaires pour l'application Web : ---------------------
+
 function cleanPassword(pw){
+    //Nettoye une chaine de caractère destiné à être un mot de passe haché par la suite.
     
     let safePassword = pw;
     safePassword = safePassword.trim();         //Retirer les espaces inutiles.
@@ -45,10 +51,104 @@ function cleanPassword(pw){
     return safePassword;
 }
 
+async function getMoviesData (movieObj){
+    //Fonction asynchrone permettant de calculer la note moyenne et les émotions les plus votées
+    //d'une série de film stockée dans un objet JavaScript.
+
+    //Pour chaque film dans la liste de films transmis : 
+    for (const movie of movieObj) {
+        //Essayer de calculer la note moyenne pour chaque film :
+        try {
+            //Récupérer tous les avis du film concerné :
+            const reviewsBelongsToMovie = await UserOpinion.findAll({
+                where: {
+                    opinion_id_movie: { [Op.eq]: movie.movie_id_movie } //Restriction sur l'identifiant du film.
+                }
+            });
+            // console.log("Les Avis du film:", reviewsBelongsToMovie);
+
+            let somme = 0;
+            let nbReview = 0;
+            for(let review of reviewsBelongsToMovie){   //Pour chaque avis dans la liste d'avis :
+                somme += review.opinion_note;           //Additionner la note avec les autres
+                nbReview += 1;                          //Augmenter le compteur d'avis de 1
+            }
+
+            let avg_note = somme/nbReview;              //Calculer de la moyenne
+            if(!avg_note){                          //Si la note est NaN :
+                avg_note = 0;                       //Remplacé la valeur NaN par 0
+            }
+            // console.log("Note moyenne:" ,avg_note);
+            movie.movie_avg_note = avg_note;        //Ajouter la valeur à l'objet
+
+        } catch(err){
+            console.error("Erreur lors du calcul de la note moyenne :", err);
+            movieObj.error = err;       //Retourner l'erreur depuis l'objet.
+        }
+
+        // Calculer les émotions les plus votées pour chaque film :
+        try{
+            //Récupérer tous les votes du film concerné : 
+            const votesForMovie = await Vote.findAll({
+                where : {
+                    id_movie : {[Op.eq] : movie.movie_id_movie}     //Restriction sur l'identifiant du film.
+                },
+                include : [                                 //Jointure avec le modèle Emotion
+                    {
+                        model: Emotion,
+                        as : "Emotion",
+                        attributes : ["emotion_name"],      //Récupérer le nom de l'émotion
+                    }
+                ]
+            });
+            // console.log(votesForMovie);
+    
+            if(votesForMovie.length != 0){  //S'il existe au moins 1 vote
+                let votesCount = [];    //Tableau pour stocker les émotions et leur nombre de votes.
+        
+                votesForMovie.forEach(vote => {     //Pour chaque vote :
+                    const emotionName = vote.Emotion.emotion_name;  //Récupérer du nom
+        
+                    //Récupérer un boolean indiquant si l'émotion existe dans le structure de compte
+                    let existingVote = votesCount.find(item => item.name === emotionName);
+        
+                    if (existingVote) {         //Si l'émotion existe déjà
+                        existingVote.count++;   //Incrémenter son nombre de votes
+                    } else {                    //Si l'émotion n'existe pas déjà
+                        votesCount.push({ name: emotionName, count: 1 });   //Ajouter l'émotion et initialiser le compteur
+                    }
+                });
+                votesCount.sort((a, b) => b.count - a.count);   //Trier les émotions dans l'ordre décroissant du nombre de votes.
+                //.sort() --> trie le tableau à l'aide d'une fonction de comparaison
+                //pour (a,b) des valeurs de votesCount :
+                //Si b.count - a.count > 0 --> b est plus grand que a donc b est placé avant.
+                //Si b.count - a.count < 0 --> a est plus grand que b donc a est placé avant.
+
+                // console.log("Votes globales:", votesCount);
+        
+                //Récupération des 3 premières valeurs (les plus votées)
+                upVotes = [votesCount[0].name, votesCount[1].name, votesCount[2].name];
+                // console.log(upVotes);
+
+                //Insertion des 3 émotions les plus upVote dans la structure du film concerné toujours.
+                movie.popularEmotions = upVotes;
+
+            }
+            //S'il n'y a pas de vote, ne rien faire de plus.
+        }
+        catch(err){
+            console.error("Erreur lors du calcul des émotions les plus votées :", err);
+            movieObj.error = err;   //Retourner l'erreur depuis l'objet.
+        }
+    }    
+    return movieObj;    //Retourner l'objet disposant des données de notes et des votes des films.
+}
+
 //Exportation des fonctions :
 module.exports = {
     convertDateFormat,
     convertRuntime,
     normalizeString,
     cleanPassword,
+    getMoviesData
 };

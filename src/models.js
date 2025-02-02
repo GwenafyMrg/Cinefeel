@@ -378,6 +378,20 @@ Vote.belongsTo(Emotion, {
     as: "Emotion",
 });
 
+//----------------Pour les films des utilisateurs :
+//Code à expliquer >>>>>>>
+
+UserOpinion.belongsTo(Movie, {
+    foreignKey: "opinion_id_movie",
+    as: "Movie"
+});
+
+Movie.hasMany(UserOpinion, {
+    foreignKey: "opinion_id_movie",
+    as: "UserOpinions"
+});
+
+
 //------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
 
 sequelize.sync({force: false})              //Tentative de synchrinisation.
