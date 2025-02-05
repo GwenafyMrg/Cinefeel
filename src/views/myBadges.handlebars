@@ -1,3 +1,4 @@
+{{!-- Page affichant les badges que l'utilisateur a obtenu ou non --}}
 <div class="container-fluid d-flex flex-column w-75 my-3">
 
     <div>
@@ -8,9 +9,10 @@
         </p>
     </div>
 
+    {{!-- Container d'affichage des badges obtenus --}}
     <div class="container bg-secondary my-2">
-        <img src="" alt="">
         <p>Vous avez obtenu les badges suivants :</p>
+        {{!-- Boucler l'affichage du partials sur les informations de badges transmises --}}
         {{#each obtainedBadges}}
             {{> badgeDisplay}}
         {{/each}}
@@ -18,6 +20,7 @@
 
     <hr>
 
+    {{!-- Container d'affichage des badges non obtenus --}}
     <div class="container bg-secondary my-2">
         <img src="" alt="">
         <p>Réaliser cette tache pour obtenir le badge.</p>

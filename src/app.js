@@ -964,16 +964,17 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
 
 app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'utilisateur.
 
-    if(req.session.user){
+    if(req.session.user){   //Si l'utilisateur est bien connecté
         try{
-            const userID = req.session.user.id;
-            console.log(userID);
+            const userID = req.session.user.id; //Récupération de l'identifiant utilisateur
+            // console.log(userID);
 
+            //Récupération des bagdes obtenues à partir de la table prévue à cet effet.
             const obtainedBadges = await UserBadge.findAll({
                 where: {
-                    id_user: { [Op.eq]: userID }
+                    id_user: { [Op.eq]: userID }    //Restriction sur l'identifiant utilisateur
                 },
-                include: [
+                include: [  //Jointure avec la table Badge
                     {
                         model: Badge,
                         as: "badge",
@@ -986,16 +987,19 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
             //     console.log(obtentions.badge);
             // });
 
-            res.render("myBadges", {userData: req.session.user, obtainedBadges : obtainedBadges});
+            res.render("myBadges", {
+                userData: req.session.user, 
+                obtainedBadges : obtainedBadges
+            });
         }
         catch(err){
-            console.error("Erreur", err);
-            res.status(500).send("Erreur" + err);
+            console.error("Erreur lors de la récupération de vos données :", err);
+            res.status(500).send("Erreur lors de la récupération de vos données :" + err);
         }
     }
     else{
-        console.error("Pas connecté");
-        res.status(500).send("Pas connecté");
+        console.error("Chemin d'accès non autorisé pour votre statut.");
+        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
     }
 });
 
