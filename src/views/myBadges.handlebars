@@ -10,7 +10,10 @@
 
     <div class="container bg-secondary my-2">
         <img src="" alt="">
-        <p>Vous avez obtenu ce badge en ...</p>
+        <p>Vous avez obtenu les badges suivants :</p>
+        {{#each obtainedBadges}}
+            {{> badgeDisplay}}
+        {{/each}}
     </div>
 
     <hr>

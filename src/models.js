@@ -256,7 +256,7 @@ const UserBadge = sequelize.define("userBadge", {   //Définit le modèle userBa
     }},
     {
         tableName: "userBadge",
-        timestamps: false           //Voir basculer à true pour plus d'info sur l'obtention des badges.
+        timestamps: false,           //Voir basculer à true pour plus d'info sur l'obtention des badges.
 });
 
 const Badge = sequelize.define("badge", {   //Définit le modèle Badge
@@ -276,6 +276,14 @@ const Badge = sequelize.define("badge", {   //Définit le modèle Badge
     badge_serial_nb : {
         type: DataTypes.TINYINT,
         allowNull: true
+    },
+    badge_type :{
+        type: DataTypes.STRING,
+        allowNull : false
+    },
+    badge_value :{
+        type : DataTypes.STRING,
+        allowNull: false
     }},
     {
         tableName: "badge",
@@ -331,12 +339,19 @@ User.belongsToMany(Movie, {
     as: "Movies"
 });
 
-//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les films.
+// Un utilisateur peut avoir plusieurs badges
 User.belongsToMany(Badge, {
     through: UserBadge,
     foreignKey: "id_user",
     otherKey: "id_badge",
-    as: "Badges"
+    as: "badges"
+});
+
+Badge.belongsToMany(User, {
+    through: UserBadge,
+    foreignKey: "id_badge",
+    otherKey: "id_user",
+    as: "users"
 });
 
 //Nouvelle section ajouté à la suite de problème de jointure entre User et UserOpinion 
@@ -391,6 +406,17 @@ Movie.hasMany(UserOpinion, {
     as: "UserOpinions"
 });
 
+//Pour les badges :
+UserBadge.belongsTo(Badge, {
+    foreignKey: "id_badge",
+    as: "badge"
+});
+
+// Associer UserBadge à User pour inclure directement les informations de l'utilisateur
+UserBadge.belongsTo(User, {
+    foreignKey: "id_user",
+    as: "user"
+});
 
 //------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
 
@@ -413,4 +439,5 @@ module.exports = {
     Vote,
     Emotion,
     Badge,
+    UserBadge
 };

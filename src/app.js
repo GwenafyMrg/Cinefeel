@@ -4,7 +4,7 @@
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
 const Handlebars = require('handlebars');                   //Gestion des helpers pour les templates Handlebars
-const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
+const {Op, Model} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
@@ -14,7 +14,7 @@ const sanitizeHtml = require('sanitize-html');              //Protéger contre l
 const bcrypt = require('bcrypt');                           //Hacher les mots de passe  
 
 //Import de module locaux : 
-const {Movie, Director, Genre, User, UserOpinion, Emotion, Vote} = require('./models'); //Importation des modèles de BDD
+const {Movie, Director, Genre, User, UserOpinion, Emotion, Vote, Badge, UserBadge} = require('./models'); //Importation des modèles de BDD
 const funct = require('./assets/functions');                //Importer les fonctions personnelles
 
 //-----------------------------------Définition de l'application Web :-------------------------------//
@@ -962,8 +962,41 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
     }
 });
 
-app.get("/my-badges", (req, res) => {       //Chemin vers les badges de l'utilisateur.
-    res.render("myBadges");
+app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'utilisateur.
+
+    if(req.session.user){
+        try{
+            const userID = req.session.user.id;
+            console.log(userID);
+
+            const obtainedBadges = await UserBadge.findAll({
+                where: {
+                    id_user: { [Op.eq]: userID }
+                },
+                include: [
+                    {
+                        model: Badge,
+                        as: "badge",
+                        attributes: ["badge_distinction","badge_url","badge_serial_nb"],
+                    }
+                ]
+            });
+            // console.log(obtainedBadges);
+            // obtainedBadges.forEach(obtentions => {
+            //     console.log(obtentions.badge);
+            // });
+
+            res.render("myBadges", {userData: req.session.user, obtainedBadges : obtainedBadges});
+        }
+        catch(err){
+            console.error("Erreur", err);
+            res.status(500).send("Erreur" + err);
+        }
+    }
+    else{
+        console.error("Pas connecté");
+        res.status(500).send("Pas connecté");
+    }
 });
 
 app.get("/parameters", (req, res) => {      //Chemin vers les paramètres.
