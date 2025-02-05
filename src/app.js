@@ -151,8 +151,13 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
         }
     }
     catch(err){
-        console.log("Erreur de redirection.");
-        res.send("Erreur de redirection.");
+        console.error("Erreur lors de la redirection :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Erreur lors de la redirection : <br>" + err
+        });
     }
 });
 
@@ -282,8 +287,13 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         }
 
     } catch (error) {
-        console.error("Erreur lors du filtrage :", error);
-        res.status(500).send("Une erreur est survenue lors du filtrage des films.");
+        console.error("Erreur lors du filtrage :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Une erreur est survenue lors du filtrage des films. <br>" + err
+        });
     }
 });
 
@@ -303,7 +313,7 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
     //Insensible à la casse, pas besoin de toLowerCase();
 
     try {
-        const query = await Movie.findAll({
+        const query = /*del await pour générer une erreur*/ Movie.findAll({
 
             //Recherché un film par son titre, le nom ou le prénom du réalisateur.
             where: {
@@ -332,8 +342,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
         const researchedMovies = await funct.getMoviesData(query);
 
         if(researchedMovies.error){
-            res.status(500).send("Erreur détéctée :" + researchedMovies.error);
-            //>>>>>>>Envoyé la page d'erreur
+            const researchError = researchedMovies.error
+            console.error(researchError);
+            res.status(researchError.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : researchError.status || 500, 
+                desc_error : researchError
+            });
         }
         else{
             if(req.session.user){
@@ -344,9 +360,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
             }
         }
     }
-    catch{
-        console.error("Erreur lors de la recherche des donneés.");
-        res.status(500).send("Une erreur s'est produite lors de la recherche.");
+    catch(err){
+            console.error("Erreur lors de la recherche des donneés :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : err
+        });
     }
 });
 
@@ -422,8 +443,14 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     } else {// Le mot de passe transmis ne corresponds pas.
                         msgError = "Mot de passe incorrect.";
                     }
-                } catch (error) {
-                    console.error('Erreur lors de la recherche de correspondance entre les mots de passe :', error);
+                } catch (err) {
+                    console.error("Erreur lors de la recherche de correspondance entre les mots de passe :", err);
+                    res.status(err.status || 500);
+                    res.render("error", {
+                        layout : false, 
+                        code_error : err.status || 500, 
+                        desc_error : err
+                    });
                 }
             }
             else{//L'email n'est pas dans la liste des utilisateurs : 
@@ -457,8 +484,13 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
             const movies = await funct.getMoviesData(movieQuery);
 
             if(movies.error){
-                res.status(500).send("Erreur détéctée :" + movies.error);
-                //>>>>>>>Envoyé la page d'erreur
+                console.error(movies.error);
+                res.status(movies.error.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : movies.error.status || 500, 
+                    desc_error : movies.error
+                });                
             }
             else{
                 if(req.session.user){
@@ -470,8 +502,13 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
             }
         }
         catch(err){
-            console.error("Erreur lors de la redirection vers l'acceuil.");
-            res.status(500).send("Erreur lors de la redirection vers l'acceuil. Les données n'ont pas pu être chargées...");
+            console.error("Erreur lors de la redirection vers l'acceuil :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Erreur lors de la redirection vers l'acceuil. <br>Les données n'ont pas pu être chargées...<br>" + err
+            });  
         }
     }
 });
@@ -484,9 +521,14 @@ app.get("/logout", (req, res) => {
         res.clearCookie("connect.sid"); //Supprimer le cookie de session du client (utilisé pour identifier).
         console.log("Déconnecté avec Succés !");
     } 
-    catch (error) {
-        console.log("Erreur lors de la déconnexion.");
-        res.status(500).send("Une erreur est survenue lors de la déconnexion à votre compte.");
+    catch (err) {   
+        console.error("Erreur lors de la déconnexion :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Une erreur est survenue lors de la déconnexion à votre compte.<br> " + err
+        });
     }
     res.redirect("/");  //Redirige vers l'URL de l'accueil.
 });
@@ -575,9 +617,14 @@ app.post("/create-account", async (req,res) => {
                         );
                         console.log("Utilisateur enregistré.");
                     }
-                    catch{
-                        console.log("Une erreur est survenue lors de la création de votre compte utilisateur.");
-                        res.status(500).send("Une erreur est survenue lors de la création de votre compte utilisateur.");
+                    catch(err){
+                        console.error("Une erreur est survenue lors de la création de votre compte utilisateur :", err);
+                        res.status(err.status || 500);
+                        res.render("error", {
+                            layout : false, 
+                            code_error : err.status || 500, 
+                            desc_error : "Une erreur est survenue lors de la création de votre compte utilisateur. <br>" + err
+                        });
                     }
                 }
             }
@@ -598,8 +645,13 @@ app.post("/create-account", async (req,res) => {
         }
     }
     catch {
-        console.log("Une erreur est survenue lors de la récupération de vos informations.");
-        res.status(422).send("Une erreur est survenue lors de la récupération de vos informations.");
+        console.error("Une erreur est survenue lors de la récupération de vos informations :", err);
+        res.status(err.status || 422);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 422, 
+            desc_error : "Une erreur est survenue lors de la récupération de vos informations. <br>" + err
+        });
     }
 });
 
@@ -720,19 +772,34 @@ app.get("/shareReview", async (req,res) => {
                 }
             }
             catch (err) {
-                console.error("Impossible de charger la section des commentaires.", err);
-                res.status(500).send("Impossible de charger la section des commentaires.");
+                console.error("Impossible de charger la section des commentaires :", err);
+                res.status(err.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : err.status || 500, 
+                    desc_error : "Impossible de charger la section des commentaires. <br>" + err
+                });
             }
         }
         catch(err){
-            console.log("Impossible d'accéder au film que vous souhaitez.");
-            res.status(500).send("Impossible d'accéder au film que vous souhaitez.");
+            console.error("Impossible d'accéder au film que vous souhaitez :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Impossible d'accéder au film que vous souhaitez. <br>" + err
+            });
         }
     }
     else{
         //Si on accède à la page shareReview directement depuis l'URL :
-        console.log("Chemin d'accès anormal.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte...");
+        console.error("Chemin d'accès anormal :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... <br>" + err
+        });
     }
 });
 
@@ -851,19 +918,34 @@ app.post("/shareReview", async(req,res) => {
                     res.render("home", {userData : req.session.user, movies : movies})
                 }
                 catch(err){
-                    console.error("La redirection a échoué.");
-                    res.status(500).send("La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !");
+                    console.error("La redirection a échoué :", err);
+                    res.status(err.status || 500);
+                    res.render("error", {
+                        layout : false, 
+                        code_error : err.status || 500, 
+                        desc_error : "La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé ! <br>" + err
+                    });
                 }
             }
             catch(err){
                 console.error("Erreur lors de l'enregistrement de l'avis :", err);
-                res.status(500).send("Erreur lors de l'enregistrement de l'avis.");
+                res.status(err.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : err.status || 500, 
+                    desc_error : "Erreur lors de l'enregistrement de l'avis : <br>" + err
+                });
             }
         }
     }
     catch(err){
-        console.log("Erreur lors de la récupération des informations de votre avis.", err);
-        res.status(500).send("Erreur lors de la récupération des informations de votre avis.");
+        console.error("Erreur lors de la récupération des informations de votre avis :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Erreur lors de la récupération des informations de votre avis. <br>" + err
+        });
     }
 });
 
@@ -903,13 +985,23 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
             res.render("myMovies", {userData : req.session.user, watchedMovies : moviesWatchedUser});
         }
         catch(err){
-            console.error("Erreur lors de la récupération de vos films.", err);
-            res.status(500).send("Vos films visionnés non pas pu être récupéré correctement...");
+            console.error("Erreur lors de la récupération de vos films :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Les films que vous avez visionnés non pas pu être récupéré correctement... <br>" + err
+            });
         }
     }
     else{
-        console.error("Chemin d'accès non autorisé pour votre statut.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+        console.error("Chemin d'accès non autorisé pour votre statut. :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page. <br>" + err
+        });
     }
 });
 
@@ -952,13 +1044,23 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
             res.render("myFav", {userData : req.session.user, favoritesMovies : favoritesMoviesUser});
         }
         catch(err){
-            console.error("Erreur lors de la récupération de vos films.", err);
-            res.status(500).send("Vos films préférés non pas pu être récupéré correctement...");
+            console.error("Erreur lors de la récupération de vos films :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Les films que vous avez visionnés non pas pu être récupéré correctement... <br>" + err
+            });
         }
     }
     else{
-        console.error("Chemin d'accès non autorisé pour votre statut.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+        console.error("Chemin d'accès non autorisé pour votre statut. :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page. <br>" + err
+        });
     }
 });
 
