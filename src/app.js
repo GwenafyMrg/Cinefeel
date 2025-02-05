@@ -101,7 +101,7 @@ app.get("/", async (req, res) => {              //Chemin d'origine
 
         //Récupération des données complémentaires dynamiques des films.
         const allMoviesAndData = await funct.getMoviesData(allMoviesQuery);
-        console.log(allMoviesAndData);
+        // console.log(allMoviesAndData);
 
         if(allMoviesAndData.error){
             res.status(500).send("Erreur : " + allMoviesAndData.error);
@@ -778,15 +778,17 @@ app.post("/shareReview", async(req,res) => {
                 const movieID = parseInt(req.body.movie, 10);   //Forcer le type INT sur l'identifiant movie.
                 // console.log("id movie :", movieID);
 
-                await UserOpinion.create(   //Insérer l'avis dans la BDD :
-                    {
-                        opinion_id_user : userID,
-                        opinion_id_movie : movieID,
-                        opinion_note : noteReview,
-                        opinion_fav : favReview,
-                        opinion_comment : commentReview,
-                    }
-                );
+                //>>>>>>>>>>>>>>>>>
+                //Temporairement commenté :
+                // await UserOpinion.create(   //Insérer l'avis dans la BDD :
+                //     {
+                //         opinion_id_user : userID,
+                //         opinion_id_movie : movieID,
+                //         opinion_note : noteReview,
+                //         opinion_fav : favReview,
+                //         opinion_comment : commentReview,
+                //     }
+                // );
 
                 //---------Traitement des Emotions :----------- :
                 if(emotionsChoices){
@@ -805,16 +807,19 @@ app.post("/shareReview", async(req,res) => {
 
                         //Eviter de récupérer un tableau à la suite du .map() (retour par défaut).
                         const emotionID = emotionChoiceQuery.map(emotion => emotion.dataValues.emotion_id_emotion)[0];
-                        console.log(emotionID);
+                        // console.log(emotionID);
 
                         //---------Enregistrement du/des vote(s) dans la BDD : -----------
-                        await Vote.create(  
-                            {
-                                id_user : userID,
-                                id_movie : movieID,
-                                id_emotion : emotionID
-                            }
-                        );                
+                        //>>>>>>>>>>>>>>>>>
+                        //Temporairement commenté :
+
+                        // await Vote.create(  
+                        //     {
+                        //         id_user : userID,
+                        //         id_movie : movieID,
+                        //         id_emotion : emotionID
+                        //     }
+                        // );                
                         //transaction et callback ???
                         // console.log("Vote de l'émotion ", emotionID, " de l'utilisateur", userID, "enregistré pour le film", movieID);
                     }
@@ -828,6 +833,80 @@ app.post("/shareReview", async(req,res) => {
                 //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
                 //------------------------
                 
+                const notObtainedBadge = await Badge.findAll({
+                    include: [{
+                        model: UserBadge,
+                        as : "userBadges",
+                        attributes : [],
+                        required: false,
+                        where: { id_user: userID }
+                    }],
+                    where: {
+                        '$userBadges.id_badge$': null  // Filtre les badges qui n'ont pas de correspondance
+                    }
+                });
+                // console.log("Les badges non obtenues :", notObtainedBadge);
+
+                for(badge of notObtainedBadge){
+                    switch (badge.badge_type) {
+                        case "genre_count":
+                            // console.log("genre_count");
+                            const moviesWatched = await Movie.findAll({
+                                include: [
+                                    {
+                                        model: UserOpinion,
+                                        as: "UserOpinions",
+                                        attributes: [],
+                                        where: {
+                                            opinion_id_user: userID
+                                        },
+                                    },
+                                    {
+                                        model: Genre,
+                                        as: "Genres",
+                                        attributes: ["genre_libelle"],
+                                        through: { attributes: [] }
+                                    },
+                                ]
+                            });
+                            // console.log(moviesWatched);
+
+                            const [target, genreOfCondition] = badge.badge_value.split(",");
+                            // console.log("Cible :" + target);
+                            // console.log("Genre :" + genreOfCondition);
+                            let cmpt = 0;
+                            moviesWatched.forEach(movie => {
+                                let genresList = [];
+                                movie.dataValues.Genres.forEach(genre => {
+                                    genresList.push(genre.genre_libelle);
+                                });
+                                console.log(genresList);
+
+                                if(genresList.includes(genreOfCondition)){
+                                    cmpt++;
+                                }
+                            });
+                            console.log(cmpt);
+                            
+                            if(cmpt >= target){
+                                console.log("Obtention du bagde : ", badge.badge_distinction);
+                                //>>>>>>>>>>>>>
+                                // Insérer l'obtention du badge dans la BDD.
+                                //>>>>>>>>>>>>>
+                            }
+                            
+                            break;
+                        // case "date_count":
+                        //     console.log("date_count");
+                        //     break;
+                        // case "movie_count":
+                        //     console.log("movie_count");
+                        //     break;
+                    }
+                }
+
+                //----------------------------------------------
+
                 try{
                     const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
                         include: [{
