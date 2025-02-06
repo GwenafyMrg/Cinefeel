@@ -847,61 +847,78 @@ app.post("/shareReview", async(req,res) => {
                 });
                 // console.log("Les badges non obtenues :", notObtainedBadge);
 
+                const moviesWatched = await Movie.findAll({
+                    include: [
+                        {
+                            model: UserOpinion,
+                            as: "UserOpinions",
+                            attributes: [],
+                            where: {
+                                opinion_id_user: userID
+                            },
+                        },
+                        {
+                            model: Genre,
+                            as: "Genres",
+                            attributes: ["genre_libelle"],
+                            through: { attributes: [] }
+                        },
+                    ]
+                });
+                // console.log(moviesWatched);
+
+                let cmpt = 0
                 for(badge of notObtainedBadge){
+                    cmpt = 0;
                     switch (badge.badge_type) {
                         case "genre_count":
-                            // console.log("genre_count");
-                            const moviesWatched = await Movie.findAll({
-                                include: [
-                                    {
-                                        model: UserOpinion,
-                                        as: "UserOpinions",
-                                        attributes: [],
-                                        where: {
-                                            opinion_id_user: userID
-                                        },
-                                    },
-                                    {
-                                        model: Genre,
-                                        as: "Genres",
-                                        attributes: ["genre_libelle"],
-                                        through: { attributes: [] }
-                                    },
-                                ]
-                            });
-                            // console.log(moviesWatched);
 
-                            const [target, genreOfCondition] = badge.badge_value.split(",");
+                            const [genreTarget, genreOfCondition] = badge.badge_value.split(",");
                             // console.log("Cible :" + target);
                             // console.log("Genre :" + genreOfCondition);
-                            let cmpt = 0;
-                            moviesWatched.forEach(movie => {
-                                let genresList = [];
-                                movie.dataValues.Genres.forEach(genre => {
-                                    genresList.push(genre.genre_libelle);
-                                });
-                                console.log(genresList);
 
-                                if(genresList.includes(genreOfCondition)){
+                            moviesWatched.forEach(movie => {
+                                let genresListPerMovie = [];
+                                movie.dataValues.Genres.forEach(genre => {
+                                    genresListPerMovie.push(genre.genre_libelle);
+                                });
+                                // console.log(genresList);
+
+                                if(genresListPerMovie.includes(genreOfCondition)){
                                     cmpt++;
                                 }
                             });
-                            console.log(cmpt);
+                            console.log("type : genre_count | condition :", genreOfCondition, "| cible :", genreTarget, "| actuel :", cmpt);
                             
-                            if(cmpt >= target){
-                                console.log("Obtention du bagde : ", badge.badge_distinction);
-                                //>>>>>>>>>>>>>
-                                // Insérer l'obtention du badge dans la BDD.
-                                //>>>>>>>>>>>>>
+                            if(cmpt >= genreTarget){
+                                await funct.insertObtentionBagde(userID, badge);
                             }
-                            
                             break;
-                        // case "date_count":
-                        //     console.log("date_count");
-                        //     break;
-                        // case "movie_count":
-                        //     console.log("movie_count");
-                        //     break;
+
+                        case "date_count":
+                            const [dateTarget, dateOfCondition] = badge.badge_value.split(",");
+                            // console.log("Cible :" + target);
+                            // console.log("Genre :" + genreOfCondition);
+                            moviesWatched.forEach(movie => {
+                                if(movie.movie_released_date.split("-")[0] <= dateOfCondition){
+                                    cmpt++;
+                                }
+                            });
+
+                            console.log("type : date_count | condition :", dateOfCondition, "| cible :", dateTarget, "| actuel :", cmpt);
+                            if(cmpt >= dateTarget){
+                                await funct.insertObtentionBagde(userID, badge);
+                            }
+                            break;
+
+                        case "movie_count":
+                            const target = badge.badge_value;
+                            cmpt = moviesWatched.length;
+                            console.log("type : movie_count | cible :", target, "| actuel :", cmpt);
+                            if(cmpt >= target){
+                                await funct.insertObtentionBagde(userID, badge);
+                            }
+                            break;
                     }
                 }
 

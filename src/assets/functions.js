@@ -1,5 +1,5 @@
 const sanitizeHtml = require('sanitize-html');              //Module de sécurité contre les Injection SQL
-const {UserOpinion, Vote, Emotion} = require('../models');  //Importations des modèles nécessaires
+const {UserOpinion, Vote, Emotion, UserBadge} = require('../models');  //Importations des modèles nécessaires
 const {Op} = require('sequelize');                          //Objet opération pour les Requêtes SQL
 
 //--------------------------Fonctions Helpers pour HandleBars : ---------------------
@@ -144,11 +144,29 @@ async function getMoviesData (movieObj){
     return movieObj;    //Retourner l'objet disposant des données de notes et des votes des films.
 }
 
+async function insertObtentionBagde(user_id, badgeObj){
+    const [element , created] = await UserBadge.findOrCreate({
+        where : {
+            id_user : user_id,
+            id_badge : badgeObj.badge_id_badge
+        },
+        defaults :{
+            id_user : user_id,
+            id_badge : badgeObj.badge_id_badge
+        }
+    });
+    if(created){
+        console.log("Obtention du bagde : ", badgeObj.badge_distinction);
+    }
+}
+
 //Exportation des fonctions :
 module.exports = {
     convertDateFormat,
     convertRuntime,
     normalizeString,
     cleanPassword,
-    getMoviesData
+    //
+    getMoviesData,
+    insertObtentionBagde
 };
