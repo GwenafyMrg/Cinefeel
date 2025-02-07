@@ -832,123 +832,133 @@ app.post("/shareReview", async(req,res) => {
                 //------------------------
                 //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
                 //------------------------
-                
-                const notObtainedBadge = await Badge.findAll({
-                    include: [{
-                        model: UserBadge,
-                        as : "userBadges",
-                        attributes : [],
-                        required: false,
-                        where: { id_user: userID }
-                    }],
-                    where: {
-                        '$userBadges.id_badge$': null  // Filtre les badges qui n'ont pas de correspondance
-                    }
-                });
-                // console.log("Les badges non obtenues :", notObtainedBadge);
-
-                const moviesWatched = await Movie.findAll({
-                    include: [
-                        {
-                            model: UserOpinion,
-                            as: "UserOpinions",
-                            attributes: [],
-                            where: {
-                                opinion_id_user: userID
-                            },
-                        },
-                        {
-                            model: Genre,
-                            as: "Genres",
-                            attributes: ["genre_libelle"],
-                            through: { attributes: [] }
-                        },
-                    ]
-                });
-                // console.log(moviesWatched);
-
-                let cmpt = 0
-                for(badge of notObtainedBadge){
-                    cmpt = 0;
-                    switch (badge.badge_type) {
-                        case "genre_count":
-
-                            const [genreTarget, genreOfCondition] = badge.badge_value.split(",");
-                            // console.log("Cible :" + target);
-                            // console.log("Genre :" + genreOfCondition);
-
-                            moviesWatched.forEach(movie => {
-                                let genresListPerMovie = [];
-                                movie.dataValues.Genres.forEach(genre => {
-                                    genresListPerMovie.push(genre.genre_libelle);
-                                });
-                                // console.log(genresList);
-
-                                if(genresListPerMovie.includes(genreOfCondition)){
-                                    cmpt++;
-                                }
-                            });
-                            console.log("type : genre_count | condition :", genreOfCondition, "| cible :", genreTarget, "| actuel :", cmpt);
-                            
-                            if(cmpt >= genreTarget){
-                                await funct.insertObtentionBagde(userID, badge);
-                            }
-                            break;
-
-                        case "date_count":
-                            const [dateTarget, dateOfCondition] = badge.badge_value.split(",");
-                            // console.log("Cible :" + target);
-                            // console.log("Genre :" + genreOfCondition);
-                            moviesWatched.forEach(movie => {
-                                if(movie.movie_released_date.split("-")[0] <= dateOfCondition){
-                                    cmpt++;
-                                }
-                            });
-
-                            console.log("type : date_count | condition :", dateOfCondition, "| cible :", dateTarget, "| actuel :", cmpt);
-                            if(cmpt >= dateTarget){
-                                await funct.insertObtentionBagde(userID, badge);
-                            }
-                            break;
-
-                        case "movie_count":
-                            const target = badge.badge_value;
-                            cmpt = moviesWatched.length;
-                            console.log("type : movie_count | cible :", target, "| actuel :", cmpt);
-                            if(cmpt >= target){
-                                await funct.insertObtentionBagde(userID, badge);
-                            }
-                            break;
-                    }
-                }
 
                 //----------------------------------------------
-
+                
                 try{
-                    const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
+                    const notObtainedBadge = await Badge.findAll({
                         include: [{
-                            model: Genre,                   //Modéle/Table à inclure.
-                            as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
-                            attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                            through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
-                        },
-                        {
-                            model: Director, 
-                            as: 'Directors',
-                            attributes: ['director_lastname','director_firstname'],
-                            through: { attributes: []}
-                        }]
+                            model: UserBadge,
+                            as : "userBadges",
+                            attributes : [],
+                            required: false,
+                            where: { id_user: userID }
+                        }],
+                        where: {
+                            '$userBadges.id_badge$': null  // Filtre les badges qui n'ont pas de correspondance
+                        }
                     });
-                    const movies = await funct.getMoviesData(movieQuery);
-                    //Pas de gestion d'erreur sur la fonction getMoviesData
-                    //S'il y a une erreur le premier catch() s'en chargera.
-
-                    //Retour à l'accueil à la suite de la publication d'avis.
-                    res.render("home", {userData : req.session.user, movies : movies})
+                    // console.log("Les badges non obtenues :", notObtainedBadge);
+    
+                    const moviesWatched = await Movie.findAll({
+                        include: [
+                            {
+                                model: UserOpinion,
+                                as: "UserOpinions",
+                                attributes: [],
+                                where: {
+                                    opinion_id_user: userID
+                                },
+                            },
+                            {
+                                model: Genre,
+                                as: "Genres",
+                                attributes: ["genre_libelle"],
+                                through: { attributes: [] }
+                            },
+                        ]
+                    });
+                    // console.log(moviesWatched);
+    
+                    let cmpt = 0
+                    for(badge of notObtainedBadge){
+                        cmpt = 0;
+                        switch (badge.badge_type) {
+                            case "genre_count":
+    
+                                const [genreTarget, genreOfCondition] = badge.badge_value.split(",");
+                                // console.log("Cible :" + target);
+                                // console.log("Genre :" + genreOfCondition);
+    
+                                moviesWatched.forEach(movie => {
+                                    let genresListPerMovie = [];
+                                    movie.dataValues.Genres.forEach(genre => {
+                                        genresListPerMovie.push(genre.genre_libelle);
+                                    });
+                                    // console.log(genresList);
+    
+                                    if(genresListPerMovie.includes(genreOfCondition)){
+                                        cmpt++;
+                                    }
+                                });
+                                console.log("type : genre_count | condition :", genreOfCondition, "| cible :", genreTarget, "| actuel :", cmpt);
+                                
+                                if(cmpt >= genreTarget){
+                                    await funct.insertObtentionBadge(userID, badge);
+                                }
+                                break;
+    
+                            case "date_count":
+                                const [dateTarget, dateOfCondition] = badge.badge_value.split(",");
+                                // console.log("Cible :" + target);
+                                // console.log("Genre :" + genreOfCondition);
+                                moviesWatched.forEach(movie => {
+                                    if(movie.movie_released_date.split("-")[0] <= dateOfCondition){
+                                        cmpt++;
+                                    }
+                                });
+    
+                                console.log("type : date_count | condition :", dateOfCondition, "| cible :", dateTarget, "| actuel :", cmpt);
+                                if(cmpt >= dateTarget){
+                                    await funct.insertObtentionBadge(userID, badge);
+                                }
+                                break;
+    
+                            case "movie_count":
+                                const target = badge.badge_value;
+                                cmpt = moviesWatched.length;
+                                console.log("type : movie_count | cible :", target, "| actuel :", cmpt);
+                                if(cmpt >= target){
+                                    await funct.insertObtentionBadge(userID, badge);
+                                }
+                                break;
+                            default :
+                                console.log("Ce type d'obtention n'est pas pris en charge.");
+                        }
+                    }
+    
+                    //----------------------------------------------
+    
+                    try{
+                        const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
+                            include: [{
+                                model: Genre,                   //Modéle/Table à inclure.
+                                as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
+                                attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
+                                through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                            },
+                            {
+                                model: Director, 
+                                as: 'Directors',
+                                attributes: ['director_lastname','director_firstname'],
+                                through: { attributes: []}
+                            }]
+                        });
+                        const movies = await funct.getMoviesData(movieQuery);
+                        //Pas de gestion d'erreur sur la fonction getMoviesData
+                        //S'il y a une erreur le premier catch() s'en chargera.
+    
+                        //Retour à l'accueil à la suite de la publication d'avis.
+                        res.render("home", {userData : req.session.user, movies : movies})
+                    }
+                    catch(err){
+                        console.error("La redirection a échoué :", err);
+                        res.status(500).send("La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !");
+                    }
                 }
                 catch(err){
-                    console.error("La redirection a échoué.");
-                    res.status(500).send("La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !");
+                    console.error("Erreur lors de la mise à jour des badges :", err);
+                    res.status(500).send("Erreur lors de la mise à jour des badges.");
                 }
             }
             catch(err){
@@ -958,7 +968,7 @@ app.post("/shareReview", async(req,res) => {
         }
     }
     catch(err){
-        console.log("Erreur lors de la récupération des informations de votre avis.", err);
+        console.log("Erreur lors de la récupération des informations de votre avis :", err);
         res.status(500).send("Erreur lors de la récupération des informations de votre avis.");
     }
 });
