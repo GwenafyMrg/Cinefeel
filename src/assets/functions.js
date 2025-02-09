@@ -166,5 +166,5 @@ module.exports = {
     cleanPassword,
     //
     getMoviesData,
-    insertObtentionBadge
+    insertObtainedBadge
 };

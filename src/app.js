@@ -419,7 +419,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                         }
                         console.log(req.session.user);
                         console.log("Connecté avec succès !");
-                    } else {// Le mot de passe transmis ne corresponds pas.
+                    } else { // Le mot de passe transmis ne corresponds pas.
                         msgError = "Mot de passe incorrect.";
                     }
                 } catch (error) {
@@ -462,7 +462,8 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
             }
             else{
                 if(req.session.user){
-                    res.render("home", {userData : req.session.user, movies : movies});
+                    res.render("home", {
+                        userData : req.session.user, movies : movies});
                 }
                 else{
                     res.render("home", {movies : movies});
@@ -494,6 +495,9 @@ app.get("/logout", (req, res) => {
 //Chemin de création de compte :
 app.get("/create-account", (req, res) => {
     if(req.session.user){
+        //>>>>>>>>>>>>
+        //Bloqué la page de création de compte si déjà connecté
+        //>>>>>>>>>>>>
         res.render("createAccount", {userData : req.session.user});
     }
     else{
@@ -535,7 +539,7 @@ app.post("/create-account", async (req,res) => {
         }
         //Début de traitement des données.
         else{
-            usernameInputCA = usernameInputCA.trim();                     //Supprimer les espaces de trop.
+            usernameInputCA = usernameInputCA.trim();              //Supprimer les espaces de trop.
             const safeUsername = sanitizeHtml(usernameInputCA, {   //Limiter les balises HTML :
                 allowedTags: ['b','i','em','strong'],       //Balises autorisées.
                 allowedAttributes: []                       //Attributs de balises autorisés.
@@ -583,18 +587,12 @@ app.post("/create-account", async (req,res) => {
             }
         }
         //Fin de traitement des données.
-
+        
         if(msgError){//Si une erreur est détécté.
             res.render("createAccount", {error : msgError});
-            // res.send(msgError);
         }
         else{//Sinon
-            if(req.session.user){
-                res.render("login", {userData : req.session.user});
-            }
-            else{
-                res.render("login"); //Redirection vers la page de connexion.
-            }
+            res.render("login", {createdAccount : true}); //Redirection vers la page de connexion.
         }
     }
     catch {
@@ -828,10 +826,6 @@ app.post("/shareReview", async(req,res) => {
                 else{
                     console.log("Avis sans votes de l'utilisateur", userID, "enregistré pour le film", movieID);
                 }
-                
-                //------------------------
-                //AFFICHER POP-UP de confirmation (CSS) (confirmer la soumission OUI ou NON)
-                //------------------------
 
                 //----------------------------------------------
                 

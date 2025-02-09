@@ -15,10 +15,6 @@ function convertRuntime(runtime){
     }
 }
 
-function selected(element){
-    element.style.backgroundColor = "green";
-}
-
 //---------------------------------------A définir :-----------------------------------------
 
 // Gérer les boutons de retournements pour toutes les movieCards.
@@ -124,10 +120,12 @@ document.addEventListener("DOMContentLoaded", function() {      //Au chargement 
         // Si plus de 3 checkboxes sont cochées, décocher la case qui vient d'être cochée
         if (checkedCheckboxes.length > 3) {
             event.target.checked = false;
-            //>>>>>>>>>>>>>>>>>>>>>>>>>>
-            //MODIFIER LE POP-UP D'ALERTE.
-            //>>>>>>>>>>>>>>>>>>>>>>>>>>
-            alert('Vous ne pouvez voter que pour 3 émotions au maximum.');
+            Swal.fire({
+                title: "Attention !",
+                text: "Vous ne pouvez voter que pour 3 émotions au maximum",
+                icon : "error",
+                confirmButtonText: "D'ACCORD",
+            });
         }
     });
 });

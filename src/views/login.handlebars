@@ -16,10 +16,6 @@
             <label for="password">Mot de passe :</label>
             <input id="password" name="password" type="password" minlength="4" maxlength="25" required>
         </div>
-        
-        {{#if error}}
-            <p class="text-center text-danger">{{error}}</p>
-        {{/if}}
 
         {{!-- Boutons interactifs : --}}
         <div class="d-flex justify-content-between mx-auto my-4 w-75">
@@ -27,6 +23,10 @@
             <button class="btn btn-block btn-info mx-3">Connexion</button>
         </div>
     </form>
+
+    {{#if error}}
+        <p class="text-center text-danger">{{error}}</p>
+    {{/if}}
 
 {{!-- Créer un compte utilisateur, s'il n'y en a pas déjà : --}}
 <div class="container-fluid bg-primary w-50 p-2 text-center">
