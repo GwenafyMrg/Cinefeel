@@ -144,7 +144,7 @@ async function getMoviesData (movieObj){
     return movieObj;    //Retourner l'objet disposant des données de notes et des votes des films.
 }
 
-async function insertObtentionBadge(user_id, badgeObj){
+async function insertObtainedBadge(user_id, badgeObj){
     const [element , created] = await UserBadge.findOrCreate({
         where : {
             id_user : user_id,
@@ -155,12 +155,7 @@ async function insertObtentionBadge(user_id, badgeObj){
             id_badge : badgeObj.badge_id_badge
         }
     });
-    if(created){
-        console.log("Obtention du badge : ", badgeObj.badge_distinction);
-        //>>>>>>>>>>>>>>>
-        //Appeler un pop-up
-        //>>>>>>>>>>>>>>>
-    }
+    return created;
 }
 
 //Exportation des fonctions :

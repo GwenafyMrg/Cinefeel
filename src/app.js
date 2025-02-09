@@ -870,6 +870,7 @@ app.post("/shareReview", async(req,res) => {
                     });
                     // console.log(moviesWatched);
     
+                    let newObtainedBadges = [];
                     let cmpt = 0
                     for(badge of notObtainedBadge){
                         cmpt = 0;
@@ -894,7 +895,10 @@ app.post("/shareReview", async(req,res) => {
                                 console.log("type : genre_count | condition :", genreOfCondition, "| cible :", genreTarget, "| actuel :", cmpt);
                                 
                                 if(cmpt >= genreTarget){
-                                    await funct.insertObtentionBadge(userID, badge);
+                                    const isCreated = await funct.insertObtainedBadge(userID, badge);
+                                    if(isCreated){
+                                        newObtainedBadges.push(badge);
+                                    }
                                 }
                                 break;
     
@@ -910,7 +914,10 @@ app.post("/shareReview", async(req,res) => {
     
                                 console.log("type : date_count | condition :", dateOfCondition, "| cible :", dateTarget, "| actuel :", cmpt);
                                 if(cmpt >= dateTarget){
-                                    await funct.insertObtentionBadge(userID, badge);
+                                    const isCreated = await funct.insertObtainedBadge(userID, badge);
+                                    if(isCreated){
+                                        newObtainedBadges.push(badge);
+                                    }
                                 }
                                 break;
     
@@ -919,13 +926,24 @@ app.post("/shareReview", async(req,res) => {
                                 cmpt = moviesWatched.length;
                                 console.log("type : movie_count | cible :", target, "| actuel :", cmpt);
                                 if(cmpt >= target){
-                                    await funct.insertObtentionBadge(userID, badge);
+                                    const isCreated = await funct.insertObtainedBadge(userID, badge);
+                                    if(isCreated){
+                                        newObtainedBadges.push(badge);
+                                    }
                                 }
                                 break;
                             default :
                                 console.log("Ce type d'obtention n'est pas pris en charge.");
                         }
                     }
+
+                    newObtainedBadges = newObtainedBadges.map(badge => ({
+                        badge_id: badge.badge_id_badge,
+                        badge_distinction: badge.badge_distinction,
+                        badge_url : badge.badge_url,
+                        badge_serial_nb : badge.badge_serial_nb
+                    }));
+                    console.log(newObtainedBadges);
     
                     //----------------------------------------------
     
@@ -949,7 +967,11 @@ app.post("/shareReview", async(req,res) => {
                         //S'il y a une erreur le premier catch() s'en chargera.
     
                         //Retour à l'accueil à la suite de la publication d'avis.
-                        res.render("home", {userData : req.session.user, movies : movies})
+                        res.render("home", {
+                            userData : req.session.user, 
+                            movies : movies,
+                            badges: JSON.stringify(newObtainedBadges), // Convertir en JSON string
+                        });
                     }
                     catch(err){
                         console.error("La redirection a échoué :", err);
