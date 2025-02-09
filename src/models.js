@@ -427,15 +427,22 @@ Vote.belongsTo(Emotion, {
 //-----Pour les badge-----//
 
 //Pour les badges :
-UserBadge.belongsTo(Badge, {
-    foreignKey: "id_badge",
-    as: "badge"
-});
 
 // Associer UserBadge à User pour inclure directement les informations de l'utilisateur
 UserBadge.belongsTo(User, {
     foreignKey: "id_user",
     as: "user"
+});
+
+UserBadge.belongsTo(Badge, {
+    foreignKey: "id_badge",
+    as: "badge"
+});
+
+//Pour les badges pas obtenus.
+Badge.hasMany(UserBadge, {
+    foreignKey : "id_badge",
+    as : "userBadges"
 });
 
 //------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
