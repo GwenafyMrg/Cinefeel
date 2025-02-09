@@ -37,9 +37,10 @@
 
 <script>
     async function showBadges() {
-        const badges = JSON.parse('{{{badges}}}'); // Reconversion en JS
+        const badges = JSON.parse('{{{badges}}}'); // Reconversion du JSON string en objet JS
 
-        for (const badge of badges) {
+        for (const badge of badges) {   //Pour chaque badges :
+            //Afficher un popup :
             await Swal.fire({
                 title: `Badge n°${badge.badge_id} Obtenu !`,
                 imageUrl : `${badge.badge_url}?raw=true`,
@@ -52,7 +53,7 @@
         }
     }
 
-    if('{{{badges}}}'){
+    if('{{{badges}}}'){ //Si une données badges (nouveaux badges obtenus) est transmise :
         showBadges(); // Lancer la séquence d'affichage des pop-ups
     }
 </script>

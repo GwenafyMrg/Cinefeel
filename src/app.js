@@ -4,7 +4,7 @@
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
 const Handlebars = require('handlebars');                   //Gestion des helpers pour les templates Handlebars
-const {Op, Model} = require('sequelize');                          //Gestion des clauses de requête SQL
+const {Op, Model} = require('sequelize');                   //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
@@ -35,7 +35,7 @@ app.engine('handlebars', engine({       //Définition des paramètres de l'appli
         allowProtoMethodsByDefault: true
     },
 
-    //Helpers pour exécuter des fonctions lors du rendu des templates.
+    //Helpers pour exécuter des fonctions lors du rendu des templates (côté client) :
     helpers: {
         convertRuntime: funct.convertRuntime,
         convertDateFormat: funct.convertDateFormat,
@@ -48,7 +48,7 @@ Handlebars.registerHelper("ifnot", function(value, options){
     //value --> valeur transmis après le "ifnot" dans le code Handlebars.
     //options --> décide quel bloc s'éxécute.
     if(!value){                         //Si le paramètre est falsy :
-        return options.fn(this);        //Exécute le bloc principale "#if"
+        return options.fn(this);        //Exécute le bloc principale "#ifnot"
     }
     else{                               //Sinon :
         return options.inverse(this);   //Exécute la partie "else"
@@ -56,7 +56,7 @@ Handlebars.registerHelper("ifnot", function(value, options){
 });
 
 Handlebars.registerHelper("ifnot-or-if", function(value1, value2, options){
-    if(!value1 || value2){
+    if(!value1 || value2){          //Si le premier est falsy ou que le second est truly :
        return options.fn(this);
     }
     else{
@@ -611,10 +611,10 @@ app.get("/shareReview", async (req,res) => {
     const movieID = req.query.movie;        //Récupération de l'identifiant du film concerné.
     let existingReview = false;
 
-    if(req.session.user){
-        const userID = req.session.user.id;
+    if(req.session.user){   //Si un utilisateur est connécté
+        const userID = req.session.user.id; //On récupère son identifiant
 
-        const reviewByCurrentUser = await UserOpinion.findAll({
+        const reviewByCurrentUser = await UserOpinion.findAll({ //Avis de l'utilisateur actuel
             where : {
                 [Op.and] : {
                     opinion_id_movie : {[Op.eq] : movieID},
@@ -706,14 +706,25 @@ app.get("/shareReview", async (req,res) => {
 
                 if(movies.error){
                     res.status(500).send("Erreur détéctée :" + movies.error);
-                    //>>>>>>>Envoyé la page d'erreur
+                    //>>>>>>>
+                    //Envoyé la page d'erreur
+                    //>>>>>>>
                 }
                 else{
                     if(req.session.user){ //Si l'utilisateur est inscrit :
-                        res.render("shareReview", {userData : req.session.user, movie : movies, emotionsList: emotionQuery, reviews: opinions, existingReview : existingReview});
+                        res.render("shareReview", {
+                            userData : req.session.user, 
+                            movie : movies, emotionsList: emotionQuery, 
+                            reviews: opinions, 
+                            existingReview : existingReview
+                        });
                     }
                     else{   //S'il ne l'est pas :
-                        res.render("shareReview", {movie : movies, emotionsList: emotionQuery, reviews : opinions});
+                        res.render("shareReview", {
+                            movie : movies,
+                            emotionsList: emotionQuery, 
+                            reviews : opinions
+                        });
                     }
                 }
             }
@@ -777,7 +788,7 @@ app.post("/shareReview", async(req,res) => {
                 // console.log("id movie :", movieID);
 
                 //>>>>>>>>>>>>>>>>>
-                //Temporairement commenté :
+                //Temporairement commenté pour les tests:
                 // await UserOpinion.create(   //Insérer l'avis dans la BDD :
                 //     {
                 //         opinion_id_user : userID,
@@ -809,7 +820,7 @@ app.post("/shareReview", async(req,res) => {
 
                         //---------Enregistrement du/des vote(s) dans la BDD : -----------
                         //>>>>>>>>>>>>>>>>>
-                        //Temporairement commenté :
+                        //Temporairement commenté pour les tests :
 
                         // await Vote.create(  
                         //     {
@@ -827,23 +838,28 @@ app.post("/shareReview", async(req,res) => {
                     console.log("Avis sans votes de l'utilisateur", userID, "enregistré pour le film", movieID);
                 }
 
-                //----------------------------------------------
+                //---------------------------------------------------------------------
+                //Gestion des nouveaux badges obtenus suite à la soumission de l'avis :
+                //---------------------------------------------------------------------
                 
                 try{
+                    //Récupération des badges non obtenus :
                     const notObtainedBadge = await Badge.findAll({
                         include: [{
                             model: UserBadge,
                             as : "userBadges",
                             attributes : [],
                             required: false,
-                            where: { id_user: userID }
+                            where: { id_user: userID }  //Restriction par l'identifiant utilisateur
                         }],
+                        //Récupéré ce qu'il ne possède pas, sans association dans la table userBadge.
                         where: {
-                            '$userBadges.id_badge$': null  // Filtre les badges qui n'ont pas de correspondance
+                            '$userBadges.id_badge$': null
                         }
                     });
                     // console.log("Les badges non obtenues :", notObtainedBadge);
-    
+                    
+                    //Récupéré l'ensemble des films qu'il a vu (celui sur lequel il vient de donner un avis aussi)
                     const moviesWatched = await Movie.findAll({
                         include: [
                             {
@@ -864,81 +880,103 @@ app.post("/shareReview", async(req,res) => {
                     });
                     // console.log(moviesWatched);
     
-                    let newObtainedBadges = [];
-                    let cmpt = 0
-                    for(badge of notObtainedBadge){
-                        cmpt = 0;
+                    let newObtainedBadges = []; //Tableau contenant les badges qu'il va débloqué.
+                    let cmpt = 0    //Compteur pour la gestion des conditions d'obtention.
+                    for(badge of notObtainedBadge){ //Pour tous les badges qu'il n'a pas débloqué.
+                        cmpt = 0;   //réinitialisation du compteur.
                         switch (badge.badge_type) {
-                            case "genre_count":
+                            case "genre_count": //La condition dépend des genres regardés :
     
                                 const [genreTarget, genreOfCondition] = badge.badge_value.split(",");
+                                //genreTarget --> le nombre de films de ce genre à voir.
+                                //genreOfCondition --> le genre qui est ciblé.
+
                                 // console.log("Cible :" + target);
                                 // console.log("Genre :" + genreOfCondition);
     
+                                //Pour chaque films vus, récupéré tous ses genres :
                                 moviesWatched.forEach(movie => {
-                                    let genresListPerMovie = [];
+                                    let genresListPerMovie = [];    //Tableau des genres du film.
                                     movie.dataValues.Genres.forEach(genre => {
-                                        genresListPerMovie.push(genre.genre_libelle);
+                                        genresListPerMovie.push(genre.genre_libelle); //Insertion des genres.
                                     });
                                     // console.log(genresList);
     
+                                    //Si le genre cible est présent dans la liste de genre du film :
                                     if(genresListPerMovie.includes(genreOfCondition)){
-                                        cmpt++;
+                                        cmpt++; //Incrémenter le compteur.
                                     }
                                 });
                                 console.log("type : genre_count | condition :", genreOfCondition, "| cible :", genreTarget, "| actuel :", cmpt);
                                 
+                                //Si le compteur a atteint la cible :
                                 if(cmpt >= genreTarget){
+                                    //Débloqué le badge correspond.
                                     const isCreated = await funct.insertObtainedBadge(userID, badge);
                                     if(isCreated){
-                                        newObtainedBadges.push(badge);
+                                        newObtainedBadges.push(badge);  //Ajouter ce badge débloqué à la liste.
                                     }
                                 }
                                 break;
     
-                            case "date_count":
+                            case "date_count":  //La condition dépend de la date des films regardés :
                                 const [dateTarget, dateOfCondition] = badge.badge_value.split(",");
+                                //dateTarget --> le nombre de films avant la date demandée à voir.
+                                //dateOfCondition --> la date de sortie du film ciblée.
+
                                 // console.log("Cible :" + target);
                                 // console.log("Genre :" + genreOfCondition);
+
+                                //Pour chaque films vus :
                                 moviesWatched.forEach(movie => {
+                                    //Si l'année est inférieur à la date(année) de la condition :
                                     if(movie.movie_released_date.split("-")[0] <= dateOfCondition){
-                                        cmpt++;
+                                        cmpt++; //Incrémenter le compteur.
                                     }
                                 });
-    
                                 console.log("type : date_count | condition :", dateOfCondition, "| cible :", dateTarget, "| actuel :", cmpt);
+                                
+                                //Si le compteur a atteint la cible :
                                 if(cmpt >= dateTarget){
+                                    //Débloqué le badge correspond.
                                     const isCreated = await funct.insertObtainedBadge(userID, badge);
                                     if(isCreated){
-                                        newObtainedBadges.push(badge);
+                                        newObtainedBadges.push(badge);  //Ajouter ce badge débloqué à la liste.
                                     }
                                 }
                                 break;
     
-                            case "movie_count":
-                                const target = badge.badge_value;
-                                cmpt = moviesWatched.length;
+                            case "movie_count": //La condition du nombre de films vus :
+                                const target = badge.badge_value; //Nombre de film à voir.
+                                cmpt = moviesWatched.length; //Compteur égale au nombre de films vus.
                                 console.log("type : movie_count | cible :", target, "| actuel :", cmpt);
+
+                                //Si le compteur a atteint la cible :
                                 if(cmpt >= target){
+                                    //Débloqué le badge correspond.
                                     const isCreated = await funct.insertObtainedBadge(userID, badge);
                                     if(isCreated){
-                                        newObtainedBadges.push(badge);
+                                        newObtainedBadges.push(badge); //Ajouter ce badge débloqué à la liste.
                                     }
                                 }
                                 break;
+
                             default :
                                 console.log("Ce type d'obtention n'est pas pris en charge.");
                         }
                     }
 
+                    //Simplification des données du tableau :
                     newObtainedBadges = newObtainedBadges.map(badge => ({
                         badge_id: badge.badge_id_badge,
                         badge_distinction: badge.badge_distinction,
                         badge_url : badge.badge_url,
                         badge_serial_nb : badge.badge_serial_nb
                     }));
-                    console.log(newObtainedBadges);
+                    // console.log(newObtainedBadges);
     
+                    //----------------------------------------------
+                    //Récupération des données pour la redirection :
                     //----------------------------------------------
     
                     try{
@@ -964,7 +1002,7 @@ app.post("/shareReview", async(req,res) => {
                         res.render("home", {
                             userData : req.session.user, 
                             movies : movies,
-                            badges: JSON.stringify(newObtainedBadges), // Convertir en JSON string
+                            badges: JSON.stringify(newObtainedBadges), // Convertion en JSON string
                         });
                     }
                     catch(err){
@@ -991,18 +1029,18 @@ app.post("/shareReview", async(req,res) => {
 
 app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'utilisateur.
 
-    if(req.session.user){
+    if(req.session.user){   //Si un utilisateur est connecté :
         try{
-            const userID = req.session.user.id;
+            const userID = req.session.user.id; //Récupération de son identifiant :
 
-            const moviesWatchedUser = await Movie.findAll({
+            const moviesWatchedUser = await Movie.findAll({ //Récupération de tous les films vus par l'utilisateur :
                 include: [
                     {
                         model: UserOpinion,
                         as: "UserOpinions",
                         attributes: [],
                         where: {
-                            opinion_id_user: userID
+                            opinion_id_user: userID //Restriction sur l'identifiant utilisateur.
                         }
                     },
                     {
@@ -1019,10 +1057,12 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
                     }
                 ]
             });
+            // console.log(moviesWatchedUser);
 
-            console.log(moviesWatchedUser);
-
-            res.render("myMovies", {userData : req.session.user, watchedMovies : moviesWatchedUser});
+            res.render("myMovies", {
+                userData : req.session.user, 
+                watchedMovies : moviesWatchedUser
+            });
         }
         catch(err){
             console.error("Erreur lors de la récupération de vos films.", err);
@@ -1037,11 +1077,11 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
 
 app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favoris de l'utilisateur.
 
-    if(req.session.user){
+    if(req.session.user){   //Si un utilisateur est connecté :
         try{
-            const userID = req.session.user.id;
+            const userID = req.session.user.id; //Récupération de son identifiant :
 
-            const favoritesMoviesUser = await Movie.findAll({
+            const favoritesMoviesUser = await Movie.findAll({ //Récupération de tous les films favoris par l'utilisateur :
                 include: [
                     {
                         model: UserOpinion,
@@ -1049,8 +1089,8 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
                         attributes: [],
                         where: {
                             [Op.and] : {
-                                opinion_id_user: userID,
-                                opinion_fav : 1             //true
+                                opinion_id_user: userID,    //Restriction sur l'identifiant utilisateur.
+                                opinion_fav : 1             //Et sur la valeur de l'attribut favori (true).
                             }
                         }
                     },
@@ -1068,10 +1108,12 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
                     }
                 ]
             });
+            // console.log(favoritesMoviesUser);
 
-            console.log(favoritesMoviesUser);
-
-            res.render("myFav", {userData : req.session.user, favoritesMovies : favoritesMoviesUser});
+            res.render("myFav", {
+                userData : req.session.user, 
+                favoritesMovies : favoritesMoviesUser
+            });
         }
         catch(err){
             console.error("Erreur lors de la récupération de vos films.", err);
@@ -1091,7 +1133,7 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
             const userID = req.session.user.id; //Récupération de l'identifiant utilisateur
             // console.log(userID);
 
-            //Récupération des bagdes obtenues à partir de la table prévue à cet effet.
+            //Récupération des bagdes obtenues à partir de la table prévue à cet effet :
             const obtainedBadges = await UserBadge.findAll({
                 where: {
                     id_user: { [Op.eq]: userID }    //Restriction sur l'identifiant utilisateur

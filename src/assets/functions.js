@@ -1,8 +1,8 @@
-const sanitizeHtml = require('sanitize-html');              //Module de sécurité contre les Injection SQL
-const {UserOpinion, Vote, Emotion, UserBadge} = require('../models');  //Importations des modèles nécessaires
-const {Op} = require('sequelize');                          //Objet opération pour les Requêtes SQL
+const sanitizeHtml = require('sanitize-html');                          //Module de sécurité contre les Injection SQL
+const {UserOpinion, Vote, Emotion, UserBadge} = require('../models');   //Importations des modèles nécessaires
+const {Op} = require('sequelize');                                      //Objet opération pour les Requêtes SQL.
 
-//--------------------------Fonctions Helpers pour HandleBars : ---------------------
+//-------------------------- Fonctions Helpers pour HandleBars (côté client) : ---------------------
 
 function convertDateFormat(date){
     //Convertit le format AAAA-MM-DD au format DD-MM-AAAA.
@@ -37,7 +37,7 @@ function normalizeString(text){
     return normalized;
 }
 
-//--------------------------Fonctions Utilitaires pour l'application Web : ---------------------
+//--------------------------Fonctions Utilitaires pour l'application Web : (côté serveur) ---------------------
 
 function cleanPassword(pw){
     //Nettoye une chaine de caractère destiné à être un mot de passe haché par la suite.
@@ -145,26 +145,32 @@ async function getMoviesData (movieObj){
 }
 
 async function insertObtainedBadge(user_id, badgeObj){
+    //Fonction permettant de créer au besoin les relations qui définissent les badges obtenus pour chaque utilisateur.
+    //Et retoure un boolean pour savoir si un enregistrement est crée ou non.
+
     const [element , created] = await UserBadge.findOrCreate({
-        where : {
+        where : {   //Ce que l'on cherche :
             id_user : user_id,
             id_badge : badgeObj.badge_id_badge
         },
-        defaults :{
+        defaults :{ //Ce que l'on crée si rien n'est trouvé.
             id_user : user_id,
             id_badge : badgeObj.badge_id_badge
         }
+        //element --> contient l'enregistrement trouvé en fonction des clauses where ou créé en fonction de defaults.
+        //created --> contient un boolean selon si l'enregistrement est créé ou non.
     });
     return created;
 }
 
 //Exportation des fonctions :
 module.exports = {
+    //Fonction helpers :
     convertDateFormat,
     convertRuntime,
     normalizeString,
     cleanPassword,
-    //
+    //Fonction utilitaires à l'app web :
     getMoviesData,
     insertObtainedBadge
 };
