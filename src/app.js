@@ -969,7 +969,7 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
             const userID = req.session.user.id;
             console.log(userID);
 
-            const obtainedBadges = await UserBadge.findAll({
+            const userBadgeQuery = await UserBadge.findAll({
                 where: {
                     id_user: { [Op.eq]: userID }
                 },
@@ -981,16 +981,39 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
                     }
                 ]
             });
-            // console.log(obtainedBadges);
-            // obtainedBadges.forEach(obtentions => {
-            //     console.log(obtentions.badge);
-            // });
+            // console.log(userBadgeQuery);
+            let unlockedBadges = [];
+            userBadgeQuery.forEach(userBadge => {
+                unlockedBadges.push(userBadge.badge);
+            });
+            // console.log(unlockedBadges);
 
-            res.render("myBadges", {userData: req.session.user, obtainedBadges : obtainedBadges});
+            try{
+                const idOfUnlockedBadges = userBadgeQuery.map(userBadge => userBadge.id_badge);
+                // console.log(idOfUnlockedBadges);
+
+                const lockedBadges = await Badge.findAll({
+                    where : {
+                        badge_id_badge : {[Op.notIn] : idOfUnlockedBadges}
+                    },
+                    attributes : ["badge_distinction","badge_url","badge_serial_nb"]
+                });
+                // console.log(lockedBadges);
+
+                res.render("myBadges", {
+                    userData: req.session.user, 
+                    obtainedBadges : unlockedBadges,
+                    notObtainedBadges : lockedBadges
+                });
+            }
+            catch(err){
+                console.error("Erreur lors de la récupération des badges vérouillés :", err);
+                res.status(500).send("Une erreur s'est produite lors de la récupération des badges vérouillés...");
+            }
         }
         catch(err){
-            console.error("Erreur", err);
-            res.status(500).send("Erreur" + err);
+            console.error("Erreur lors de la récupération de vos badges :", err);
+            res.status(500).send("Une erreur s'est produite lors de la récupération de vos badges...");
         }
     }
     else{
