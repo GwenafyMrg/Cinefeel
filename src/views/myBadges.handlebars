@@ -1,3 +1,4 @@
+{{!-- Page affichant les badges que l'utilisateur a obtenu ou non --}}
 <div class="container-fluid d-flex flex-column w-75 my-3">
 
     <div>
@@ -8,16 +9,22 @@
         </p>
     </div>
 
+    {{!-- Container d'affichage des badges obtenus --}}
     <div class="container bg-secondary my-2">
-        <img src="" alt="">
-        <p>Vous avez obtenu ce badge en ...</p>
+        <p>Vous avez obtenu les badges suivants grâce à vos visionnages:</p>
+        {{#each obtainedBadges}}
+            {{> badgeDisplay}}
+        {{/each}}
     </div>
 
     <hr>
 
+    {{!-- Container d'affichage des badges non obtenus --}}
     <div class="container bg-secondary my-2">
-        <img src="" alt="">
-        <p>Réaliser cette tache pour obtenir le badge.</p>
+        <p>Les badges suivants sont encore vérouillés, accomplissez les objectifs pour les débloqués :</p>
+        {{#each notObtainedBadges}}
+            {{> badgeDisplay}}
+        {{/each}}
     </div>
 
     <button class="btn btn-block btn-info w-25 align-self-center my-2">Afficher plus...</button>

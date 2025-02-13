@@ -34,3 +34,26 @@
 
     <button class="btn btn-block btn-info w-25">Plus de film ! (à modifier)</button>
 </div>
+
+<script>
+    async function showBadges() {
+        const badges = JSON.parse('{{{badges}}}'); // Reconversion du JSON string en objet JS
+
+        for (const badge of badges) {   //Pour chaque badges :
+            //Afficher un popup :
+            await Swal.fire({
+                title: `Badge n°${badge.badge_id} Obtenu !`,
+                imageUrl : `${badge.badge_url}?raw=true`,
+                imageHeight : 200,
+                imageWidth : 200,
+                imageAlt : "Image du badge obtenu",
+                text: `${badge.badge_distinction}.`,
+                confirmButtonText: "SUPER !",
+            });
+        }
+    }
+
+    if('{{{badges}}}'){ //Si une données badges (nouveaux badges obtenus) est transmise :
+        showBadges(); // Lancer la séquence d'affichage des pop-ups
+    }
+</script>
