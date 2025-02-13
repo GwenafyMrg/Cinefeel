@@ -119,8 +119,13 @@ app.get("/", async (req, res) => {              //Chemin d'origine
         }
 
     } catch (err){
-        console.error("Erreur lors de l'affichage des donneés.", err);
-        res.status(500).send("Erreur lors de l'affichage des données.");
+        console.error("Erreur lors de l'affichage des donneés :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Erreur lors de l'affichage des donneés : <br>" + err
+        });
     }
 });
 
@@ -951,10 +956,9 @@ app.post("/shareReview", async(req,res) => {
 
 app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'utilisateur.
 
-    if(req.session.user){
+    try{
+        const userID = req.session.user.id;
         try{
-            const userID = req.session.user.id;
-
             const moviesWatchedUser = await Movie.findAll({
                 include: [
                     {
@@ -994,7 +998,7 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
             });
         }
     }
-    else{
+    catch(err){
         console.error("Chemin d'accès non autorisé pour votre statut. :", err);
         res.status(err.status || 404);
         res.render("error", {
@@ -1007,10 +1011,9 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
 
 app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favoris de l'utilisateur.
 
-    if(req.session.user){
+    try{
+        const userID = req.session.user.id;
         try{
-            const userID = req.session.user.id;
-
             const favoritesMoviesUser = await Movie.findAll({
                 include: [
                     {
@@ -1044,22 +1047,22 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
             res.render("myFav", {userData : req.session.user, favoritesMovies : favoritesMoviesUser});
         }
         catch(err){
-            console.error("Erreur lors de la récupération de vos films :", err);
+            console.error("Erreur lors de la récupération de vos films favoris :", err);
             res.status(err.status || 500);
             res.render("error", {
                 layout : false, 
                 code_error : err.status || 500, 
-                desc_error : "Les films que vous avez visionnés non pas pu être récupéré correctement... <br>" + err
+                desc_error : "Les films que vous avez préférés non pas pu être récupéré correctement... <br>" + err
             });
         }
     }
-    else{
+    catch(err){
         console.error("Chemin d'accès non autorisé pour votre statut. :", err);
         res.status(err.status || 404);
         res.render("error", {
             layout : false, 
             code_error : err.status || 404, 
-            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page. <br>" + err
+            desc_error : `Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page. <br>` + err
         });
     }
 });
