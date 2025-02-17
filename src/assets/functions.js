@@ -1,8 +1,9 @@
+//-----------------------------------Importations des modules node:---------------------------------------//
 const sanitizeHtml = require('sanitize-html');                          //Module de sécurité contre les Injection SQL
-const {UserOpinion, Vote, Emotion, UserBadge, Movie} = require('../models');   //Importations des modèles nécessaires
+const {Movie, UserOpinion, UserBadge, Vote, Emotion} = require('../models');   //Importations des modèles nécessaires
 const {Op} = require('sequelize');                                      //Objet opération pour les Requêtes SQL.
 
-//-------------------------- Fonctions Helpers pour HandleBars (côté client) : ---------------------
+//-------------------------- Fonctions Helpers pour HandleBars (côté client) : ---------------------//
 
 function convertDateFormat(date){
     //Convertit le format AAAA-MM-DD au format DD-MM-AAAA.
@@ -52,7 +53,7 @@ function cleanPassword(pw){
 }
 
 async function getMoviesData (movieObj){
-    //Fonction asynchrone permettant de calculer la note moyenne et les émotions les plus votées
+    //Fonction asynchrone permettant de mettre à jour les notes moyennes et afficher les émotions les plus votées
     //d'une série de film stockée dans un objet JavaScript.
 
     //Pour chaque film dans la liste de films transmis : 
@@ -67,24 +68,30 @@ async function getMoviesData (movieObj){
             });
             // console.log("Les Avis du film:", reviewsBelongsToMovie);
 
-            let somme = 0;
+            //-----Initialisation des variables :-----//
+            let sum = 0;
             let nbReview = 0;
-            for(let review of reviewsBelongsToMovie){   //Pour chaque avis dans la liste d'avis :
-                somme += review.opinion_note;           //Additionner la note avec les autres
-                nbReview += 1;                          //Augmenter le compteur d'avis de 1
-            }
+            let updated_avg_note = 0;
 
-            let avg_note = somme/nbReview;          //Calculer de la moyenne
-            if(!avg_note){                          //Si la note est NaN :
-                avg_note = 0;                       //Remplacé la valeur NaN par 0
+            //-----Calcule de la moyenne :-----//
+            for(let review of reviewsBelongsToMovie){   //Pour chaque avis dans la liste d'avis :
+                sum += review.opinion_note;                 //Additionner la note avec les autres
+                nbReview += 1;                              //Augmenter le compteur d'avis de 1
             }
-            // console.log("Note moyenne calculée:" ,avg_note);
-            currentAvgNote = movie.movie_avg_note;
-            // console.log("Note moyenne en BDD:" ,currentAvgNote);
-            if(avg_note != currentAvgNote){
-                try{
+            updated_avg_note = sum/nbReview;        //Calculer de la moyenne
+
+            if(!updated_avg_note){                      //Si la note est NaN :
+                updated_avg_note = 0;                       //Remplacé la valeur NaN par 0
+            }
+            // console.log("Note moyenne mise à jour :" ,updated_avg_note);
+
+            //-----Actualisation de la note moyenne :-----//
+            current_avg_note = movie.movie_avg_note;
+            // console.log("Note moyenne actuelle :" ,current_avg_note);
+            if(updated_avg_note != current_avg_note){   //Si la note actuelle est différente de celle calculée :
+                try{    //Mise à jour de la base de données :
                     await Movie.update(
-                        {movie_avg_note : avg_note},
+                        {movie_avg_note : updated_avg_note},
                         {
                             where : {movie_id_movie : movie.movie_id_movie}
                         }
@@ -95,7 +102,6 @@ async function getMoviesData (movieObj){
                     movieObj.error = err;   //Retourner l'erreur depuis l'objet.
                 }
             }
-
             movie.movie_avg_note = avg_note;        //Ajouter la valeur à l'objet
 
         } catch(err){

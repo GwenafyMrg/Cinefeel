@@ -159,32 +159,32 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
 app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films obtenu par requête POST.
 
     try {
-        const selectedGenres = req.body.genres;         // Récupération des genres sélectionnés
-        const minRuntime = req.body.runtimeMinScale;    // Récupération de la Durée minimale 
-        const maxRuntime = req.body.runtimeMaxScale;    // Récupération de la Durée maximale
-        const minYear = req.body.dateMinScale;          // Récupération de la Date de sortie minimale
-        const maxYear = req.body.dateMaxScale;          // Récupération de la Date de sortie maximale
-        const minAvgNote = req.body.noteMinScale;
-        const maxAvgNote = req.body.noteMaxScale;
-        // console.log(selectedGenres);
-        // console.log(minRuntime);
-        // console.log(maxDate);
-        console.log(maxAvgNote);
+        //-----Initialisation des variables :-----//
+        const selectedGenres = req.body.genres;         // Récupération des genres sélectionnés.
+        const minRuntime = req.body.runtimeMinScale;    // Récupération de la Durée minimale.
+        const maxRuntime = req.body.runtimeMaxScale;    // Récupération de la Durée maximale.
+        const minYear = req.body.dateMinScale;          // Récupération de la Date de sortie minimale.
+        const maxYear = req.body.dateMaxScale;          // Récupération de la Date de sortie maximale.
+        const minAvgNote = req.body.noteMinScale;       // Récupération de la note moyenne minimale.
+        const maxAvgNote = req.body.noteMaxScale;       // Récupération de la note moyenne maximale.
 
         // Construire dynamiquement la clause WHERE
         const whereClause = {};
         const savedFilters = {};
 
-        // Ajouter le filtre par genres si sélectionné
-        //----------------------------------
-        //Résultat attendu incorrecte (n'affiche pas tous les genres originaux)
-        //----------------------------------
+        // console.log(selectedGenres);
+        // console.log(minRuntime);
+        // console.log(maxDate);
+        // console.log(maxAvgNote);
+
+        //-----Ajout d'un filtrage par genres :-----//
         if (selectedGenres) {
             //Vérifie si des clauses AND existe déjà, sinon initialise un tableau.
             if(!whereClause[Op.and]){
                 whereClause[Op.and] = [];
             }
-            const selectedValues = Object.keys(selectedGenres); // Récupération des clés (noms des genres) uniquement
+            const selectedValues = Object.keys(selectedGenres); // Récupération des clés (noms des genres) uniquement.
+            //Essayer de récupérer les identifiants de films associés aux genres séléctionnés.
             try{
                 const movieIDs = await Movie.findAll({
                     attributes : ["movie_id_movie"],
@@ -195,9 +195,12 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                         where : {genre_libelle : {[Op.in] : selectedValues}}
                     }]
                 });
-                console.log(movieIDs);
+                //Récupération d'un tableau simple d'identifiants.
                 const movieIDsArray = movieIDs.map(movie => movie.movie_id_movie);
-                console.log(movieIDsArray);
+
+                // console.log(movieIDs);
+                // console.log(movieIDsArray);
+
                 whereClause[Op.and].push({movie_id_movie : {[Op.in] : movieIDsArray}});
             }
             catch(err){
@@ -205,69 +208,70 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 res.status(500).send("Erreur", err);
             }
             
-            //Add savedFilters !!!
+            //Ajout des genres séléctionnés au tableau de sauvegarde.
             savedFilters.genreArray = selectedValues;
         }
-        //----------------------------------
-        //----------------------------------
 
-        // Ajouter le filtre par durée si spécifié:
+        //-----Ajout d'un filtrage sur la durée :-----//
         if (minRuntime || maxRuntime) {
 
             //Vérifie si des clauses AND existe déjà, sinon initialise un tableau.
             if(!whereClause[Op.and]){
                 whereClause[Op.and] = [];
             }
-            //Ajoute les conditions sur la durée du film : minRuntime <= movie_runtime <= maxRuntime
+
+            //Ajoute des restrictions sur la durée du film : minRuntime <= movie_runtime <= maxRuntime
             if (minRuntime) {
                 whereClause[Op.and].push({ movie_runtime: { [Op.gte]: minRuntime } });
-                savedFilters.minRuntime = minRuntime;
+                savedFilters.minRuntime = minRuntime; //Ajout de la durée séléctionnée au tableau de sauvegarde.
             }
             if (maxRuntime) {
                 whereClause[Op.and].push({ movie_runtime: { [Op.lte]: maxRuntime } });
-                savedFilters.maxRuntime = maxRuntime;
+                savedFilters.maxRuntime = maxRuntime; //Ajout de la durée séléctionnée au tableau de sauvegarde.
             }
         }
 
-        //Ajouter le filtre par date de sortie si spécifié:
+        //-----Ajout d'un filtrage sur la date de sortie :-----//
         if(minYear || maxYear){
 
             //Vérifie si des clauses AND existe déjà, sinon initialise un tableau.
             if(!whereClause[Op.and]){
                 whereClause[Op.and] = [];
             }
-            //Ajout des filtres sur la date de sortie du film : fullMinDate <= movie_release_date <= fullMaxDate
+
+            //Ajout de restrictions sur la date de sortie du film : fullMinDate <= movie_release_date <= fullMaxDate
             if(minYear){
                 const fullMinDate = minYear + "-01-01"; //Reconstition d'une date minimale complète pour préciser la requête.
                 whereClause[Op.and].push({movie_released_date : {[Op.gte]: fullMinDate} });
-                savedFilters.minReleasedDate = minYear;
+                savedFilters.minReleasedDate = minYear; //Ajout de la date minimale séléctionnée au tableau de sauvegarde.
             }
             if(maxYear){
                 const fullMaxDate = maxYear + "-12-31"; //Reconstition d'une date maximale complète pour préciser la requête.
                 whereClause[Op.and].push({movie_released_date : {[Op.lte]: fullMaxDate} });
-                savedFilters.maxReleasedDate = maxYear;
+                savedFilters.maxReleasedDate = maxYear; //Ajout de la date maximale séléctionnée au tableau de sauvegarde.
             }
         }
 
+        //-----Ajout d'un filtrage sur la note moyenne :-----//
         if(minAvgNote || maxAvgNote){
             if(!whereClause[Op.and]){
                 whereClause[Op.and] = [];
             }
             if(minAvgNote){
                 whereClause[Op.and].push({movie_avg_note : {[Op.gte] : minAvgNote}});
-                savedFilters.minAvgNote = minAvgNote;
+                savedFilters.minAvgNote = minAvgNote; //Ajout de la note minimale séléctionnée au tableau de sauvegarde.
             }
             if(maxAvgNote){
                 whereClause[Op.and].push({movie_avg_note : {[Op.lte] : maxAvgNote}});
-                savedFilters.maxAvgNote = maxAvgNote;
+                savedFilters.maxAvgNote = maxAvgNote; //Ajout de la note maximale séléctionnée au tableau de sauvegarde.
             }
         }
 
-        console.log(whereClause);
+        // console.log(whereClause);
         // console.log(savedFilters);
 
-        // Effectuer la requête avec les clauses dynamiques
-        const queryFilter = await Movie.findAll({
+        //-----Récupération des films filtrés :-----//
+        const filteredMoviesQuery = await Movie.findAll({
             where: whereClause,
             include: [
                 {
@@ -284,27 +288,27 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 },
             ],
         });
-        console.log(queryFilter);
-        queryFilter.forEach(movie => {
-            console.log(movie.Genres);
-        })
-        const filteredMovies = await funct.getMoviesData(queryFilter);
-        
-        // Rendu de la vue avec les résultats
-        const genresList = await Genre.findAll(); // Liste des genres pour le formulaire
+        // console.log(filteredMoviesQuery);
+        // filteredMoviesQuery.forEach(movie => {
+        //     console.log(movie.Genres);
+        // })
+        const filteredMovies = await funct.getMoviesData(filteredMoviesQuery);
 
-        // Marquer les genres sélectionnés dans genresList
-        genresList.forEach(genre => {
+        //-----Traitement des genres séléctionnés pour les renvoyés à la vue :-----//
+        const genresList = await Genre.findAll(); // Liste complète des genres pour le formulaire.
+        genresList.forEach(genre => {   // Marquer les genres sélectionnés dans genresList :
             // Vérifie si ce genre est dans les genres sélectionnés
             genre.selected = savedFilters.genreArray && savedFilters.genreArray.includes(genre.genre_libelle);
         });
         // console.log(genresList);
 
+        //-----Gestion des erreurs potentielles :-----//
         if(filteredMovies.error){
             res.status(500).send("Erreur détéctée :" + filteredMovies.error);
             //>>>>>>>Envoyé la page d'erreur
         }
         else{
+            //-----Retour à la vue :-----//
             if (req.session.user) {
                 // res.render("filter", {userData : req.session.user, filteredMovies : filteredMovies});
                 res.render("filter", {
