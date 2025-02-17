@@ -91,6 +91,26 @@ document.addEventListener("DOMContentLoaded", function () {
     dateMaxScale.addEventListener("input", function() {
         dateMaxDisplay.textContent = dateMaxScale.value;
     });   
+
+    //----------------------Note du film à filtrer :-------------------------
+
+    //Balise de note minimale:
+    noteMinScale = document.getElementById("noteMinScale");
+    noteMinDisplay = document.getElementById("noteMinDisplay");
+    //Balise de note maximale:
+    noteMaxScale = document.getElementById("noteMaxScale");
+    noteMaxDisplay = document.getElementById("noteMaxDisplay");
+
+    //Actualisation de la note minimale :
+    noteMinDisplay.textContent = noteMinScale.value;
+    noteMinScale.addEventListener("input", function() {
+        noteMinDisplay.textContent = noteMinScale.value;
+    });
+    //Actualisation de la note maximale :
+    noteMaxDisplay.textContent = noteMaxScale.value;
+    noteMaxScale.addEventListener("input", function() {
+        noteMaxDisplay.textContent = noteMaxScale.value;
+    });
 });
 
 //---------------------------------------------------------------------------------------------

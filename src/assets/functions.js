@@ -1,5 +1,5 @@
 const sanitizeHtml = require('sanitize-html');                          //Module de sécurité contre les Injection SQL
-const {UserOpinion, Vote, Emotion, UserBadge} = require('../models');   //Importations des modèles nécessaires
+const {UserOpinion, Vote, Emotion, UserBadge, Movie} = require('../models');   //Importations des modèles nécessaires
 const {Op} = require('sequelize');                                      //Objet opération pour les Requêtes SQL.
 
 //-------------------------- Fonctions Helpers pour HandleBars (côté client) : ---------------------
@@ -74,11 +74,28 @@ async function getMoviesData (movieObj){
                 nbReview += 1;                          //Augmenter le compteur d'avis de 1
             }
 
-            let avg_note = somme/nbReview;              //Calculer de la moyenne
+            let avg_note = somme/nbReview;          //Calculer de la moyenne
             if(!avg_note){                          //Si la note est NaN :
                 avg_note = 0;                       //Remplacé la valeur NaN par 0
             }
-            // console.log("Note moyenne:" ,avg_note);
+            // console.log("Note moyenne calculée:" ,avg_note);
+            currentAvgNote = movie.movie_avg_note;
+            // console.log("Note moyenne en BDD:" ,currentAvgNote);
+            if(avg_note != currentAvgNote){
+                try{
+                    await Movie.update(
+                        {movie_avg_note : avg_note},
+                        {
+                            where : {movie_id_movie : movie.movie_id_movie}
+                        }
+                    )
+                }
+                catch(err){
+                    console.error("Erreur lors de la modification de la note moyenne dans le Base de Données :", err);
+                    movieObj.error = err;   //Retourner l'erreur depuis l'objet.
+                }
+            }
+
             movie.movie_avg_note = avg_note;        //Ajouter la valeur à l'objet
 
         } catch(err){

@@ -99,11 +99,29 @@
                 </div>
 
                 {{!-- Affichage du filtre des notes : --}}
+                <div id="noteFilter" class="filter">
+                    <p>Note moyenne du film :</p>
+                    {{!-- Gestion de la note minimale --}}
+                    <label for="noteMinScale">Note minimale : <span id="noteMinDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré  --}}
+                    {{#if currentFilters.minAvgNote}}
+                        <input id="noteMinScale" name="noteMinScale" type="range" min="0" max="9.9" step="0.1" value="{{currentFilters.minAvgNote}}">
+                    {{else}}
+                        {{!-- Sinon --}}
+                        <input id="noteMinScale" name="noteMinScale" type="range" min="0" max="9.9" step="0.1" value="0">
+                    {{/if}}
+                    <br>
 
-                {{!-- <div id="noteFilter" class="filter">
-                    <label for="AvgNoteScale">Note globale du film:</label>
-                    <input id="AvgNoteScale" type="range" min="0" max="10" step="0.5">
-                </div> --}}
+                    {{!-- Gestion de la note maximale --}}
+                    <label for="noteMaxScale">Note maximale : <span id="noteMaxDisplay">...</span> </label><br>
+                    {{!-- Si un ancien filtre est enregistré  --}}
+                    {{#if currentFilters.maxAvgNote}}
+                        <input id="noteMaxScale" name="noteMaxScale" type="range" min="0.1" max="10" step="0.1" value="{{currentFilters.maxAvgNote}}">
+                    {{!-- Sinon --}}
+                    {{else}}
+                        <input id="noteMaxScale" name="noteMaxScale" type="range" min="0.1" max="10" step="0.1" value="300">
+                    {{/if}}
+                </div>
             </div>
             <div>
                 <button type="submit" class="btn btn-block btn-dark">Appliquer les filtres</button>

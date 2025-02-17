@@ -164,9 +164,12 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         const maxRuntime = req.body.runtimeMaxScale;    // Récupération de la Durée maximale
         const minYear = req.body.dateMinScale;          // Récupération de la Date de sortie minimale
         const maxYear = req.body.dateMaxScale;          // Récupération de la Date de sortie maximale
+        const minAvgNote = req.body.noteMinScale;
+        const maxAvgNote = req.body.noteMaxScale;
         // console.log(selectedGenres);
         // console.log(minRuntime);
         // console.log(maxDate);
+        console.log(maxAvgNote);
 
         // Construire dynamiquement la clause WHERE
         const whereClause = {};
@@ -221,6 +224,20 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 const fullMaxDate = maxYear + "-12-31"; //Reconstition d'une date maximale complète pour préciser la requête.
                 whereClause[Op.and].push({movie_released_date : {[Op.lte]: fullMaxDate} });
                 savedFilters.maxReleasedDate = maxYear;
+            }
+        }
+
+        if(minAvgNote || maxAvgNote){
+            if(!whereClause[Op.and]){
+                whereClause[Op.and] = [];
+            }
+            if(minAvgNote){
+                whereClause[Op.and].push({movie_avg_note : {[Op.gte] : minAvgNote}});
+                savedFilters.minAvgNote = minAvgNote;
+            }
+            if(maxAvgNote){
+                whereClause[Op.and].push({movie_avg_note : {[Op.lte] : maxAvgNote}});
+                savedFilters.maxAvgNote = maxAvgNote;
             }
         }
 
