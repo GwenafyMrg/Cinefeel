@@ -180,8 +180,30 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         //Résultat attendu incorrecte (n'affiche pas tous les genres originaux)
         //----------------------------------
         if (selectedGenres) {
+            //Vérifie si des clauses AND existe déjà, sinon initialise un tableau.
+            if(!whereClause[Op.and]){
+                whereClause[Op.and] = [];
+            }
             const selectedValues = Object.keys(selectedGenres); // Récupération des clés (noms des genres) uniquement
-            whereClause["$Genres.genre_libelle$"] = { [Op.in]: selectedValues };
+            try{
+                const movieIDs = await Movie.findAll({
+                    attributes : ["movie_id_movie"],
+                    include : [{
+                        model: Genre,
+                        as : "Genres",
+                        attributes : [],
+                        where : {genre_libelle : {[Op.in] : selectedValues}}
+                    }]
+                });
+                console.log(movieIDs);
+                const movieIDsArray = movieIDs.map(movie => movie.movie_id_movie);
+                console.log(movieIDsArray);
+                whereClause[Op.and].push({movie_id_movie : {[Op.in] : movieIDsArray}});
+            }
+            catch(err){
+                console.log("Erreur lors de la récupération des genres associés aux films filtrés :", err);
+                res.status(500).send("Erreur", err);
+            }
             
             //Add savedFilters !!!
             savedFilters.genreArray = selectedValues;
@@ -241,8 +263,8 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
             }
         }
 
-        // console.log(whereClause);
-        console.log(savedFilters);
+        console.log(whereClause);
+        // console.log(savedFilters);
 
         // Effectuer la requête avec les clauses dynamiques
         const queryFilter = await Movie.findAll({
@@ -262,7 +284,10 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
                 },
             ],
         });
-        // console.log(queryFilter);
+        console.log(queryFilter);
+        queryFilter.forEach(movie => {
+            console.log(movie.Genres);
+        })
         const filteredMovies = await funct.getMoviesData(queryFilter);
         
         // Rendu de la vue avec les résultats
