@@ -88,7 +88,7 @@ app.get("/", async (req, res) => {              //Chemin d'origine
                 model: Genre,                   //Modéle/Table à inclure.
                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
                 attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
             },
             {
                 model: Director, 
@@ -445,7 +445,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     model: Genre,                   //Modéle/Table à inclure.
                     as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
                     attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                    through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                    through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
                 },
                 {
                     model: Director, 
@@ -682,7 +682,7 @@ app.get("/shareReview", async (req,res) => {
                     include : [
                         {
                             model : Emotion,
-                            as : "Emotion",
+                            as: "Emotion",
                             attributes : ["emotion_name"],  //Récupération directe du nom des émotions votées.
                         }
                     ]
@@ -847,14 +847,14 @@ app.post("/shareReview", async(req,res) => {
                     const notObtainedBadge = await Badge.findAll({
                         include: [{
                             model: UserBadge,
-                            as : "userBadges",
+                            as: "ObtentionsBadge",
                             attributes : [],
                             required: false,
                             where: { id_user: userID }  //Restriction par l'identifiant utilisateur
                         }],
                         //Récupéré ce qu'il ne possède pas, sans association dans la table userBadge.
                         where: {
-                            '$userBadges.id_badge$': null
+                            '$ObtentionsBadge.id_badge$': null
                         }
                     });
                     // console.log("Les badges non obtenues :", notObtainedBadge);
@@ -864,7 +864,7 @@ app.post("/shareReview", async(req,res) => {
                         include: [
                             {
                                 model: UserOpinion,
-                                as: "UserOpinions",
+                                as: "Opinions",
                                 attributes: [],
                                 where: {
                                     opinion_id_user: userID
@@ -985,7 +985,7 @@ app.post("/shareReview", async(req,res) => {
                                 model: Genre,                   //Modéle/Table à inclure.
                                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
                                 attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                                through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                                through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
                             },
                             {
                                 model: Director, 
@@ -1037,7 +1037,7 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
                 include: [
                     {
                         model: UserOpinion,
-                        as: "UserOpinions",
+                        as: "Opinions",
                         attributes: [],
                         where: {
                             opinion_id_user: userID //Restriction sur l'identifiant utilisateur.
@@ -1085,7 +1085,7 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
                 include: [
                     {
                         model: UserOpinion,
-                        as: "UserOpinions",
+                        as: "Opinions",
                         attributes: [],
                         where: {
                             [Op.and] : {
@@ -1140,7 +1140,7 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
                 include: [  //Jointure avec la table Badge
                     {
                         model: Badge,
-                        as: "badge",
+                        as: "Badge",
                         attributes: ["badge_distinction","badge_url","badge_serial_nb"],
                     }
                 ]
@@ -1148,7 +1148,7 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
             // console.log(userBadgeQuery);
             let unlockedBadges = [];
             userBadgeQuery.forEach(userBadge => {
-                unlockedBadges.push(userBadge.badge);
+                unlockedBadges.push(userBadge.Badge);
             });
             // console.log(unlockedBadges);
 
