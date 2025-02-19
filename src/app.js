@@ -4,7 +4,7 @@
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
 const Handlebars = require('handlebars');                   //Gestion des helpers pour les templates Handlebars
-const {Op, Model} = require('sequelize');                   //Gestion des clauses de requête SQL
+const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
@@ -130,11 +130,14 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
     try{
         const genresList = await Genre.findAll();   //Récupérer tous les genres sans filtrage.
         //Réinitialiser le filtre des genres :
+        //>>>>>>>>>>>>>
+        //Voir pour supprimer cette section qui est inutile !!!
         genresList.forEach(genre => {               //Pour chaque genre :
             if("selected" in genre){                //Si l'attribut "selected" existe dans les données de "genre".
                 genre.selected = false;             //Réinitiliser la séléction des genres (état non séléctionné)
             }
         });
+        //>>>>>>>>>>>>>
 
         if(req.session.user){
             res.render("filter", {
@@ -249,7 +252,9 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         const filteredMovies = await funct.getMoviesData(queryFilter);
         
         // Rendu de la vue avec les résultats
-        const genresList = await Genre.findAll(); // Liste des genres pour le formulaire
+        const genresList = await Genre.findAll({
+            attributes : ["genre_libelle"]
+        }); 
 
         // Marquer les genres sélectionnés dans genresList
         genresList.forEach(genre => {
@@ -409,7 +414,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     //await bcrypt.compare(<brutPassword>, <HashedPassword>);
                     const isPwMatch = await bcrypt.compare(passwordInputLog, users[i].user_mdp);
                     if (isPwMatch) {//Le mot de passe transmis corresponds.
-                        const authenticateUser = users[i];
+                        const authenticateUser = users[i]; //..
                         //Création de la session utilisateur.
                         req.session.user = {
                             id: authenticateUser.user_id_user,
@@ -614,16 +619,18 @@ app.get("/shareReview", async (req,res) => {
     if(req.session.user){   //Si un utilisateur est connécté
         const userID = req.session.user.id; //On récupère son identifiant
 
-        const reviewByCurrentUser = await UserOpinion.findAll({ //Avis de l'utilisateur actuel
+        const reviewByCurrentUser = await UserOpinion.findOne({ //Avis de l'utilisateur actuel
             where : {
                 [Op.and] : {
                     opinion_id_movie : {[Op.eq] : movieID},
                     opinion_id_user : {[Op.eq] : userID}
                 }
-            }
+            },
+            attributes : ["opinion_id_movie", "opinion_id_user"]
         });
         console.log(reviewByCurrentUser);
-        if(reviewByCurrentUser.length != 0){
+        //... null si aucun
+        if(reviewByCurrentUser){
             console.log("un avis est publié ici");
             existingReview = true;
         }
@@ -632,7 +639,7 @@ app.get("/shareReview", async (req,res) => {
     if(movieID){
         //---------------------Afficher le film séléctionné :-------------------
         try{ 
-            const movieQuery = await Movie.findAll({        //Récupérer les informations du film correspondant
+            const movieQuery = await Movie.findOne({        //Récupérer les informations du film correspondant
                 where : {
                     movie_id_movie : {[Op.eq] : movieID}    //Restriction sur l'identifiant du film.
                 },
@@ -652,10 +659,13 @@ app.get("/shareReview", async (req,res) => {
                 ]
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
-            // console.log(movieQuery);
+            console.log(movieQuery);
 
-            const movies = await funct.getMoviesData(movieQuery);
+            //... Mise en tableau
+            const movies = await funct.getMoviesData([movieQuery]);
     
+            //...
+            //Change variable name
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
     
@@ -671,7 +681,8 @@ app.get("/shareReview", async (req,res) => {
                             as: "User", // Doit correspondre à l'alias défini dans belongsTo
                             attributes: ["user_username"], // Colonnes spécifiques à inclure
                         }
-                    ]
+                    ],
+                    attributes : { exclude : ["opinion_id_movie"]}
                 });
                 // console.log(opinions);
                 
@@ -685,7 +696,8 @@ app.get("/shareReview", async (req,res) => {
                             as: "Emotion",
                             attributes : ["emotion_name"],  //Récupération directe du nom des émotions votées.
                         }
-                    ]
+                    ],
+                    attributes : { exclude : ["opinion_id_movie"]}
                 });
                 // console.log(votes);
 
@@ -729,12 +741,12 @@ app.get("/shareReview", async (req,res) => {
                 }
             }
             catch (err) {
-                console.error("Impossible de charger la section des commentaires.", err);
+                console.error("Impossible de charger la section des commentaires :", err);
                 res.status(500).send("Impossible de charger la section des commentaires.");
             }
         }
         catch(err){
-            console.log("Impossible d'accéder au film que vous souhaitez.");
+            console.log("Impossible d'accéder au film que vous souhaitez :", err);
             res.status(500).send("Impossible d'accéder au film que vous souhaitez.");
         }
     }
@@ -849,10 +861,11 @@ app.post("/shareReview", async(req,res) => {
                             model: UserBadge,
                             as: "ObtentionsBadge",
                             attributes : [],
-                            required: false,
+                            required: false,            //...
                             where: { id_user: userID }  //Restriction par l'identifiant utilisateur
                         }],
                         //Récupéré ce qu'il ne possède pas, sans association dans la table userBadge.
+                        // ...
                         where: {
                             '$ObtentionsBadge.id_badge$': null
                         }
@@ -1143,7 +1156,8 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
                         as: "Badge",
                         attributes: ["badge_distinction","badge_url","badge_serial_nb"],
                     }
-                ]
+                ],
+                attributes : { exclude : ["id_user"]}
             });
             // console.log(userBadgeQuery);
             let unlockedBadges = [];

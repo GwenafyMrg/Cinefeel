@@ -63,7 +63,8 @@ async function getMoviesData (movieObj){
             const reviewsBelongsToMovie = await UserOpinion.findAll({
                 where: {
                     opinion_id_movie: { [Op.eq]: movie.movie_id_movie } //Restriction sur l'identifiant du film.
-                }
+                },
+                attributes : ["opinion_note"]
             });
             // console.log("Les Avis du film:", reviewsBelongsToMovie);
 
@@ -99,7 +100,8 @@ async function getMoviesData (movieObj){
                         as : "Emotion",
                         attributes : ["emotion_name"],      //Récupérer le nom de l'émotion
                     }
-                ]
+                ],
+                attributes : ["id_emotion"]
             });
             // console.log(votesForMovie);
     
