@@ -125,7 +125,7 @@ app.get("/", async (req, res) => {              //Chemin d'origine
 });
 
 //Route pour la recherche de film par filtre (+ réinitialisation)
-app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films obtenu par requête GET. 
+app.get("/explore-movies", async (req, res) => {    //Chemin du filtrage des films obtenu par requête GET. 
 
     try{
         const genresList = await Genre.findAll();   //Récupérer tous les genres sans filtrage.
@@ -159,7 +159,7 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
     }
 });
 
-app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films obtenu par requête POST.
+app.post("/explore-movies", async (req,res) => {    //Chemin du filtrage des films obtenu par requête POST.
 
     try {
         const selectedGenres = req.body.genres;         // Récupération des genres sélectionnés
@@ -292,7 +292,7 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
     }
 });
 
-app.get("/search", (req,res) => {           //Chemin de recherche des films par requête GET.
+app.get("/find-movies", (req,res) => {           //Chemin de recherche des films par requête GET.
     
     if(req.session.user){
         res.render("search", {userData : req.session.user});
@@ -302,7 +302,7 @@ app.get("/search", (req,res) => {           //Chemin de recherche des films par 
     }
 })
 
-app.post("/search", async (req, res) => {   //Chemin de recherche par requête POST.
+app.post("/find-movies", async (req, res) => {   //Chemin de recherche par requête POST.
 
     const value = req.body.researchValue;
     //Insensible à la casse, pas besoin de toLowerCase();
@@ -399,7 +399,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
 
             //Tant que l'email recherché n'est pas trouvé ou que la liste n'est pas parcouru totalement.
             while(!foundEmail && i < users.length){
-                if(emailInputLog == users[i].user_email){ //L'email corresponds :
+                if(safeEmail == users[i].user_email){ //L'email corresponds :
                     //Email/Utilisateur trouvé.
                     foundEmail = true;
                 }
@@ -466,13 +466,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                 //>>>>>>>Envoyé la page d'erreur
             }
             else{
-                if(req.session.user){
-                    res.render("home", {
-                        userData : req.session.user, movies : movies});
-                }
-                else{
-                    res.render("home", {movies : movies});
-                }
+                res.redirect("/");
             }
         }
         catch(err){
@@ -597,7 +591,7 @@ app.post("/create-account", async (req,res) => {
             res.render("createAccount", {error : msgError});
         }
         else{//Sinon
-            res.render("login", {createdAccount : true}); //Redirection vers la page de connexion.
+            res.redirect("/login");
         }
     }
     catch {
@@ -607,7 +601,7 @@ app.post("/create-account", async (req,res) => {
 });
 
 //Chemin de publication d'un avis :
-app.get("/shareReview", async (req,res) => {
+app.get("/share-review", async (req,res) => {
 
     //------------------
     //>>>>>>Check la structure du code
@@ -758,7 +752,7 @@ app.get("/shareReview", async (req,res) => {
 });
 
 //Chemin de publication d'un avis par post
-app.post("/shareReview", async(req,res) => {
+app.post("/share-review", async(req,res) => {
 
     try{
         //Récupération des entrées de l'avis utilisateur par le formulaire :
@@ -771,7 +765,7 @@ app.post("/shareReview", async(req,res) => {
         if(!emotionsChoices && commentReview == ""){
             const movieID = req.body.movie;
             console.log("Redirection vers la page d'avis en raison du manque d'information.");
-            res.redirect(`/shareReview?movie=${movieID}`);
+            res.redirect(`/share-review?movie=${movieID}`);
         }
         //S'il y a assez d'informations pour traiter l'avis :
         else{
@@ -801,15 +795,15 @@ app.post("/shareReview", async(req,res) => {
 
                 //>>>>>>>>>>>>>>>>>
                 //Temporairement commenté pour les tests:
-                // await UserOpinion.create(   //Insérer l'avis dans la BDD :
-                //     {
-                //         opinion_id_user : userID,
-                //         opinion_id_movie : movieID,
-                //         opinion_note : noteReview,
-                //         opinion_fav : favReview,
-                //         opinion_comment : commentReview,
-                //     }
-                // );
+                await UserOpinion.create(   //Insérer l'avis dans la BDD :
+                    {
+                        opinion_id_user : userID,
+                        opinion_id_movie : movieID,
+                        opinion_note : noteReview,
+                        opinion_fav : favReview,
+                        opinion_comment : commentReview,
+                    }
+                );
 
                 //---------Traitement des Emotions :----------- :
                 if(emotionsChoices){

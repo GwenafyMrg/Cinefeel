@@ -184,7 +184,7 @@ const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle Us
         allowNull: false
     },
     opinion_comment : {
-        type: DataTypes.STRING(500),       
+        type: DataTypes.TEXT,  
         allowNull: true
     },
     opinion_fav : {

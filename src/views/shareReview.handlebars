@@ -10,7 +10,7 @@
     {{!-- Formulaire d'avis utilisateur --}}
     <div class="w-75 d-flex flex-column my-1">
         <p>Écrivez votre commentaire ici :</p>
-        <form name="reviewForm" action="/shareReview" method="post" class="card d-flex flex-column align-self-center justify-content-evenly w-75 p-2">
+        <form name="reviewForm" action="/share-review" method="post" class="card d-flex flex-column align-self-center justify-content-evenly w-75 p-2">
 
             {{!-- Balise masquée pour récupérer facilement l'identifiant utilisateur --}}
             <input type="hidden" name="movie" value="{{movie.[0].movie_id_movie}}">
@@ -77,13 +77,21 @@
                 {{#ifnot-or-if userData existingReview}}
                     <textarea id="commentInput" name="comment" disabled></textarea>
                 {{else}}
-                    <textarea id="commentInput" name="comment"></textarea>
+                    <textarea id="commentInput" name="comment" placeholder="Ecriver quelque chose :"></textarea>
                 {{/ifnot-or-if}}
             </div>
 
             <details>
-                <summary>Information de publication</summary>
-                 <p>Si vous souhaitez que votre avis soit enregistré, vous devez transmettre un vote d'émotions ou alors un commentaire en plus de votre note.</p>
+                <summary><b>Conditions de publication</b></summary>
+                    <p>Si vous souhaitez que votre avis soit enregistré, vous devez :</p>
+                    <ul>
+                        <li>Transmettre un vote d'émotions OU un commentaire EN PLUS de votre note.</li>
+                        <li>Séléctionner 3 émotions ou moins pour votre vote.</li>
+                        <li>Partager un commentaire de moins de 500 caractères.</li>
+                        <li>Rester poli(e) et cordial(e) dans vos commentaires.</li>
+                    </ul>
+                    <p>Tout manquement à ces conditions aura pour conséquence <b>l'impossibilité d'enregristrer
+                        votre avis</b> aisni que de vous exposez à un <b>bannissement</b> de la communauté.</p>
             </details>
 
             {{!-- Si l'utilisateur est invité ou qu'un avis existe déjà en tant qu'utilisateur inscrit --}}
