@@ -762,7 +762,7 @@ app.post("/share-review", async(req,res) => {
         let commentReview = req.body.comment;
 
         //Si aucune émotions n'est choisi ou qu'aucun commentaire est fait, l'avis est considéré comme imcomplet :
-        if(!emotionsChoices && commentReview == ""){
+        if(!emotionsChoices && commentReview == "" || commentReview.length > 500){
             const movieID = req.body.movie;
             console.log("Redirection vers la page d'avis en raison du manque d'information.");
             res.redirect(`/share-review?movie=${movieID}`);
