@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
 //---------------------------------------------------------------------------------------------
 //------------------------------Concernant la page des avis :-----------------------------------
 
-document.addEventListener("DOMContentLoaded", function() {      //Au chargement de la page :s
+document.addEventListener("DOMContentLoaded", function() {      //Au chargement de la page :
 
     //Actualiser la note choisie :
     const noteDisplay = document.getElementById("noteDisplay");
@@ -142,10 +142,27 @@ document.addEventListener("DOMContentLoaded", function() {      //Au chargement 
             event.target.checked = false;
             Swal.fire({
                 title: "Attention !",
-                text: "Vous ne pouvez voter que pour 3 émotions au maximum",
+                text: "Vous ne pouvez voter que pour 3 émotions au maximum.",
                 icon : "error",
                 confirmButtonText: "D'ACCORD",
             });
         }
     });
+
+    const commentInput = document.getElementById("commentInput");
+    // console.log(commentInput);
+    if(commentInput){
+        commentInput.addEventListener('input', function() {
+            console.log(commentInput.value.length);
+            if(commentInput.value.length > 500){
+                commentInput.value = commentInput.value.substring(0,500);
+                Swal.fire({
+                    title: "Attention !",
+                    text: "Vous ne pouvez rédiger un commentaire de plus de 500 caractères.",
+                    icon : "error",
+                    confirmButtonText: "D'ACCORD",
+                });
+            }
+        });
+    }
 });

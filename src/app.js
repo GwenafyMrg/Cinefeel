@@ -4,7 +4,7 @@
 const express = require('express');                         //Module express
 const {engine} = require('express-handlebars');             //Gestion d'express et handlebars
 const Handlebars = require('handlebars');                   //Gestion des helpers pour les templates Handlebars
-const {Op, Model} = require('sequelize');                   //Gestion des clauses de requête SQL
+const {Op} = require('sequelize');                          //Gestion des clauses de requête SQL
 const bodyParser = require('body-parser');                  //Gestion des entrées de formulaire HTML
 const path = require('path');                               //Gestion correcte de chemins d'accès
 const session = require('express-session');                 //Gestion de sessions utilisateurs
@@ -88,7 +88,7 @@ app.get("/", async (req, res) => {              //Chemin d'origine
                 model: Genre,                   //Modéle/Table à inclure.
                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
                 attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
             },
             {
                 model: Director, 
@@ -119,22 +119,30 @@ app.get("/", async (req, res) => {              //Chemin d'origine
         }
 
     } catch (err){
-        console.error("Erreur lors de l'affichage des donneés.", err);
-        res.status(500).send("Erreur lors de l'affichage des données.");
+        console.error("Erreur lors de l'affichage des donneés :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Erreur lors de l'affichage des donneés : " + err
+        });
     }
 });
 
 //Route pour la recherche de film par filtre (+ réinitialisation)
-app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films obtenu par requête GET. 
+app.get("/explore-movies", async (req, res) => {    //Chemin du filtrage des films obtenu par requête GET. 
 
     try{
         const genresList = await Genre.findAll();   //Récupérer tous les genres sans filtrage.
         //Réinitialiser le filtre des genres :
+        //>>>>>>>>>>>>>
+        //Voir pour supprimer cette section qui est inutile !!!
         genresList.forEach(genre => {               //Pour chaque genre :
             if("selected" in genre){                //Si l'attribut "selected" existe dans les données de "genre".
                 genre.selected = false;             //Réinitiliser la séléction des genres (état non séléctionné)
             }
         });
+        //>>>>>>>>>>>>>
 
         if(req.session.user){
             res.render("filter", {
@@ -151,12 +159,17 @@ app.get("/moviesList", async (req, res) => {    //Chemin du filtrage des films o
         }
     }
     catch(err){
-        console.log("Erreur de redirection.");
-        res.send("Erreur de redirection.");
+        console.error("Erreur lors de la redirection :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Erreur lors de la redirection : " + err
+        });
     }
 });
 
-app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films obtenu par requête POST.
+app.post("/explore-movies", async (req,res) => {    //Chemin du filtrage des films obtenu par requête POST.
 
     try {
         //-----Initialisation des variables :-----//
@@ -328,12 +341,17 @@ app.post("/moviesList", async (req,res) => {    //Chemin du filtrage des films o
         }
 
     } catch (error) {
-        console.error("Erreur lors du filtrage :", error);
-        res.status(500).send("Une erreur est survenue lors du filtrage des films.");
+        console.error("Erreur lors du filtrage :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Une erreur est survenue lors du filtrage des films. " + err
+        });
     }
 });
 
-app.get("/search", (req,res) => {           //Chemin de recherche des films par requête GET.
+app.get("/find-movies", (req,res) => {           //Chemin de recherche des films par requête GET.
     
     if(req.session.user){
         res.render("search", {userData : req.session.user});
@@ -343,7 +361,7 @@ app.get("/search", (req,res) => {           //Chemin de recherche des films par 
     }
 })
 
-app.post("/search", async (req, res) => {   //Chemin de recherche par requête POST.
+app.post("/find-movies", async (req, res) => {   //Chemin de recherche par requête POST.
 
     const value = req.body.researchValue;
     //Insensible à la casse, pas besoin de toLowerCase();
@@ -378,8 +396,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
         const researchedMovies = await funct.getMoviesData(query);
 
         if(researchedMovies.error){
-            res.status(500).send("Erreur détéctée :" + researchedMovies.error);
-            //>>>>>>>Envoyé la page d'erreur
+            const researchError = researchedMovies.error
+            console.error(researchError);
+            res.status(researchError.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : researchError.status || 500, 
+                desc_error : researchError
+            });
         }
         else{
             if(req.session.user){
@@ -390,9 +414,14 @@ app.post("/search", async (req, res) => {   //Chemin de recherche par requête P
             }
         }
     }
-    catch{
-        console.error("Erreur lors de la recherche des donneés.");
-        res.status(500).send("Une erreur s'est produite lors de la recherche.");
+    catch(err){
+        console.error("Erreur lors de la recherche des donneés :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : err
+        });
     }
 });
 
@@ -440,7 +469,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
 
             //Tant que l'email recherché n'est pas trouvé ou que la liste n'est pas parcouru totalement.
             while(!foundEmail && i < users.length){
-                if(emailInputLog == users[i].user_email){ //L'email corresponds :
+                if(safeEmail == users[i].user_email){ //L'email corresponds :
                     //Email/Utilisateur trouvé.
                     foundEmail = true;
                 }
@@ -455,7 +484,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     //await bcrypt.compare(<brutPassword>, <HashedPassword>);
                     const isPwMatch = await bcrypt.compare(passwordInputLog, users[i].user_mdp);
                     if (isPwMatch) {//Le mot de passe transmis corresponds.
-                        const authenticateUser = users[i];
+                        const authenticateUser = users[i]; //..
                         //Création de la session utilisateur.
                         req.session.user = {
                             id: authenticateUser.user_id_user,
@@ -468,8 +497,14 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     } else { // Le mot de passe transmis ne corresponds pas.
                         msgError = "Mot de passe incorrect.";
                     }
-                } catch (error) {
-                    console.error('Erreur lors de la recherche de correspondance entre les mots de passe :', error);
+                } catch (err) {
+                    console.error("Erreur lors de la recherche de correspondance entre les mots de passe :", err);
+                    res.status(err.status || 500);
+                    res.render("error", {
+                        layout : false, 
+                        code_error : err.status || 500, 
+                        desc_error : err
+                    });
                 }
             }
             else{//L'email n'est pas dans la liste des utilisateurs : 
@@ -491,7 +526,7 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
                     model: Genre,                   //Modéle/Table à inclure.
                     as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
                     attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                    through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                    through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
                 },
                 {
                     model: Director, 
@@ -503,22 +538,26 @@ app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
             const movies = await funct.getMoviesData(movieQuery);
 
             if(movies.error){
-                res.status(500).send("Erreur détéctée :" + movies.error);
-                //>>>>>>>Envoyé la page d'erreur
+                console.error(movies.error);
+                res.status(movies.error.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : movies.error.status || 500, 
+                    desc_error : movies.error
+                });                
             }
             else{
-                if(req.session.user){
-                    res.render("home", {
-                        userData : req.session.user, movies : movies});
-                }
-                else{
-                    res.render("home", {movies : movies});
-                }
+                res.redirect("/");
             }
         }
         catch(err){
-            console.error("Erreur lors de la redirection vers l'acceuil.");
-            res.status(500).send("Erreur lors de la redirection vers l'acceuil. Les données n'ont pas pu être chargées...");
+            console.error("Erreur lors de la redirection vers l'acceuil :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Erreur lors de la redirection vers l'acceuil. Les données n'ont pas pu être chargées..." + err
+            });  
         }
     }
 });
@@ -531,9 +570,14 @@ app.get("/logout", (req, res) => {
         res.clearCookie("connect.sid"); //Supprimer le cookie de session du client (utilisé pour identifier).
         console.log("Déconnecté avec Succés !");
     } 
-    catch (error) {
-        console.log("Erreur lors de la déconnexion.");
-        res.status(500).send("Une erreur est survenue lors de la déconnexion à votre compte.");
+    catch (err) {   
+        console.error("Erreur lors de la déconnexion :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Une erreur est survenue lors de la déconnexion à votre compte. " + err
+        });
     }
     res.redirect("/");  //Redirige vers l'URL de l'accueil.
 });
@@ -541,10 +585,14 @@ app.get("/logout", (req, res) => {
 //Chemin de création de compte :
 app.get("/create-account", (req, res) => {
     if(req.session.user){
-        //>>>>>>>>>>>>
         //Bloqué la page de création de compte si déjà connecté
-        //>>>>>>>>>>>>
-        res.render("createAccount", {userData : req.session.user});
+        console.error("Chemin d'accès non autorisé pour votre statut. Vous possédez déjà un compte utilisateur.");
+        res.status(404);
+        res.render("error", {
+            layout : false, 
+            code_error : 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page. En effet, vous possédez déjà un compte utilisateur."
+        });
     }
     else{
         res.render("createAccount");
@@ -625,9 +673,14 @@ app.post("/create-account", async (req,res) => {
                         );
                         console.log("Utilisateur enregistré.");
                     }
-                    catch{
-                        console.log("Une erreur est survenue lors de la création de votre compte utilisateur.");
-                        res.status(500).send("Une erreur est survenue lors de la création de votre compte utilisateur.");
+                    catch(err){
+                        console.error("Une erreur est survenue lors de la création de votre compte utilisateur :", err);
+                        res.status(err.status || 500);
+                        res.render("error", {
+                            layout : false, 
+                            code_error : err.status || 500, 
+                            desc_error : "Une erreur est survenue lors de la création de votre compte utilisateur. " + err
+                        });
                     }
                 }
             }
@@ -638,17 +691,22 @@ app.post("/create-account", async (req,res) => {
             res.render("createAccount", {error : msgError});
         }
         else{//Sinon
-            res.render("login", {createdAccount : true}); //Redirection vers la page de connexion.
+            res.redirect("/login");
         }
     }
     catch {
-        console.log("Une erreur est survenue lors de la récupération de vos informations.");
-        res.status(422).send("Une erreur est survenue lors de la récupération de vos informations.");
+        console.error("Une erreur est survenue lors de la récupération de vos informations :", err);
+        res.status(err.status || 422);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 422, 
+            desc_error : "Une erreur est survenue lors de la récupération de vos informations. " + err
+        });
     }
 });
 
 //Chemin de publication d'un avis :
-app.get("/shareReview", async (req,res) => {
+app.get("/share-review", async (req,res) => {
 
     //------------------
     //>>>>>>Check la structure du code
@@ -660,16 +718,18 @@ app.get("/shareReview", async (req,res) => {
     if(req.session.user){   //Si un utilisateur est connécté
         const userID = req.session.user.id; //On récupère son identifiant
 
-        const reviewByCurrentUser = await UserOpinion.findAll({ //Avis de l'utilisateur actuel
+        const reviewByCurrentUser = await UserOpinion.findOne({ //Avis de l'utilisateur actuel
             where : {
                 [Op.and] : {
                     opinion_id_movie : {[Op.eq] : movieID},
                     opinion_id_user : {[Op.eq] : userID}
                 }
-            }
+            },
+            attributes : ["opinion_id_movie", "opinion_id_user"]
         });
         console.log(reviewByCurrentUser);
-        if(reviewByCurrentUser.length != 0){
+        //... null si aucun
+        if(reviewByCurrentUser){
             console.log("un avis est publié ici");
             existingReview = true;
         }
@@ -678,7 +738,7 @@ app.get("/shareReview", async (req,res) => {
     if(movieID){
         //---------------------Afficher le film séléctionné :-------------------
         try{ 
-            const movieQuery = await Movie.findAll({        //Récupérer les informations du film correspondant
+            const movieQuery = await Movie.findOne({        //Récupérer les informations du film correspondant
                 where : {
                     movie_id_movie : {[Op.eq] : movieID}    //Restriction sur l'identifiant du film.
                 },
@@ -698,10 +758,13 @@ app.get("/shareReview", async (req,res) => {
                 ]
             });
             // Voir pour passer au raw: true pour faciliter et alléger les infos récupérées ou le noter dans le CR.
-            // console.log(movieQuery);
+            console.log(movieQuery);
 
-            const movies = await funct.getMoviesData(movieQuery);
+            //... Mise en tableau
+            const movies = await funct.getMoviesData([movieQuery]);
     
+            //...
+            //Change variable name
             const emotionQuery = await Emotion.findAll();   //Récupérer toutes les émotions disponibles.
             // console.log(emotionQuery);
     
@@ -717,7 +780,8 @@ app.get("/shareReview", async (req,res) => {
                             as: "User", // Doit correspondre à l'alias défini dans belongsTo
                             attributes: ["user_username"], // Colonnes spécifiques à inclure
                         }
-                    ]
+                    ],
+                    attributes : { exclude : ["opinion_id_movie"]}
                 });
                 // console.log(opinions);
                 
@@ -728,10 +792,11 @@ app.get("/shareReview", async (req,res) => {
                     include : [
                         {
                             model : Emotion,
-                            as : "Emotion",
+                            as: "Emotion",
                             attributes : ["emotion_name"],  //Récupération directe du nom des émotions votées.
                         }
-                    ]
+                    ],
+                    attributes : { exclude : ["opinion_id_movie"]}
                 });
                 // console.log(votes);
 
@@ -775,24 +840,39 @@ app.get("/shareReview", async (req,res) => {
                 }
             }
             catch (err) {
-                console.error("Impossible de charger la section des commentaires.", err);
-                res.status(500).send("Impossible de charger la section des commentaires.");
+                console.error("Impossible de charger la section des commentaires :", err);
+                res.status(err.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : err.status || 500, 
+                    desc_error : "Impossible de charger la section des commentaires. " + err
+                });
             }
         }
         catch(err){
-            console.log("Impossible d'accéder au film que vous souhaitez.");
-            res.status(500).send("Impossible d'accéder au film que vous souhaitez.");
+            console.error("Impossible d'accéder au film que vous souhaitez :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Impossible d'accéder au film que vous souhaitez. " + err
+            });
         }
     }
     else{
         //Si on accède à la page shareReview directement depuis l'URL :
-        console.log("Chemin d'accès anormal.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte...");
+        console.error("Chemin d'accès anormal :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... " + err
+        });
     }
 });
 
 //Chemin de publication d'un avis par post
-app.post("/shareReview", async(req,res) => {
+app.post("/share-review", async(req,res) => {
 
     try{
         //Récupération des entrées de l'avis utilisateur par le formulaire :
@@ -802,10 +882,10 @@ app.post("/shareReview", async(req,res) => {
         let commentReview = req.body.comment;
 
         //Si aucune émotions n'est choisi ou qu'aucun commentaire est fait, l'avis est considéré comme imcomplet :
-        if(!emotionsChoices && commentReview == ""){
+        if(!emotionsChoices && commentReview == "" || commentReview.length > 500){
             const movieID = req.body.movie;
             console.log("Redirection vers la page d'avis en raison du manque d'information.");
-            res.redirect(`/shareReview?movie=${movieID}`);
+            res.redirect(`/share-review?movie=${movieID}`);
         }
         //S'il y a assez d'informations pour traiter l'avis :
         else{
@@ -835,15 +915,15 @@ app.post("/shareReview", async(req,res) => {
 
                 //>>>>>>>>>>>>>>>>>
                 //Temporairement commenté pour les tests:
-                // await UserOpinion.create(   //Insérer l'avis dans la BDD :
-                //     {
-                //         opinion_id_user : userID,
-                //         opinion_id_movie : movieID,
-                //         opinion_note : noteReview,
-                //         opinion_fav : favReview,
-                //         opinion_comment : commentReview,
-                //     }
-                // );
+                await UserOpinion.create(   //Insérer l'avis dans la BDD :
+                    {
+                        opinion_id_user : userID,
+                        opinion_id_movie : movieID,
+                        opinion_note : noteReview,
+                        opinion_fav : favReview,
+                        opinion_comment : commentReview,
+                    }
+                );
 
                 //---------Traitement des Emotions :----------- :
                 if(emotionsChoices){
@@ -893,14 +973,15 @@ app.post("/shareReview", async(req,res) => {
                     const notObtainedBadge = await Badge.findAll({
                         include: [{
                             model: UserBadge,
-                            as : "userBadges",
+                            as: "ObtentionsBadge",
                             attributes : [],
-                            required: false,
+                            required: false,            //...
                             where: { id_user: userID }  //Restriction par l'identifiant utilisateur
                         }],
                         //Récupéré ce qu'il ne possède pas, sans association dans la table userBadge.
+                        // ...
                         where: {
-                            '$userBadges.id_badge$': null
+                            '$ObtentionsBadge.id_badge$': null
                         }
                     });
                     // console.log("Les badges non obtenues :", notObtainedBadge);
@@ -910,7 +991,7 @@ app.post("/shareReview", async(req,res) => {
                         include: [
                             {
                                 model: UserOpinion,
-                                as: "UserOpinions",
+                                as: "Opinions",
                                 attributes: [],
                                 where: {
                                     opinion_id_user: userID
@@ -1031,7 +1112,7 @@ app.post("/shareReview", async(req,res) => {
                                 model: Genre,                   //Modéle/Table à inclure.
                                 as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
                                 attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                                through: { attributes: []}      //Exclure les informations de la table pivot (movieGenre).
+                                through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
                             },
                             {
                                 model: Director, 
@@ -1053,37 +1134,56 @@ app.post("/shareReview", async(req,res) => {
                     }
                     catch(err){
                         console.error("La redirection a échoué :", err);
-                        res.status(500).send("La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !");
+                        res.status(err.status || 500);
+                        res.render("error", {
+                            layout : false, 
+                            code_error : err.status || 500, 
+                            desc_error : "La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé !" + err
+                        });
                     }
                 }
                 catch(err){
-                    console.error("Erreur lors de la mise à jour des badges :", err);
-                    res.status(500).send("Erreur lors de la mise à jour des badges.");
+                    console.error("La redirection a échoué :", err);
+                    res.status(err.status || 500);
+                    res.render("error", {
+                        layout : false, 
+                        code_error : err.status || 500, 
+                        desc_error : "La redirection vers l'acceuil a échoué mais votre avis est bien sauvegardé ! " + err
+                    });
                 }
             }
             catch(err){
                 console.error("Erreur lors de l'enregistrement de l'avis :", err);
-                res.status(500).send("Erreur lors de l'enregistrement de l'avis.");
+                res.status(err.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : err.status || 500, 
+                    desc_error : "Erreur lors de l'enregistrement de l'avis : " + err
+                });
             }
         }
     }
     catch(err){
-        console.log("Erreur lors de la récupération des informations de votre avis :", err);
-        res.status(500).send("Erreur lors de la récupération des informations de votre avis.");
+        console.error("Erreur lors de la récupération des informations de votre avis :", err);
+        res.status(err.status || 500);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 500, 
+            desc_error : "Erreur lors de la récupération des informations de votre avis. " + err
+        });
     }
 });
 
 app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'utilisateur.
 
-    if(req.session.user){   //Si un utilisateur est connecté :
+    try{
+        const userID = req.session.user.id;
         try{
-            const userID = req.session.user.id; //Récupération de son identifiant :
-
-            const moviesWatchedUser = await Movie.findAll({ //Récupération de tous les films vus par l'utilisateur :
+            const moviesWatchedUser = await Movie.findAll({
                 include: [
                     {
                         model: UserOpinion,
-                        as: "UserOpinions",
+                        as: "Opinions",
                         attributes: [],
                         where: {
                             opinion_id_user: userID //Restriction sur l'identifiant utilisateur.
@@ -1111,27 +1211,36 @@ app.get("/my-movies", async (req, res) => {       //Chemin vers les films de l'u
             });
         }
         catch(err){
-            console.error("Erreur lors de la récupération de vos films.", err);
-            res.status(500).send("Vos films visionnés non pas pu être récupéré correctement...");
+            console.error("Erreur lors de la récupération de vos films :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Les films que vous avez visionnés non pas pu être récupéré correctement... " + err
+            });
         }
     }
-    else{
-        console.error("Chemin d'accès non autorisé pour votre statut.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+    catch(err){
+        console.error("Chemin d'accès non autorisé pour votre statut. :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page. " + err
+        });
     }
 });
 
 app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favoris de l'utilisateur.
 
-    if(req.session.user){   //Si un utilisateur est connecté :
+    try{
+        const userID = req.session.user.id;
         try{
-            const userID = req.session.user.id; //Récupération de son identifiant :
-
-            const favoritesMoviesUser = await Movie.findAll({ //Récupération de tous les films favoris par l'utilisateur :
+            const favoritesMoviesUser = await Movie.findAll({
                 include: [
                     {
                         model: UserOpinion,
-                        as: "UserOpinions",
+                        as: "Opinions",
                         attributes: [],
                         where: {
                             [Op.and] : {
@@ -1162,23 +1271,32 @@ app.get("/my-favorites", async (req, res) => {    //Chemin vers les films favori
             });
         }
         catch(err){
-            console.error("Erreur lors de la récupération de vos films.", err);
-            res.status(500).send("Vos films préférés non pas pu être récupéré correctement...");
+            console.error("Erreur lors de la récupération de vos films favoris :", err);
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Les films que vous avez préférés non pas pu être récupéré correctement... " + err
+            });
         }
     }
-    else{
-        console.error("Chemin d'accès non autorisé pour votre statut.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+    catch(err){
+        console.error("Chemin d'accès non autorisé pour votre statut. :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page." + err
+        });
     }
 });
 
 app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'utilisateur.
 
-    if(req.session.user){   //Si l'utilisateur est bien connecté
+    try{ //Si l'utilisateur est bien connecté
+        const userID = req.session.user.id; //Récupération de l'identifiant utilisateur
+        // console.log(userID);
         try{
-            const userID = req.session.user.id; //Récupération de l'identifiant utilisateur
-            // console.log(userID);
-
             const userBadgeQuery = await UserBadge.findAll({
                 where: {
                     id_user: { [Op.eq]: userID }    //Restriction sur l'identifiant utilisateur
@@ -1186,15 +1304,16 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
                 include: [  //Jointure avec la table Badge
                     {
                         model: Badge,
-                        as: "badge",
+                        as: "Badge",
                         attributes: ["badge_distinction","badge_url","badge_serial_nb"],
                     }
-                ]
+                ],
+                attributes : { exclude : ["id_user"]}
             });
             // console.log(userBadgeQuery);
             let unlockedBadges = [];
             userBadgeQuery.forEach(userBadge => {
-                unlockedBadges.push(userBadge.badge);
+                unlockedBadges.push(userBadge.Badge);
             });
             // console.log(unlockedBadges);
 
@@ -1218,17 +1337,32 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
             }
             catch(err){
                 console.error("Erreur lors de la récupération des badges vérouillés :", err);
-                res.status(500).send("Une erreur s'est produite lors de la récupération des badges vérouillés...");
+                res.status(err.status || 500);
+                res.render("error", {
+                    layout : false, 
+                    code_error : err.status || 500, 
+                    desc_error : "Une erreur s'est produite lors de la récupération des badges vérouillés :" + err
+                });
             }
         }
         catch(err){
             console.error("Erreur lors de la récupération de vos badges :", err);
-            res.status(500).send("Une erreur s'est produite lors de la récupération de vos badges...");
+            res.status(err.status || 500);
+            res.render("error", {
+                layout : false, 
+                code_error : err.status || 500, 
+                desc_error : "Une erreur s'est produite lors de la récupération de vos badges :" + err
+            });
         }
     }
-    else{
-        console.error("Chemin d'accès non autorisé pour votre statut.");
-        res.status(404).send("Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page.");
+    catch(err){
+        console.error("Chemin d'accès non autorisé pour votre statut :", err);
+        res.status(err.status || 404);
+        res.render("error", {
+            layout : false, 
+            code_error : err.status || 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... Vous n'avez pas le statut adéquat pour accéder à cette page." + err
+        });
     }
 });
 

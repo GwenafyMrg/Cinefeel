@@ -22,14 +22,14 @@
            
             {{!-- Logo --}}
             <div class="col-2">
-                <img src="images/logo.png" alt="Website_logo" onclick="window.location.href='/'">
+                <img src="https://github.com/GwenafyMrg/cinefeel-pictures-repo/blob/main/public/Cinefeel_logo.png?raw=true" alt="Website_logo" onclick="window.location.href='/'" width="100" height="100">
             </div>
            
             {{!-- Liste de films --}}
-            <button class="btn btn-block btn-info col-2" onclick="window.location.href='../moviesList'">Liste de films</button>
+            <button class="btn btn-block btn-info col-2" onclick="window.location.href='../explore-movies'">Liste de films</button>
             
             {{!-- Search Section --}}
-            <form id="searchForm" method="POST" action="/search" class="col-5 d-flex align-items-center justify-content-between bg-info p-1">
+            <form id="searchForm" method="POST" action="/find-movies" class="col-5 d-flex align-items-center justify-content-between bg-info p-1">
                 <input id="searchBar" name="researchValue" type="text" class="w-75" placeholder="Rechercher par un titre ou un réalisateur">
                 <button type="submit">Rechercher</button>
             </form>
@@ -58,7 +58,7 @@
                         <a href="../parameters">Paramètres</a>
                     {{/if}}
                 </details>
-                <img src="" alt="Profil_picture" class="border rounded-circle">
+                <img src="https://github.com/GwenafyMrg/cinefeel-pictures-repo/blob/main/public/Guest.png?raw=true" alt="Profil_picture" class="border rounded-circle" width="50" height="50">
             </div> 
         </nav>
     </div>
