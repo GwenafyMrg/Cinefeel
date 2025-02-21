@@ -103,7 +103,7 @@ async function getMoviesData (movieObj){
                     movieObj.error = err;   //Retourner l'erreur depuis l'objet.
                 }
             }
-            movie.movie_avg_note = avg_note;        //Ajouter la valeur à l'objet
+            movie.movie_avg_note = updated_avg_note;        //Ajouter la valeur à l'objet
 
         } catch(err){
             console.error("Erreur lors du calcul de la note moyenne :", err);
