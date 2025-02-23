@@ -1,8 +1,8 @@
-{{!-- Contenu de la page d'accueil --}}
+{{!-- Contenu de la page d'accueil : --}}
 <div class="container-fluid d-flex flex-column align-items-center my-3">
 
+    {{!-- Conteneur d'explication : --}}
     <div class="text-center w-75">
-
         <h3>Bienvenue sur <i>Cinéfeel</i>, la plateforme où le cinéma rencontre vos émotions !</h3>
         <p>
             <i>Cinéfeel</i>, c’est bien plus qu’un simple site. 
@@ -21,16 +21,37 @@
         <p>
             Rejoignez <i>Cinéfeel</i> et laissez votre passion du cinéma s’exprimer autrement. 🎥✨
         </p>   
-
     </div>
 
+    {{!-- Conteneur d'affichage des films : --}}
     <div id="moviesDisplay" class="gridMovies w-100 m-3 bg-danger">
-        {{!-- Pour chaque films transmis en paramètre de template --}}
+        {{!-- Pour chaque films transmis en paramètre de template : --}}
         {{#each movies}}
-            {{!-- Afficher le partial suivant --}}
+            {{!-- Afficher le partial suivant : --}}
             {{> movieDisplay}}
         {{/each}}
     </div>
-
-    <button class="btn btn-block btn-info w-25">Plus de film ! (à modifier)</button>
 </div>
+
+{{!-- Insertion de code JavaScript : --}}
+<script>
+    async function showBadges() {
+        const badges = JSON.parse('{{{badges}}}'); // Convertir en objet JS.
+
+        for (const badge of badges) {   // Pour chaque badges :
+            await Swal.fire({   // Afficher un popup :
+                title: `Badge n°${badge.badge_id} Obtenu !`,
+                imageUrl : `${badge.badge_url}?raw=true`,
+                imageHeight : 200,
+                imageWidth : 200,
+                imageAlt : "Image du badge obtenu",
+                text: `${badge.badge_distinction}.`,
+                confirmButtonText: "SUPER !",
+            });
+        }
+    }
+
+    if('{{{badges}}}'){ // Si une données badges (nouveaux badges obtenus) est transmise :
+        showBadges(); // Lancer la séquence d'affichage des pop-ups.
+    }
+</script>

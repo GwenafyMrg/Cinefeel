@@ -1,67 +1,87 @@
-{{!-- Partials > template d'affichage des films --}}
+{{!-- Partials / Template d'affichage des films : --}}
 <div class="card-container m-2">
 
-    {{!-- Première face (recto) --}}
+    {{!-- Première face de la carte (recto) : --}}
     <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
-    
+        
+        {{!-- Afficher le titre du film : --}}
         <h3>{{movie_title}}</h3>  
 
+        {{!-- Afficher le poster du film : --}}
         <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="moviePoster border border-2 my-3">
 
+        {{!-- Afficher la note du film : --}}
         <p id="movieNote" class="bg-info">Note : {{movie_avg_note}}</p>
-        {{#if popularEmotions}}
+
+        {{!-- Afficher les émotions les plus votées du film : --}}
+        {{#if popularEmotions}}     {{!-- Si les émotions populaires existent : --}}
             <p id="movieEmotions" class="bg-info">Emotions populaires : {{popularEmotions}}</p>
-        {{else}}
+        {{else}}    {{!-- Sinon : --}}
             <p id="movieEmotions" class="bg-info">Avis insuffisants</p>
         {{/if}}
 
+        {{!-- Section des boutons de la carte : --}}
         <div class="w-100">
-            {{!-- Ajout d'un bouton qui redirige vers la page d'avis. --}}
-            <button id="addReviewTo{{movie_id_movie}}" class="btn btn-block btn-success border rounded-circle" onclick="window.location.href='/shareReview?movie={{movie_id_movie}}'">Partager un avis</button>
+            {{!-- Bouton de redirection vers la page d'avis correspondante : --}}
+            <button id="addReviewTo{{movie_id_movie}}" class="btn btn-block btn-success border rounded-circle" onclick="window.location.href='/share-review?movie={{movie_id_movie}}'">Partager un avis</button>
+            {{!-- Bouton pour retourner la carte : --}}
             <button class="switchButton btn btn-block btn-warning border rounded-circle ms-5">Retourner</button>
         </div>
         
     </div>
 
-    {{!-- ---------------------------------------------------------------------------------------------------------- --}}
+    {{!-- -------------------------------------------------- --}}
 
     <br>
-    {{!-- Seconde Face (verso) --}}
+    {{!-- Seconde Face de la carte (verso) --}}
     <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
         
-        <h3>{{movie_title}}</h3>
+        {{!-- Afficher le titre du film : --}}
+        <h3>{{movie_title}}</h3>  
+
+        {{!-- Afficher le poster du film : --}}
         <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="w-50 mh-50 border border-2 my-4">
 
+        {{!-- Conteneur des informations détaillées du film : --}}
         <div class="infoMovie">
-
+            {{!-- Afficher les genres du film : --}}
             <p id="movieGenre" class="bg-info">
-                {{!-- Si la structure n'est pas vide --}}
+                {{!-- Si la structure contenant les genres n'est pas vide : --}}
                 {{#if this.Genres}}
-                    {{!-- Pour chaque genre stocké dans la structure Genre :  --}}
+                    {{!-- Pour chaque genre stocké dans la structure Genre : --}}
                     {{#each this.Genres}}
-                        {{!-- Afficher le genre --}}
+                        {{!-- Afficher le genre : --}}
                         - {{this.genre_libelle}}
                     {{/each}}
-                {{!-- Si la structure est vide --}}
+                {{!-- Sinon : --}}
                 {{else}}
                     Aucun genre associé...
                 {{/if}}
             </p>
 
+            {{!-- Afficher les réalisateurs du film : --}}
             <p id="movieDir" class="bg-info">
+                {{!-- Si la structure contenant les réalisateurs n'est pas vide : --}}
                 {{#if this.Directors}}
+                {{!-- Pour chaque réalisateur stocké dans la structure Director : --}}
                     {{#each this.Directors}}
+                        {{!-- Afficher le réalisateur : --}}
                         Réalisateur: {{this.director_firstname}} {{this.director_lastname}}
                     {{/each}}
+                {{!-- Sinon : --}}
                 {{else}}
                     Aucun réalisateur associé à ce film.
                 {{/if}}
             </p>
 
+            {{!-- Afficher la durée du film : --}}
             <p id="movieRuntime" class="bg-info">Durée: {{convertRuntime movie_runtime}}</p>
+
+            {{!-- Afficher la date de sortie du film : --}}
             <p id="movieReleasedDate" class="bg-info">Date de sortie: {{convertDateFormat movie_released_date}}</p>
-        
         </div>
+
+        {{!-- Bouton pour retourner la carte : --}}
         <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
     </div>      
 </div>

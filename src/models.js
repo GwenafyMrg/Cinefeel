@@ -1,36 +1,35 @@
-//-----------------------------------Importation des modules node:---------------------------------------//
+//---------- Importations des modules node : ----------//
 
-const {Sequelize, DataTypes} = require('sequelize');    //Gestion de la BDD.
+const {Sequelize, DataTypes} = require('sequelize');    // Gestion de la BDD.
 
-//-----------------------------------Définition du serveur BDD (mariaDB) :-------------------------------//
+//---------- Définition du serveur Base De Données (mariaDB) : ----------//
 
-const sequelize = new Sequelize('cinefeel','test','test', { //Définition des paramètres de connexion.
+const sequelize = new Sequelize('cinefeel','test','test', { // Définir les paramètres de connexion.
     dialect: 'mysql',
     host : 'localhost',
-
-    //Afficher les logs (requête test/par défaut).
-    logging: false
+    logging: false      // Afficher les logs.
 });
 
-sequelize.authenticate()    //Tentative de connexion avec le BDD.
-    .then(() => {
+sequelize.authenticate()    // Tenter de se connecter à la BDD.
+    .then(() => {   // En cas de réussite :
         console.log("La connexion avec la BDD est établie !");
     })
-    .catch(() => {
+    .catch(() => {  // En cas d'échec :
         console.error("La connexion a échouée...");
 });
 
-//-----------------------------------Créations des modèles de BDD: -------------------------------//
+//---------- Créations des modèles de BDD : ----------//
 
-const Movie = sequelize.define("movie", {   //Définit le modèle Movie
-    movie_id_movie : {              //Nom du champ.
-        type: DataTypes.INTEGER,    //Type de donnée du champ.
-        primaryKey: true,           //Est-il une clé primaire ?
-        autoIncrement : true        //Est-il auto-incrémenté ?
+//----- Définition du modèle Movie : -----//
+const Movie = sequelize.define("movie", {
+    movie_id_movie : {              // Nom du champ.
+        type: DataTypes.INTEGER,    // Type de donnée du champ.
+        primaryKey: true,           // Est-il une clé primaire ?
+        autoIncrement : true        // Est-il auto-incrémenté ?
     },
     movie_title: {                  
-        type: DataTypes.STRING,     //STRING limite la taille par défaut à 255.
-        allowNull: false            //Peut-il être de type null ?
+        type: DataTypes.STRING,     // Le type STRING limite la taille par défaut à 255 caractères.
+        allowNull: false            // Peut-il être de type null ?
     },
     movie_poster_url: {
         type: DataTypes.STRING,
@@ -45,15 +44,16 @@ const Movie = sequelize.define("movie", {   //Définit le modèle Movie
         allowNull: true
     },
     movie_avg_note: {
-        type: DataTypes.DOUBLE,
+        type: DataTypes.DOUBLE, // Le type DOUBLE permet les nombres à virgules.
         allowNull: false
     }
 }, {
-        tableName: 'movie',     //Nom de la table dans la BDD.
-        timestamps: false,      //Utiliser les champs `createdAt` et `updatedAt` ?
+        tableName: 'movie',     // Nom de la table dans la BDD.
+        timestamps: false,      // Faut-il utiliser les champs `createdAt` et `updatedAt` ?
 });
 
-const Genre = sequelize.define("genre", {   //Définit la modèle Genre.
+//----- Définition du modèle Genre : -----//
+const Genre = sequelize.define("genre", {
     genre_id_genre : {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -68,27 +68,29 @@ const Genre = sequelize.define("genre", {   //Définit la modèle Genre.
         timestamps: false
 });
 
-const movieGenre = sequelize.define("movieGenre", { //Définit le modèle movieGenre
+//----- Définition du modèle MovieGenre : -----//
+const MovieGenre = sequelize.define("MovieGenre", {
     id_movie: {
         type: DataTypes.INTEGER,
-        references : {              //Définir une clé étrangère :
-            model: Movie,           //Quel modèle fait-on référence ?
-            key: "movie_id_movie"   //Quel champ est une clé étrangère pour ce modèle ?
+        references : {              // Définir une clé étrangère :
+            model: Movie,           // A quel modèle fait-on référence ?
+            key: "movie_id_movie"   // Quel champ est une clé étrangère pour ce modèle ?
         }
     },
     id_genre: {
         type: DataTypes.INTEGER,
-        references: {               //Définit la clé étrangère :
-            model: Genre,           //Définir une clé étrangère pour relier movieGenre à Genre.
-            key: "genre_id_genre"   //Définir le champ genre_id_genre comme clé étrangère de movieGenre.
+        references: {               // Définir la clé étrangère :
+            model: Genre,           // Définir une clé étrangère pour faire référence à Genre depuis MovieGenre.
+            key: "genre_id_genre"   // Définir le champ genre_id_genre comme clé étrangère de MovieGenre.
         }
     }
 }, {
-    tableName: "movieGenre",
+    tableName: "MovieGenre",
     timestamps: false
 });
 
-const Director = sequelize.define("director", { //Définit le modèle Director.
+//----- Définition du modèle Director : -----//
+const Director = sequelize.define("director", {
     director_id_director: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -115,7 +117,8 @@ const Director = sequelize.define("director", { //Définit le modèle Director.
     timestamps: false
 });
 
-const movieDir = sequelize.define("movieDir", { //Définit le modèle movieDir.
+//----- Définition du modèle MovieDir : -----//
+const MovieDir = sequelize.define("MovieDir", {
     id_movie : {
         type: DataTypes.INTEGER,
         references: {
@@ -131,11 +134,12 @@ const movieDir = sequelize.define("movieDir", { //Définit le modèle movieDir.
         }
     }
 }, {
-    tableName: "movieDir",
+    tableName: "MovieDir",
     timestamps: false
 });
 
-const User = sequelize.define("user", { //Définit le modèle User.
+//----- Définition du modèle User : -----//
+const User = sequelize.define("user", {
     user_id_user : {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -154,7 +158,7 @@ const User = sequelize.define("user", { //Définit le modèle User.
         allowNull:false
     },
     user_admin : {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.BOOLEAN,    // Le type BOOLEAN contient soit la valeur "true" soit la valeur "false".
         allowNull: true,
         defaultValue: 0
     }},
@@ -164,7 +168,8 @@ const User = sequelize.define("user", { //Définit le modèle User.
     }
 );
 
-const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle UserOpinion.
+//----- Définition du modèle UserOpinion : -----//
+const UserOpinion = sequelize.define("userOpinion", { 
     opinion_id_user : {
         type: DataTypes.INTEGER,
         references : {
@@ -184,7 +189,7 @@ const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle Us
         allowNull: false
     },
     opinion_comment : {
-        type: DataTypes.STRING(500),       
+        type: DataTypes.TEXT,  
         allowNull: true
     },
     opinion_fav : {
@@ -198,7 +203,8 @@ const UserOpinion = sequelize.define("userOpinion", {   //Définit le modèle Us
     }
 );
 
-const Vote = sequelize.define("vote", {     //Définit le modèle Vote
+//----- Définition du modèle Vote : -----//
+const Vote = sequelize.define("vote", {
     id_user : {
         type : DataTypes.INTEGER,
         references : {
@@ -225,7 +231,8 @@ const Vote = sequelize.define("vote", {     //Définit le modèle Vote
         timestamps : false
 });
 
-const Emotion = sequelize.define("emotion", {   //Définit le modèle Emotion
+//----- Définition du modèle Emotion : -----//
+const Emotion = sequelize.define("emotion", {
     emotion_id_emotion : {
         type : DataTypes.INTEGER,
         primaryKey : true,
@@ -239,7 +246,8 @@ const Emotion = sequelize.define("emotion", {   //Définit le modèle Emotion
         timestamps : false
 });
 
-const UserBadge = sequelize.define("userBadge", {   //Définit le modèle userBadge
+//----- Définition du modèle UserBadge : -----//
+const UserBadge = sequelize.define("userBadge", {
     id_user : {
         type: DataTypes.INTEGER,
         references: {
@@ -256,10 +264,11 @@ const UserBadge = sequelize.define("userBadge", {   //Définit le modèle userBa
     }},
     {
         tableName: "userBadge",
-        timestamps: false           //Voir basculer à true pour plus d'info sur l'obtention des badges.
+        timestamps: false,           //Voir basculer à true pour plus d'info sur l'obtention des badges.
 });
 
-const Badge = sequelize.define("badge", {   //Définit le modèle Badge
+//----- Définition du modèle Badge : -----//
+const Badge = sequelize.define("badge", {
     badge_id_badge : {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -276,141 +285,215 @@ const Badge = sequelize.define("badge", {   //Définit le modèle Badge
     badge_serial_nb : {
         type: DataTypes.TINYINT,
         allowNull: true
+    },
+    badge_type :{
+        type: DataTypes.STRING,
+        allowNull : false
+    },
+    badge_value :{
+        type : DataTypes.STRING,
+        allowNull: false
     }},
     {
         tableName: "badge",
         timestamps: false
 });
 
-//------------------------------- Jointure entre les modèles de BDD : -------------------------------//
+//----- Jointures entre les modèles de BDD : -----//
 
-//<model>.belongsToMany(<model_à_joindre>, {
-    // through: <model_pivot>, 
-    // foreignKey: <model_pivot_fk1>, 
-    // otherKey: <model_pivot_fk2>, 
-    // as: <nom_model_à_joindre>
-// });
+//>>>>>>>>>>>>>>>>>>
+//ASSOCIATION A EXPLIQUER ET A TRIEE :
+    // Un utilisateur peut avoir plusieurs badges
+    //...
+    //Pour chaque association.
+//>>>>>>>>>>>>>>>>>>
 
-//Création d'une relation plusieurs à plusieurs entre les films et les réalisateurs.
+//----- Les relations plusieurs à plusieurs (avec une table intermédiaire) : -----//
+
+// Création d'une relation plusieurs à plusieurs entre les films et les réalisateurs :
+// Un film peut avoir plusieurs réalisateurs.
 Movie.belongsToMany(Director, {
-    through: movieDir,          //Quel modèle/table fait la jonction entre les deux ?
-    foreignKey: 'id_movie',     //Qui est la clé étrangère relié à Movie ?
-    otherKey: 'id_director',    //Qui est la clé étrangère relié à Genre ?
-    as: 'Directors'             //Renommer le modèle.
+    through: MovieDir,          // Quel modèle/table fait la jonction entre les deux ?
+    foreignKey: 'id_movie',     // Quelle est la clé étrangère de la table de jonction qui relie Movie ?
+    otherKey: 'id_director',    // Quelle est la clé étrangère de la table de jonction qui relie Director ?
+    as: 'Directors'             // Donner un alias à l'association.
 });
 
-//Création d'une relation plusieurs à plusieurs entre les films et les utilisateurs.
+// Un réalisateur peut réaliser plusieurs films.
+Director.belongsToMany(Movie, {
+    through: MovieDir,          
+    foreignKey: 'id_director',  
+    otherKey: 'id_movie',       
+    as: 'Movies'             
+});
+
+// Création d'une relation plusieurs à plusieurs entre les films et les genres :
+// Un film peut être associé à plusieurs genres.
+Movie.belongsToMany(Genre, {
+    through: MovieGenre,        // Quel modèle/table fait la jonction entre les deux ?
+    foreignKey: 'id_movie',     // Quelle est la clé étrangère de la table de jonction qui relie Movie ?
+    otherKey: "id_genre",       // Quelle est la clé étrangère de la table de jonction qui relie Genre ?
+    as: "Genres"                // Donner un alias à l'association.
+});
+
+// Un Genre peut être associé à plusieurs films.
+Genre.belongsToMany(Movie, {
+    through: MovieGenre,        
+    foreignKey: 'id_genre',     // Quelle est la clé étrangère de la table de jonction qui relie Genre ?
+    otherKey: "id_movie",       // Quelle est la clé étrangère de la table de jonction qui relie Movie ?
+    as: "Movies"                
+});
+
+// Création d'une relation plusieurs à plusieurs entre les films et les utilisateurs :
+// Un film peut être vu par plusieurs utilisateurs.
 Movie.belongsToMany(User, {
-    through: UserOpinion,       //Utilisation du modèle userOpinion pour associer des avis à des films.
-    foreignKey: "opinion_id_user",
-    otherKey: "opinion_id_movie",
+    through: UserOpinion,           // Utiliser le modèle userOpinion pour associer des avis à des films.
+    foreignKey: "opinion_id_movie", // Quelle est la clé étrangère de la table de jonction qui relie Movie ?
+    otherKey: "opinion_id_user",    // Quelle est la clé étrangère de la table de jonction qui relie User ?
     as: "Users"
 });
 
-//Création d'une relation plusieurs à plusieurs entre les films et les genres.
-Movie.belongsToMany(Genre, {
-    through: movieGenre,        //Quel modèle/table fait la jonction entre les deux ?
-    foreignKey: 'id_movie',     //Qui est la clé étrangère relié à Movie ?
-    otherKey: "id_genre",       //Qui est la clé étrangère relié à Genre ?
-    as: "Genres"                //Renommer le modèle.
+// Un utilisateur peut voir plusieurs films.
+User.belongsToMany(Movie, {
+    through: UserOpinion,           // Utiliser le modèle userOpinion pour associer des avis à des films.
+    foreignKey: "opinion_id_user",  // Quelle est la clé étrangère de la table de jonction qui relie User ?
+    otherKey: "opinion_id_movie",   // Quelle est la clé étrangère de la table de jonction qui relie Movie ?
+    as: "Movies"
 });
 
-//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les émotions.
+// Création d'une relation plusieurs à plusieurs entre les utilisateurs et les émotions :
+// Un utilisateur peut ressentir plusieurs émotions.
 User.belongsToMany(Emotion, {
-    through: Vote,               //Utilisation du modèle Vote pour relier un vote utilisateur et une émotion.
+    through: Vote,               // Utiliser le modèle Vote pour relier un vote utilisateur et une émotion.
     foreignKey: "id_user",
     otherKey: "id_emotion",
     as: "Emotions"
 });
 
-//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les films.
-User.belongsToMany(Movie, {
-    through: UserOpinion,        //Utilisation du modèle userOpinion pour associer des avis à des films.
-    foreignKey: "opinion_id_user",
-    otherKey: "opinion_id_movie",
-    as: "Movies"
+// Une émotion peut être ressenti par plusieurs utilisateurs.
+Emotion.belongsToMany(User, {
+    through: Vote,               // Utiliser le modèle Vote pour relier des votes utilisateur et des émotions.
+    foreignKey: "id_emotion",
+    otherKey: "id_user",
+    as: "Users"
 });
 
-//Création d'une relation plusieurs à plusieurs entre les utilisateurs et les films.
+// Création d'une relation plusieurs à plusieurs entre les utilisateurs et les badges :
+// Un utilisateur peut avoir plusieurs badges.
 User.belongsToMany(Badge, {
-    through: UserBadge,
+    through: UserBadge,         // Utiliser le modèle UserBadge pour relier des utilisateurs à des badges.
     foreignKey: "id_user",
     otherKey: "id_badge",
     as: "Badges"
 });
 
-//Nouvelle section ajouté à la suite de problème de jointure entre User et UserOpinion 
-//Relation à retirer éventuellement ???
+// Un badge peut appartenir à plusieurs utilisateurs.
+Badge.belongsToMany(User, {
+    through: UserBadge,         // Utiliser le modèle UserBadge pour relier des badges à des utilisateurs.
+    foreignKey: "id_badge",
+    otherKey: "id_user",
+    as: "Users"
+});
 
-// Un utilisateur peut avoir plusieurs opinions
+//----- Les relations individuels / Sans tablot pivot (sans table intermédiaire) -----//
+// C'est-à-dire des relations par une clé étrangère stockée directement dans l'une des 2 relations (pas de table pivot donc).
+
+//----- Pour les avis : -----//
+// Un utilisateur peut avoir plusieurs opinions.
 User.hasMany(UserOpinion, {
-    foreignKey: "opinion_id_user", // clé étrangère dans UserOpinion pointant vers User
-    as: "Opinions", // alias pour accéder aux opinions depuis un utilisateur
+    foreignKey: "opinion_id_user",  // Clé étrangère dans UserOpinion pointant vers User.
+    as: "Opinions",                 // Alias pour accéder aux opinions depuis un utilisateur.
 });
 
-// Une opinion appartient à un utilisateur
+// Une opinion appartient à un utilisateur.
 UserOpinion.belongsTo(User, {
-    foreignKey: "opinion_id_user", // clé étrangère dans UserOpinion pointant vers User
-    as: "User", // alias pour accéder à l'utilisateur depuis une opinion
+    foreignKey: "opinion_id_user",  // Clé étrangère dans UserOpinion pointant vers User.
+    as: "User",                     // Alias pour accéder à l'utilisateur depuis une opinion.
 });
 
-//-----------------Pour les votes :----------------------
-//Un utilisateur a plusieurs votes
-User.hasMany(Vote, {
-    foreignKey: "id_user", 
-    as: "Vote", 
+// Un film a 0 ou plusieurs avis.
+Movie.hasMany(UserOpinion, {
+    foreignKey: "opinion_id_movie",
+    as: "Opinions"
 });
 
-//Un vote appartient à un utilisateur
-Vote.belongsTo(User, {
-    foreignKey: "id_user",
-    as: "User",
-});
-
-//Une emotion a plusieurs votes associés
-Emotion.hasMany(Vote, {
-    foreignKey: "id_emotion", 
-});
-
-//Un vote appartient à une émotion
-Vote.belongsTo(Emotion, {
-    foreignKey: "id_emotion",
-    as: "Emotion",
-});
-
-//----------------Pour les films des utilisateurs :
-//Code à expliquer >>>>>>>
-
+// Un avis est donné à un film.
 UserOpinion.belongsTo(Movie, {
     foreignKey: "opinion_id_movie",
     as: "Movie"
 });
 
-Movie.hasMany(UserOpinion, {
-    foreignKey: "opinion_id_movie",
-    as: "UserOpinions"
+//----- Pour les votes : -----//
+// Un utilisateur a 0 ou plusieurs votes.
+User.hasMany(Vote, {
+    foreignKey: "id_user", 
+    as: "Votes", 
 });
 
+// Un vote appartient à un utilisateur.
+Vote.belongsTo(User, {
+    foreignKey: "id_user",
+    as: "User",
+});
 
-//------------------------------- Synchronisation entre les modèles et la BDD :-------------------------------//
+// Une emotion a 0 ou plusieurs votes associés.
+Emotion.hasMany(Vote, {
+    foreignKey: "id_emotion", 
+    as : "Votes"
+});
 
-sequelize.sync({force: false})              //Tentative de synchrinisation.
-    .then(() => {                           //Cas de réussite.
+// Un vote appartient à une émotion (mais on peut réaliser plusieurs votes dans le même avis).
+Vote.belongsTo(Emotion, {
+    foreignKey: "id_emotion",
+    as: "Emotion",
+});
+
+//----- Pour les badges : -----//
+// Associer UserBadge à User pour inclure directement les informations de l'utilisateur.
+// Un utilisateur a obtenu 0 ou plusieurs badges. (pas encore utilisé)
+User.hasMany(UserBadge, {
+    foreignKey: "id_user",
+    as: "ObtainedBadges"
+});
+
+// Un badge obtenu est lié à un utilisateur.
+UserBadge.belongsTo(User, {
+    foreignKey: "id_user",
+    as: "User"
+});
+
+// Un badge peut être sujet à plusieurs obtentions différentes.
+Badge.hasMany(UserBadge, {
+    foreignKey : "id_badge",
+    as : "ObtentionsBadge"
+});
+
+// Un badge obtenu est lié à un badge.
+UserBadge.belongsTo(Badge, {
+    foreignKey: "id_badge",
+    as: "Badge"
+});
+
+//----- Synchronisation entre les modèles et la Base De Données : -----//
+
+sequelize.sync({force: false})              // Tenter de synchronisation.
+    .then(() => {                           //En cas de réussite.
         console.log("Synchronisée.");
     })
-    .catch((err) => {                       //Cas d'échec.
+    .catch((err) => {                       //En cas d'échec.
         console.error("Erreur : ", err);
 });
 
-//Exportation des modèles utilisés dans la BDD :
+//----- Exportations des modèles utilisés dans la BDD : -----//
 module.exports = {
     sequelize,
     Movie,
     Genre,
     Director,
-    User,
     UserOpinion,
+    User,
     Vote,
     Emotion,
+    UserBadge,
     Badge,
 };

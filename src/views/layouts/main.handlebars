@@ -1,72 +1,97 @@
-{{!-- Menu --}}
-
+{{!-- Layout principal / Menu --}}
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{!--Importation du FrameWork BootStrap--}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-    {{!-- Importation du fichier CSS --}}
-    <link rel="stylesheet" href="css/styles.css">
-    {{!-- Importation des fonctions concernants le DOM --}}
-    <script src="functionsDOM.js"></script>
-    <title>Cinéfeel</title>
-</head>
-<body>
-    <div class="container-fluid bg-primary">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <nav id="navbar" class="container bg-secondary row m-auto py-3 align-items-center justify-content-between">
-           
-            {{!-- Logo --}}
-            <div class="col-2">
-                <img src="images/logo.png" alt="Website_logo" onclick="window.location.href='/'">
-            </div>
-           
-            {{!-- Liste de films --}}
-            <button class="btn btn-block btn-info col-2" onclick="window.location.href='../moviesList'">Liste de films</button>
+        {{!-- Importation du FrameWork BootStrap : --}}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+        {{!-- Importation du fichier CSS : --}}
+        <link rel="stylesheet" href="css/styles.css">
+        {{!-- Importation de la bibliothèque sweetAlert2 pour les popups : --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        {{!-- Importation des fonctions concernants le DOM : --}}
+        <script src="functionsDOM.js"></script>
+        <title>Cinéfeel</title>
+    </head>
+    <body>
+        <div class="container-fluid bg-primary">
+            <nav id="navbar" class="container bg-secondary row m-auto py-3 align-items-center justify-content-between">
             
-            {{!-- Search Section --}}
-            <form id="searchForm" method="POST" action="/search" class="col-5 d-flex align-items-center justify-content-between bg-info p-1">
-                <input id="searchBar" name="researchValue" type="text" class="w-75" placeholder="Rechercher par un titre ou un réalisateur">
-                <button type="submit">Rechercher</button>
-            </form>
+                {{!-- Logo : --}}
+                <div class="col-2">
+                    <img src="https://github.com/GwenafyMrg/cinefeel-pictures-repo/blob/main/public/Cinefeel_logo.png?raw=true" alt="Website_logo" onclick="window.location.href='/'" width="100" height="100">
+                </div>
+            
+                {{!-- Liste de films / Redirection vers la page de filtre : --}}
+                <button class="btn btn-block btn-info col-2" onclick="window.location.href='../explore-movies'">Liste de films</button>
+                
+                {{!-- Formulaire de recherche de film par texte : --}}
+                <form id="searchForm" method="POST" action="/find-movies" class="col-5 d-flex align-items-center justify-content-between bg-info p-1">
+                    <input id="searchBar" name="researchValue" type="text" class="w-75" placeholder="Rechercher par un titre ou un réalisateur">
+                    <button type="submit">Rechercher</button>
+                </form>
 
-            {{!-- Section profil --}}
-            <div class="d-flex col-2 bg-info d-flex justify-content-between">
-                <details class="d-flex flex-column">
-                    {{#if userData}}
-                        <summary>{{userData.username}}</summary>
-                    {{else}}
-                        <summary>Profil</summary>
-                    {{/if}}
-                    <hr>
-                    {{#if userData}}
-                        <a href="../">Profil</a>
-                        <a href="../my-movies" class="border-3">Vos films</a>
-                        <a href="../my-favorites" class="border-3">Vos favoris</a>
-                        <a href="../my-badges">Vos badges</a>
-                        <hr>
-                        <a href="../logout">Déconnexion</a>
-                        <a href="../parameters">Paramètres</a>
-                    {{else}}
-                        <a href="../login">Connexion</a>
-                        <a href="../parameters">Paramètres</a>
-                    {{/if}}
-                </details>
-                <img src="" alt="Profil_picture" class="border rounded-circle">
-            </div> 
-        </nav>
-    </div>
+                {{!-- Section profil : --}}
+                <div class="d-flex col-2 bg-info d-flex justify-content-between">
+                    {{!-- Section déroulante : --}}
+                    <details class="d-flex flex-column">
+                        {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}
+                            <summary>{{userData.username}}</summary>
+                        {{else}}            {{!-- Sinon : --}}
+                            <summary>Profil</summary>
+                        {{/if}}
+                        <hr>                {{!-- Séparation : --}}
+                        {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}
+                            {{!-- Liens possibles : --}}
+                            <a href="../">Profil</a>
+                            <a href="../my-movies" class="border-3">Vos films</a>
+                            <a href="../my-favorites" class="border-3">Vos favoris</a>
+                            <a href="../my-badges">Vos badges</a>
+                            <hr>    {{!-- Séparation : --}}
+                            <a href="../logout">Déconnexion</a>
+                            <a href="../parameters">Paramètres</a>
+                        {{else}}    {{!-- Sinon : --}}
+                            {{!-- Liens possibles si aucun utilisateur est connecté : --}}
+                            <a href="../login">Connexion</a>
+                            <a href="../parameters">Paramètres</a>
+                        {{/if}}
+                    </details>
+                    {{!-- Photo de profil des utilisateurs : --}}
+                    <img src="https://github.com/GwenafyMrg/cinefeel-pictures-repo/blob/main/public/Guest.png?raw=true" alt="Profil_picture" class="border rounded-circle" width="50" height="50">
+                </div> 
+            </nav>
+        </div>
 
-    <main>
-        {{!-- Génération du template --}}
-        {{{body}}}
-    </main>
+        <main>
+            {{!-- Génération du template : --}}
+            {{{body}}}
+        </main>
 
-    {{!-- Pied de page --}}
-    <footer class="bg-primary">
-        <p>Voici le pied de page</p>
-    </footer>
-</body>
+        {{!-- Pied de page --}}
+        <footer class="bg-primary p-2">
+            <div id="contacts">
+                <h3>Contacts :</h3>
+                <ul>
+                    <li>Email : contact@cinefeel.fr</li>
+                    <li>GitHub : <a href="https://github.com/GwenafyMrg/Cinefeel">Cinefeel</a></li>
+                </ul>
+            </div>
+            <div id="credits-and-copyright">
+                <h3>Crédits et Copyright :</h3>
+                <p>&copy; 2025 Plateforme Communautaire | Tous droits réservés.</p>
+                <p>Les images utilisées sur cette plateforme proviennent de différentes sources :</p>
+                <ul>
+                    <li>Images empruntées à <a href="https://www.allocine.fr" target="_blank">Allociné</a> utilisées à des fins informatives. Tous droits réservés à leurs propriétaires respectifs.</li>
+                    <li>Images générées avec <a href="https://openai.com/dall-e" target="_blank">DALL-E</a>. Ces images sont soumises aux <a href="https://openai.com/terms" target="_blank">conditions d'utilisation</a> de OpenAI.</li>
+                </ul>
+                <p>Si vous êtes titulaire des droits d'une image et souhaitez sa suppression, veuillez nous contacter à <a href="mailto:contact@plateforme.com">contact@plateforme.com</a>.</p>
+            </div>
+            <div id="info">
+                <h3>Informations légales :</h3>
+                <p><a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></p>
+            </div>
+        </footer>
+    </body>
 </html>

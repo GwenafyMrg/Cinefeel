@@ -1,24 +1,23 @@
+{{!-- Contenu de la page des films vus : --}}
 <div class="container-fluid d-flex flex-column align-items-center w-100 my-3">
 
+    {{!-- Conteneur d'explication : --}}
     <div class="container text-left w-75 m-3">
         Accédez ici à la liste complète de tous les films que vous avez visionnés.
     </div>
 
-    <!-- Boucle avec le {{{body}}} qui renvoie sur moviesDisplay. -->
+    {{!-- S'il y a des films vus : --}}
     {{#if watchedMovies}}
+        {{!--Conteneur d'affichage des films vus : --}}
         <div id="moviesDisplay" class="gridMovies w-100 m-3 bg-danger">
-            {{#each watchedMovies}}
-                {{> movieDisplay}}
+            {{#each watchedMovies}} {{!-- Pour chaque films vus : --}}
+                {{> movieDisplay}}  {{!-- Afficher le partial suivant : --}}
             {{/each}}
         </div>
+    {{!-- Sinon : --}}
     {{else}}
+        {{!-- Afficher une explication : --}}
         <p>Il semble que vous n'ayez pas encore regardé de films.</p>
         <p>Revenez ici après avoir partagé quelques avis sur certains d'entre eux.</p>
     {{/if}}
-
-    <div class="container d-flex justify-content-center align-items-center">
-        <button class="btn btn-light border rounded-left"> < </button>
-        <p class="text-center bg-light mb-0 p-2 border rounded-1">Naviguer à travers les films</p>
-        <button class="btn btn-light border rounded-right"> > </button>
-    </div>
 </div>
