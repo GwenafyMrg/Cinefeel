@@ -1,6 +1,7 @@
-{{!-- Page affichant les badges que l'utilisateur a obtenu ou non --}}
+{{!-- Contenu de la page des bagdes : --}}
 <div class="container-fluid d-flex flex-column w-75 my-3">
 
+    {{!-- Conteneur d'explication : --}}
     <div>
         <p>
             Découvrez votre collection de badges brillamment gagnés après de longues heures de visionnage passionnant. 
@@ -9,23 +10,21 @@
         </p>
     </div>
 
-    {{!-- Container d'affichage des badges obtenus --}}
+    {{!-- Conteneur d'affichage des badges obtenus : --}}
     <div class="container bg-secondary my-2">
         <p>Vous avez obtenu les badges suivants grâce à vos visionnages:</p>
-        {{#each obtainedBadges}}
-            {{> badgeDisplay}}
+        {{#each obtainedBadges}}    {{!-- Pour chaque badge obtenue : --}}
+            {{> badgeDisplay}}      {{!-- Afficher le partial suivant : --}}
         {{/each}}
     </div>
 
-    <hr>
+    <hr>    {{!-- Séparation : --}}
 
-    {{!-- Container d'affichage des badges non obtenus --}}
+    {{!-- Conteneur d'affichage des badges non obtenus : --}}
     <div class="container bg-secondary my-2">
         <p>Les badges suivants sont encore vérouillés, accomplissez les objectifs pour les débloqués :</p>
-        {{#each notObtainedBadges}}
-            {{> badgeDisplay}}
+        {{#each notObtainedBadges}} {{!-- Pour chaque badge non obtenue : --}}
+            {{> badgeDisplay}}      {{!-- Afficher le partial suivant : --}}
         {{/each}}
     </div>
-
-    <button class="btn btn-block btn-info w-25 align-self-center my-2">Afficher plus...</button>
 </div>
