@@ -1,36 +1,39 @@
-{{!-- Partial > Affichage des commentaires/avis de film --}}
+{{!-- Partial / Template d'affichage des commentaires/avis de film : --}}
 <div class="reviewCard container-fluid card">
 
-    {{!-- En-tête de l'avis --}}
+    {{!-- En-tête de l'avis : --}}
     <div class="headerReviewCard">
+        {{!-- Affichage de la note choisie : --}}
         <div class="noteDisplay">
             Note: {{opinion_note}} /10
         </div>
+        {{!-- Affichage des émotions votées : --}}
         <div class="emotionsDisplay d-flex">
             Il/Elle a ressenti(e): 
-            {{!-- Boucler la génération des émotions votées --}}
-            {{#each vote}}
-                <p>{{emotion}},</p>
+            {{#each vote}}  {{!-- Boucler la génération des émotions votées : --}}
+                <p> -{{emotion}} </p>
             {{/each}}
         </div>
     </div>
-    {{!-- Corps de l'avis --}}
+    {{!-- Corps de l'avis : --}}
     <div class="bodyReview">
+        {{!-- Affichage du commentaire rédigé : --}}
         <div class="commentDisplay">
-            {{#if opinion_comment}}
+            {{#if opinion_comment}} {{!-- Si un commentaire existe : --}}
                 Son commentaire: {{opinion_comment}}
             {{/if}}
         </div>
     </div>
 
-    {{!-- Pied de page de l'avis --}}
+    {{!-- Pied de page de l'avis : --}}
     <div class="footerReview">
+        {{!-- Afficher l'utilisateur auteur de l'avis : --}}
         <div class="authorDisplay">
             Rédigé par: {{User.user_username}}
         </div>
-        {{!-- Affichage d'une date de publication (potentiellement) --}}
+        {{!-- Affichage éventuel de la date de publication :
         <div class="dateReview">
             Date ?
-        </div>
+        </div> --}}
     </div>
 </div>

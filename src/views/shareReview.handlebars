@@ -1,69 +1,80 @@
-{{!-- Template de soumission d'avis pour un film par un utilisateur --}}
+{{!-- Contenu de la page de publication d'avis utilisateur : --}}
 <div class="container-fluid d-flex">
-    {{!-- Réaffichage du film précédemment séléctionné --}}
+    {{!-- Réaffichage du film précédemment séléctionné : --}}
     <div class="w-25">
-        {{#each movie}}
-            {{> movieDisplay}}
+        {{#each movie}}         {{!-- Pour le film séléctionné : --}}
+            {{> movieDisplay}}  {{!-- Afficher le partial suivant : --}}
         {{/each}}
     </div>
 
-    {{!-- Formulaire d'avis utilisateur --}}
     <div class="w-75 d-flex flex-column my-1">
         <p>Écrivez votre commentaire ici :</p>
+
+        {{!-- Formulaire d'avis utilisateur : --}}
         <form name="reviewForm" action="/share-review" method="post" class="card d-flex flex-column align-self-center justify-content-evenly w-75 p-2">
 
-            {{!-- Balise masquée pour récupérer facilement l'identifiant utilisateur --}}
+            {{!-- Balise masquée pour récupérer facilement l'identifiant du film correspondant : --}}
             <input type="hidden" name="movie" value="{{movie.[0].movie_id_movie}}">
 
-            {{!-- Utilisation d'un helper spécifique pour gérer le cas d'un Invité --}}
+            {{!-- S'il n'y a pas d'utilisateur connecté : --}}
             {{#ifnot userData}}
                 <p class="text-danger text-center">Créer un compte utilisateur afin de partager votre avis avec la communauté.</p>
             {{/ifnot}}
+            {{!-- Si l'utilisateur a déjà publié un avis : --}}
             {{#if existingReview}}
                 <p class="text-danger text-center">Vous avez déjà enregistré un avis pour ce film !</p>
                 <p class="text-danger text-center"><b>Il est encore impossible de modifier un avis à l'heure actuelle...</b></p>
             {{/if}}
 
+            {{!-- Conteneur d'en-tête de l'avis (note et favori) : --}}
             <div class="d-flex justify-content-between m-3">
+                {{!-- Bouton pour réinitialiser l'avis : --}}
                 <div>
-                    <button type="reset">Effacer</button> {{!-- Réinitiliser les données --}}
+                    <button type="reset">Effacer</button>
                 </div>
                 <div>
-                    {{!-- Note attribuée au film --}}
+                    {{!-- Note à attribuer au film : --}}
                     <label for="noteInput">Note : <span id="noteDisplay"></span> /10</label>
+                    {{!-- Si aucun utilisateur est connecté ou qu'un avis est déjà publié par l'utilisateur : --}}
                     {{#ifnot-or-if userData existingReview}}
                         <input id="noteInput" name="note" type="range" min="0" max="10" value="0" disabled>
+                    {{!-- Sinon : --}}
                     {{else}}
                         <input id="noteInput" name="note" type="range" min="0" max="10" value="0">
                     {{/ifnot-or-if}}
 
-                    {{!-- Film favori ou non --}}
+                    {{!-- Film à mettre en favori ou non : --}}
                     <label for="favInput">Favori :</label>
+                    {{!-- Si aucun utilisateur est connecté ou qu'un avis est déjà publié par l'utilisateur : --}}
                     {{#ifnot-or-if userData existingReview}}
                         <input id="favInput" name="fav" type="checkbox" disabled>
+                    {{!-- Sinon : --}}
                     {{else}}
                         <input id="favInput" name="fav" type="checkbox">
                     {{/ifnot-or-if}}
                 </div>
             </div>
 
+            {{!-- Conteneur de choix des émotions : --}}
             <div id="emotionsContainer" class="d-flex flex-wrap">
+                {{!-- Si aucun utilisateur est connecté ou qu'un avis est déjà publié par l'utilisateur : --}}
                 {{#ifnot-or-if userData existingReview}}
                     {{!-- Pour chaque emotion : --}}
                     {{#each emotionsList}}
-                        {{!-- Générer un conteneur --}}
+                        {{!-- Générer un conteneur : --}}
                         <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
-                            {{!-- Avec un label et une case à cocher avec le nom de l'émotion --}}
+                            {{!-- Avec un label et une case à cocher avec le nom de l'émotion DESACTIVE : --}}
                             <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
                             <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox" disabled>
                         </div>
                     {{/each}}
+                {{!-- Sinon : --}}
                 {{else}}
                     {{!-- Pour chaque emotion : --}}
                     {{#each emotionsList}}
-                        {{!-- Générer un conteneur --}}
+                        {{!-- Générer un conteneur : --}}
                         <div id="{{normalizeString this.emotion_name}}Div" class="btn btn-info m-1">
-                            {{!-- Avec un label et une case à cocher avec le nom de l'émotion --}}
+                            {{!-- Avec un label et une case à cocher avec le nom de l'émotion : --}}
                             <label for="{{normalizeString this.emotion_name}}Option">{{this.emotion_name}}</label>
                             <input id="{{normalizeString this.emotion_name}}Option" name="emotions[{{normalizeString this.emotion_name}}]" type="checkbox">
                         </div>
@@ -71,16 +82,19 @@
                 {{/ifnot-or-if}}
             </div>
 
+            {{!-- Conteneur de zone de texte : --}}
             <div class="m-3">
-                {{!-- Zone de texte pour un commentaire plus détaillée --}}
                 <label for="commentInput">Ajouter un commentaire à la suite de votre visionnage :</label><br>
+                {{!-- Si aucun utilisateur est connecté ou qu'un avis est déjà publié par l'utilisateur : --}}
                 {{#ifnot-or-if userData existingReview}}
                     <textarea id="commentInput" name="comment" disabled></textarea>
+                {{!-- Sinon : --}}
                 {{else}}
                     <textarea id="commentInput" name="comment" placeholder="Ecriver quelque chose :"></textarea>
                 {{/ifnot-or-if}}
             </div>
 
+            {{!-- Liste déroulante des conditions de publication de l'avis : --}}
             <details>
                 <summary><b>Conditions de publication</b></summary>
                     <p>Si vous souhaitez que votre avis soit enregistré, vous devez :</p>
@@ -94,24 +108,27 @@
                         votre avis</b> aisni que de vous exposez à un <b>bannissement</b> de la communauté.</p>
             </details>
 
-            {{!-- Si l'utilisateur est invité ou qu'un avis existe déjà en tant qu'utilisateur inscrit --}}
+            {{!-- Si aucun utilisateur est connecté ou qu'un avis est déjà publié par l'utilisateur : --}}
             {{#ifnot-or-if userData existingReview}}
                 <button type="submit" disabled>Publier</button>
-            {{!-- S'il est inscrit et qu'il n'a pas encore d'avis --}}
+            {{!-- Sinon, s'il est inscrit et qu'il n'a pas encore enregistré d'avis : --}}
             {{else}}
                 <button type="submit">Publier</button>
             {{/ifnot-or-if}}
         </form>
     </div>
 </div>
-<hr>
+
+<hr>    {{!-- Séparation : --}}
+
+{{!-- Conteneur d'affichage des avis existants pour ce film : --}}
 <div class="container-fluid d-flex flex-column align-items-center">
     <div class="feedbackDisplay">
-        {{#if reviews}}
-            {{#each reviews}}
-                {{> feedbackDisplay}}
+        {{#if reviews}}     {{!-- Si une donnée sur les avis existe : --}}
+            {{#each reviews}}   {{!-- Pour chaque avis : --}}
+                {{> feedbackDisplay}}   {{!-- Afficher le partial suivant : --}}
             {{/each}}
-        {{else}}
+        {{else}}            {{!-- Sinon : --}}
             <p>Aucun commentaire n'a encore été publié pour ce film.</p>
         {{/if}}
     </div>

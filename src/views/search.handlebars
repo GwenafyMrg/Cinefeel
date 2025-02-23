@@ -1,32 +1,23 @@
 {{!-- Contenu de la page de recherche : --}}
 <div class="container-fluid d-flex flex-column align-items-center my-3">
 
+    {{!-- Conteneur d'explication : --}}
     <div class="text-left w-75 m-3">
-        {{!-- Si une recherche est rentré par l'utilisateur --}}
+        {{!-- Si une recherche est rentré par l'utilisateur : --}}
         {{#if research}}
             Voici les résultats de la recherche sur "{{research}}" :<br>
             Si le film que vous cherchez ne s'y trouve pas, utilisez <a href="/explore-movies">l'option de filtrage</a> pour élargir votre recherche.
-        {{!-- Sinon --}}
+        {{!-- Sinon : --}}
         {{else}}
             Nous vous invitons à entrer un <b>titre de film</b> ou <b>un réalisateur</b> dans la barre de navigation afin de lancer une recherche.<br>
             Toutefois, si vous souhaitez disposer de filtres pour votre recherche, rendez-vous dans la <a href="/moviesList">liste de films</a>.
         {{/if}}
     </div>
 
+    {{!-- Conteneur d'affichage des films correspondant à la recherche : --}}
     <div id="searchMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
-        {{!-- Pour chaque resultats obtenus en paramètre de template --}}
-        {{#each result}}
-            {{!-- Afficher le partial suivant --}}
-            {{> movieDisplay}}
+        {{#each result}}    {{!-- Pour chaque résultat obtenus suite à la recherche : --}}
+            {{> movieDisplay}}  {{!-- Afficher le partial suivant : --}}
         {{/each}}
-    </div>
-
-    {{!-- ------------------------------------------------ --}}
-    {{!-- Utilité à voir ! --}}
-    {{!-- ------------------------------------------------ --}}
-    <div class="container d-flex justify-content-center align-items-center">
-        <button class="btn btn-light border rounded-left"> < </button>
-        <p class="text-center bg-light mb-0 p-2 border rounded-1">Naviguer à travers les films</p>
-        <button class="btn btn-light border rounded-right"> > </button>
     </div>
 </div>
