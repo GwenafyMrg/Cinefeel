@@ -367,112 +367,126 @@ app.get("/login", (req, res) => {   //Chemin de connexion initial (GET).
 
 app.post("/login", async (req,res) => {     //Chemin de connexion (POST).
 
-    const emailInputLog = req.body.email;       //Récupération de l'email transmis
-    const passwordInputLog = req.body.password; //Récupération du mot de passe transmis
-    let msgError = "";                          //Initialisation d'un message d'erreur potentiel.
+    try {
+        const emailInputLog = req.body.email;       //Récupération de l'email transmis
+        const passwordInputLog = req.body.password; //Récupération du mot de passe transmis
+        let msgError = "";                          //Initialisation d'un message d'erreur potentiel.
 
-    //-------------------------------Sécuriser les entrées utilisateurs---------------------------------
-    //Gestion de la taille des entrées.
-    if(emailInputLog.length > 40 || passwordInputLog.length > 25){
-        msgError = "La taille des champs n'a pas été respectée !";
-    }
-    //Début de traitement des données.
-    else{
-
-        //Gestion de l'email :
-        const safeEmail = emailInputLog.trim(); //L'input de type "email" se charge déjà de la bonne syntaxe.
-        // console.log("Email de connexion : " + safeEmail);
-
-        //Gestion du mot de passe :
-        let safePassword = funct.cleanPassword(passwordInputLog);
-        // console.log("Mot de passe de connexion : " + safePassword);
-
-        //Si le mot de passe sécurisé correspond au mot de passe initial.
-        if(safePassword == passwordInputLog){
-            //Récupérer la liste des utilisateurs.
-            const users = await User.findAll();
-            // console.log(users);
-
-            //Rechercher dans un premier temps une correspondance avec l'adresse Email.
-            let foundEmail = false;
-            let i = 0;
-
-            //Tant que l'email recherché n'est pas trouvé ou que la liste n'est pas parcouru totalement.
-            while(!foundEmail && i < users.length){
-                if(safeEmail == users[i].user_email){ //L'email corresponds :
-                    //Email/Utilisateur trouvé.
-                    foundEmail = true;
-                }
-                else{//L'email ne corresponds pas :
-                    i++; //Passer à l'utilisateur suivant.
-                }
+        //-------------------------------Sécuriser les entrées utilisateurs---------------------------------
+        
+        try{
+            //Gestion de la taille des entrées.
+            if(emailInputLog.length > 40 || passwordInputLog.length > 25){
+                msgError = "La taille des champs n'a pas été respectée !";
             }
-
-            //Dans un second temps comparer la correspondance avec le mot de passe.
-            if(foundEmail){//L'email/l'utilisateur est trouvé : 
-                try {
-                    //await bcrypt.compare(<brutPassword>, <HashedPassword>);
-                    const isPwMatch = await bcrypt.compare(passwordInputLog, users[i].user_mdp);
-                    if (isPwMatch) {//Le mot de passe transmis corresponds.
-                        const authenticateUser = users[i]; //..
-                        //Création de la session utilisateur.
-                        req.session.user = {
-                            id: authenticateUser.user_id_user,
-                            username: authenticateUser.user_username,
-                            email: authenticateUser.user_email,
-                            admin: authenticateUser.user_admin,
-                        }
-                        console.log(req.session.user);
-                        console.log("Connecté avec succès !");
-                    } else { // Le mot de passe transmis ne corresponds pas.
-                        msgError = "Mot de passe incorrect.";
-                    }
-                } catch (error) {
-                    console.error('Erreur lors de la recherche de correspondance entre les mots de passe :', error);
-                }
-            }
-            else{//L'email n'est pas dans la liste des utilisateurs : 
-                msgError = "L'email transmis n'est associé à aucun compte utilisateur !";
-            }
-        }
-        else{ //Si le mot de passe initial est différent du mot de passe sécurisé :
-            //On s'arrête ici car le mot de passe entré par l'utilisateur sera différent et ne pourra pas être correctement comparé.
-            msgError = "Votre mot de passe de connexion semble suspect... Veuillez réessayer.";
-        }
-    }
-    if(msgError){//Une erreur est relevée :
-        res.render("login", {error : msgError});
-    }
-    else{//Succès de la connexion :
-        try {
-            const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
-                include: [{
-                    model: Genre,                   //Modéle/Table à inclure.
-                    as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
-                    attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
-                    through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
-                },
-                {
-                    model: Director, 
-                    as: 'Directors',
-                    attributes: ['director_lastname','director_firstname'],
-                    through: { attributes: []}
-                }]
-            });
-            const movies = await funct.getMoviesData(movieQuery);
-
-            if(movies.error){
-                res.status(500).send("Erreur détéctée :" + movies.error);
-                //>>>>>>>Envoyé la page d'erreur
-            }
+            //Début de traitement des données.
             else{
-                res.redirect("/");
+
+                //Gestion de l'email :
+                const safeEmail = emailInputLog.trim(); //L'input de type "email" se charge déjà de la bonne syntaxe.
+                // console.log("Email de connexion : " + safeEmail);
+
+                //Gestion du mot de passe :
+                let safePassword = funct.cleanPassword(passwordInputLog);
+                // console.log("Mot de passe de connexion : " + safePassword);
+
+                //Si le mot de passe sécurisé correspond au mot de passe initial.
+                if(safePassword == passwordInputLog){
+                    //Récupérer la liste des utilisateurs.
+                    const users = await User.findAll();
+                    // console.log(users);
+
+                    //Rechercher dans un premier temps une correspondance avec l'adresse Email.
+                    let foundEmail = false;
+                    let i = 0;
+
+                    //Tant que l'email recherché n'est pas trouvé ou que la liste n'est pas parcouru totalement.
+                    while(!foundEmail && i < users.length){
+                        if(safeEmail == users[i].user_email){ //L'email corresponds :
+                            //Email/Utilisateur trouvé.
+                            foundEmail = true;
+                        }
+                        else{//L'email ne corresponds pas :
+                            i++; //Passer à l'utilisateur suivant.
+                        }
+                    }
+
+                    //Dans un second temps comparer la correspondance avec le mot de passe.
+                    if(foundEmail){//L'email/l'utilisateur est trouvé : 
+                        try {
+                            //await bcrypt.compare(<brutPassword>, <HashedPassword>);
+                            const isPwMatch = await bcrypt.compare(passwordInputLog, users[i].user_mdp);
+                            if (isPwMatch) {//Le mot de passe transmis corresponds.
+                                const authenticateUser = users[i]; //..
+                                //Création de la session utilisateur.
+                                req.session.user = {
+                                    id: authenticateUser.user_id_user,
+                                    username: authenticateUser.user_username,
+                                    email: authenticateUser.user_email,
+                                    admin: authenticateUser.user_admin,
+                                }
+                                console.log(req.session.user);
+                                console.log("Connecté avec succès !");
+                            } else { // Le mot de passe transmis ne corresponds pas.
+                                msgError = "Mot de passe incorrect.";
+                            }
+                        } catch (error) {
+                            console.error('Erreur lors de la recherche de correspondance entre les mots de passe :', error);
+                        }
+                    }
+                    else{//L'email n'est pas dans la liste des utilisateurs : 
+                        msgError = "L'email transmis n'est associé à aucun compte utilisateur !";
+                    }
+                }
+                else{ //Si le mot de passe initial est différent du mot de passe sécurisé :
+                    //On s'arrête ici car le mot de passe entré par l'utilisateur sera différent et ne pourra pas être correctement comparé.
+                    msgError = "Votre mot de passe de connexion semble suspect... Veuillez réessayer.";
+                }
+            }
+
+            if(msgError){//Une erreur est relevée :
+                res.render("login", {error : msgError});
+            }
+            else{//Succès de la connexion :
+                try {
+                    const movieQuery = await Movie.findAll({           //Rechercher tous les films : 
+                        include: [{
+                            model: Genre,                   //Modéle/Table à inclure.
+                            as: "Genres",                   //Modifier le nom de l'attribut dans dataValues.
+                            attributes: ['genre_libelle'],  //Champs du Modèle/Table à inclure.
+                            through: { attributes: []}      //Exclure les informations de la table pivot (MovieGenre).
+                        },
+                        {
+                            model: Director, 
+                            as: 'Directors',
+                            attributes: ['director_lastname','director_firstname'],
+                            through: { attributes: []}
+                        }]
+                    });
+                    const movies = await funct.getMoviesData(movieQuery);
+
+                    if(movies.error){
+                        res.status(500).send("Erreur détéctée :" + movies.error);
+                        //>>>>>>>Envoyé la page d'erreur
+                    }
+                    else{
+                        res.redirect("/");
+                    }
+                }
+                catch(err){
+                    console.error("Erreur lors de la redirection vers l'acceuil :", err);
+                    res.status(500).send("Erreur lors de la redirection vers l'acceuil. Les données n'ont pas pu être chargées...");
+                }
             }
         }
         catch(err){
-            console.error("Erreur lors de la redirection vers l'acceuil.");
-            res.status(500).send("Erreur lors de la redirection vers l'acceuil. Les données n'ont pas pu être chargées...");
+            console.error("Erreur lors du traitement des entrées utilisateurs :", err);
+            res.status(500).send("Erreur lors du traitement des entrées utilisateurs.");
         }
+    }
+    catch(err){
+        console.error("Erreur lors de la récupération des entrées utilisateurs :", err);
+        res.status(500).send("Erreur lors de la récupération des entrées utilisateurs.");
     }
 });
 
@@ -762,7 +776,7 @@ app.post("/share-review", async(req,res) => {
         let commentReview = req.body.comment;
 
         //Si aucune émotions n'est choisi ou qu'aucun commentaire est fait, l'avis est considéré comme imcomplet :
-        if(!emotionsChoices && commentReview == "" || commentReview.length > 500){
+        if(!emotionsChoices && commentReview == "" || commentReview.length > 500 || Object.keys(emotionsChoices).length > 3){
             const movieID = req.body.movie;
             console.log("Redirection vers la page d'avis en raison du manque d'information.");
             res.redirect(`/share-review?movie=${movieID}`);
@@ -795,15 +809,15 @@ app.post("/share-review", async(req,res) => {
 
                 //>>>>>>>>>>>>>>>>>
                 //Temporairement commenté pour les tests:
-                await UserOpinion.create(   //Insérer l'avis dans la BDD :
-                    {
-                        opinion_id_user : userID,
-                        opinion_id_movie : movieID,
-                        opinion_note : noteReview,
-                        opinion_fav : favReview,
-                        opinion_comment : commentReview,
-                    }
-                );
+                // await UserOpinion.create(   //Insérer l'avis dans la BDD :
+                //     {
+                //         opinion_id_user : userID,
+                //         opinion_id_movie : movieID,
+                //         opinion_note : noteReview,
+                //         opinion_fav : favReview,
+                //         opinion_comment : commentReview,
+                //     }
+                // );
 
                 //---------Traitement des Emotions :----------- :
                 if(emotionsChoices){
@@ -1195,7 +1209,14 @@ app.get("/my-badges", async (req, res) => {       //Chemin vers les badges de l'
 });
 
 app.get("/parameters", (req, res) => {      //Chemin vers les paramètres.
-    res.render("parameters");
+    if(req.session.user){
+        res.render("parameters", {
+            userData : req.session.user
+        });
+    }
+    else{
+        res.render("parameters");
+    }
 });
 
 app.listen(3000, () => {                    //Lancer le serveur.
