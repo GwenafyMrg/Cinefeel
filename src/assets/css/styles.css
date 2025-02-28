@@ -1,49 +1,184 @@
+:root {
+    --white- : rgba(255, 255, 255, 0.95); ;
+    --black-theator- : #2d132c;
+    --crepuscule- : #3d2e4f;
+    --red-seat- : #801336
+}
+
+body, html {
+    font-size: 16px;
+    width: 100%;
+    margin: 0px;
+}
+
+#homeHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height:100px;           /*Modifier*/
+    background-color: var(--black-theator-);
+}
+
+#navbar {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    padding: 1vw;
+    width: 75%;
+    height: 75%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--crepuscule-);
+}
+
+.logo-container {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    height: 85%;
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--white-);
+}
+
+.navbar-item {
+    border-radius: 15px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;   
+    width: 20%;
+    border-style:none;
+    background-color: var(--white-);
+}
+
+#searchForm {
+    width: 50%;
+}
+
+/* ------------------ */
+
+main {
+    padding: 15px;
+    background-image: url("/images/cinema.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+footer {
+    height: auto;
+    padding: 5px 15px;
+    background-color: var(--black-theator-);
+    font-size: 0.80rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    color: var(--white-);
+}
+
+footer h3 {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+footer p , footer li{
+    font-size: 0.75rem;
+}
+
+footer a {
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: none;
+    color: var(--red-seat-);
+}
+
+.explication-text {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 80vw;
+    height: auto;
+    text-align: center;
+    padding: 10px;
+    color: var(--white-);
+    background-color: var(--black-theator-);
+    opacity: 0.88;
+    border-radius: 15px;
+    border: 5px var(--white-);
+    box-shadow: 5px 5px 10px gray;
+}
+
+#moviesDisplay {
+    /* background-color: red; */
+    display: grid;  
+    grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
+    box-sizing: border-box;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 15px 15px;
+}
+
+/*------------------------------------------------------------------------------------*/
+
 /* Section à commenter */
 
-.switchButton {
-    font-size: small;
-    align-self: self-end;
-    position: absolute;
-    bottom: 2%;
-}
-
-.moviePoster {
-    max-height: 75%;
-    height: 60%;
-}
-
-.movieCard p {
-    font-size: small;
-    margin: 2px;
-    padding: 2px;
-    width: 80%;
-    border: 1px solid lightblue;
-    border-radius: 5px;
-    opacity: 80%;
-    position: relative;
-}
-
-.movieCard h3 {
+.infoMovie {
     width: 90%;
-    max-height: 1.5em;
-    overflow:hidden; /* Cache ce qui dépasse */
-    text-overflow:ellipsis; /* "..." */
-    white-space: nowrap;
-    text-align: center;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    border-bottom: 2px solid black;
-    border-radius: 10px;
-}
-
-.movieCard .infoMovie {
-
     display: grid;
     grid-template-areas: "genre genre"
                         "dir dir"
                         "runtime date";
-    justify-items: center;
-    column-gap: 3px;
-    row-gap: 2px;
+    justify-items: start;
+    column-gap: 5px;
+    overflow: hidden;
+}
+
+.infoMovie > * {
+    width: 100%;
+    height: auto;
+    font-size: 0.8rem;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    margin-top: 5px;
+}
+
+#movieGenre {
+    /* background-color: red; */
+    width: 100%;
+    font-size: 0.8rem;
+    white-space: nowrap;    /* Empêche le texte de se mettre sur plusieurs lignes */
+    overflow:hidden;       /* Masque le texte qui dépasse */
+    text-overflow: ellipsis; /* Ajoute "..." si le texte est coupé */
+    border: 1px solid var(--white-);
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#movieGenre ul {
+    display: flex;
+    justify-content: right;
+    list-style-type: none;  /* Retire les puces */
+    padding-left: 3px;             /* Retire les marges externes */
+    margin: 0;
+}
+
+#movieGenre li {
+    margin-right: 5px;
 }
 
 #movieGenre{grid-area: genre;}
@@ -51,20 +186,12 @@
 #movieRuntime{grid-area: runtime;}
 #movieReleasedDate{grid-area: date;}
 
-.infoMovie p {
-    width: 100%;
-    text-indent: 2px;
-}
-
-.gridMovies {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-}
-
 /*--------------------------------- Gestion de l'animation des cartes: ---------------------------------------*/
 
 /* Conteneur des cartes */
 .card-container {
+    height: auto;
+    /* background-color: blue; */
     display: grid;          /* Utilise Grid pour superposer les cartes */
     place-items: center;    /* Centre les éléments horizontalement et verticalement */
     perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
@@ -76,13 +203,83 @@
     backface-visibility: hidden;            /* Cache l'arrière lors du retournement */
     transition: transform 0.8s ease-in-out;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    height: 450px;
-
+    height: 80vh;
+    background: linear-gradient(45deg, var(--white-) 10%, black 55%, var(--white-) 100%);
+    opacity: 0.95;
+    box-sizing: border-box;
+    overflow: hidden;
+    
     /* Bordure de carte */
     border: 5px solid white;
     border-radius: 20px;
     outline: 1px solid black;
+}
+
+.movieCard h3 {
+    width: 90%;
+    height: auto;
+    font-size: 1.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    border-bottom: 2px solid black;
+    border-radius: 10px;
+}
+  
+.moviePoster {
+    border: 2px white solid;
+    box-shadow: 1px 1px 3px black;
+    object-fit: cover;
+    margin: 5px;
+    height: 50%;
+    /* display: none; */
+}
+
+.movieNote, .movieEmotions {
+    font-size: 0.8rem;
+    margin: 2px;
+    width: 80%;
+    height: auto;
+    text-align: left;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
+}
+
+.buttonsDiv{
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    width: 100%;
+    padding: 7px;
+    box-sizing: border-box;
+}
+
+.movieCard button {
+    font-size: 0.8rem;
+    border: 2px ridge var(--white-);
+    border-radius: 25px;
+    box-shadow: 1px 1px 3px black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reviewButton {
+    background-color: var(--white-);
+    margin-right: auto;
+}
+
+.switchButton {
+    background-color: var(--white-);
 }
 
 /* Position initiale des cartes */

@@ -1,8 +1,8 @@
 {{!-- Contenu de la page d'accueil : --}}
-<div class="container-fluid d-flex flex-column align-items-center my-3">
+<div id="home-background" class="container-fluid d-flex flex-column align-items-center">
 
     {{!-- Conteneur d'explication : --}}
-    <div class="text-center w-75">
+    <div class="explication-text">
         <h3>Bienvenue sur <i>Cinéfeel</i>, la plateforme où le cinéma rencontre vos émotions !</h3>
         <p>
             <i>Cinéfeel</i>, c’est bien plus qu’un simple site. 
@@ -24,7 +24,7 @@
     </div>
 
     {{!-- Conteneur d'affichage des films : --}}
-    <div id="moviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+    <div id="moviesDisplay">
         {{!-- Pour chaque films transmis en paramètre de template : --}}
         {{#each movies}}
             {{!-- Afficher le partial suivant : --}}
