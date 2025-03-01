@@ -1,8 +1,9 @@
 :root {
-    --white- : rgba(255, 255, 255, 0.95); ;
+    --white- : rgba(255, 255, 255, 0.95);
     --black-theator- : #2d132c;
     --crepuscule- : #3d2e4f;
-    --red-seat- : #801336
+    --red-seat- : #801336;
+    --red-light- : #ee4540;
 }
 
 body, html {
@@ -17,6 +18,7 @@ body, html {
     align-items: center;
     height:100px;           /*Modifier*/
     background-color: var(--black-theator-);
+    border-bottom: 2px solid black;
 }
 
 #navbar {
@@ -41,19 +43,7 @@ body, html {
     justify-content: center;
     align-items: center;
     background-color: var(--white-);
-}
-
-.navbar-item {
-    border-radius: 15px;
-    padding: 5px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    height: 100%;   
-    width: 20%;
-    border-style:none;
-    background-color: var(--white-);
+    cursor:pointer;
 }
 
 #searchForm {
@@ -79,6 +69,7 @@ footer {
     justify-content: center;
     align-items: left;
     color: var(--white-);
+    border-top: 2px solid black;
 }
 
 footer h3 {
@@ -90,14 +81,14 @@ footer p , footer li{
     font-size: 0.75rem;
 }
 
-footer a {
+a {
     font-weight: bold;
     font-style: italic;
     text-decoration: none;
     color: var(--red-seat-);
 }
 
-.explication-text {
+.explication-text{
     margin-top: 10px;
     margin-bottom: 20px;
     width: 80vw;
@@ -108,14 +99,14 @@ footer a {
     background-color: var(--black-theator-);
     opacity: 0.88;
     border-radius: 15px;
-    border: 5px var(--white-);
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
     box-shadow: 5px 5px 10px gray;
 }
 
-#moviesDisplay {
-    /* background-color: red; */
+.moviesDisplay {
     display: grid;  
-    grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
+    grid-template-columns: repeat(4, minmax(20%, 1fr));
     box-sizing: border-box;
     overflow: hidden;
     width: 100%;
@@ -123,6 +114,173 @@ footer a {
     justify-content: center;
     align-items: center;
     gap: 15px 15px;
+}
+
+.navbar-item {
+    border-radius: 15px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100%;   
+    width: 20%;
+    border-style:none;
+    background-color: var(--white-);
+    position: relative;
+}
+
+#profilSection {
+    justify-content: right;
+}
+
+#parameters-div {
+    border: 5px solid var(--black-theator-);
+    border-radius: 15px;
+    background-color: var(--crepuscule-);
+    width: 100%;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 10px;
+    padding: 15px;
+}
+
+.parameter {
+    color : var(--white-);
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--white-);
+    border-radius: 15px;
+    padding: 5px;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+details {
+    max-block-size: auto;
+    z-index: 10;
+    position: absolute; /* On le positionne absolument par rapport à son conteneur parent. */
+    top: 30%;
+    left: 10%;  /* Positionner à 10 % de son parent. */
+    height: auto;
+    border-radius: 15px;
+    background-color: var(--white-);
+}
+
+details > a {
+    display: block;
+    padding: 2px 8px;
+}
+
+summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: sticky;
+}
+  
+#login-container, #create-account-container {
+    color: var(--white-);
+    border: 5px solid var(--black-theator-);
+    background-color: var(--crepuscule-);
+    width: 50vw;
+    height: 70vh;
+    padding: 15px;
+    margin-bottom: 10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    button {
+        font-size: 0.8rem;
+        border: 2px ridge var(--white-);
+        border-radius: 25px;
+        box-shadow: 1px 1px 3px black;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: background-color 0.5s linear;
+    }
+
+    button:hover {
+        background-color: var(--red-light-);
+    }
+}
+    
+#login-form, #create-account-form {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 90%;
+    height: 100%;
+    gap: 10px;
+
+    .explication-text {
+        width: 80%;
+    }
+
+    div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--black-theator-);
+        border: 1px solid black;
+        border-radius: 15px;
+        width: 75%;
+        padding: 10px;
+
+        label {
+            text-align: left;
+            flex: 30%;
+        }
+
+        input {
+            background-color: var(--crepuscule-);
+            color: var(--white-);
+            flex: auto;
+            transition: background-color 0.5s linear;
+        }
+
+        input:hover {
+            background-color: var(--red-light-);
+        }
+    }
+
+    .buttonsDiv {
+        background-color:transparent;
+        border: none;
+        justify-content: space-evenly;
+    }
+}
+
+#create-account-form .explication-text {
+    width: 90%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+}
+
+.error-container {
+    background-color: var(--red-seat-);
+    border: 2px solid red;
+    border-radius: 15px;
+    margin: 10px;
+    margin-top: 15px;
+    padding: 15px;
+    width: 25vw;
+    height: 10vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /*------------------------------------------------------------------------------------*/
@@ -208,7 +366,8 @@ footer a {
     justify-content: space-between;
     width: 100%;
     height: 80vh;
-    background: linear-gradient(45deg, var(--white-) 10%, black 55%, var(--white-) 100%);
+    background: linear-gradient(45deg, var(--white-) 10%, rgba(0,0,0,0.85) 55%, var(--white-) 100%);
+    /* background-color: rgba(255, 255, 255, 0.75); */
     opacity: 0.95;
     box-sizing: border-box;
     overflow: hidden;
@@ -238,7 +397,6 @@ footer a {
     object-fit: cover;
     margin: 5px;
     height: 50%;
-    /* display: none; */
 }
 
 .movieNote, .movieEmotions {

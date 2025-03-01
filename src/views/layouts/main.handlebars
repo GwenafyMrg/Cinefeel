@@ -33,15 +33,14 @@
                 </form>
 
                 {{!-- Section profil : --}}
-                <div class="navbar-item">
+                <div id="profilSection"class="navbar-item">
                     {{!-- Section déroulante : --}}
-                    <details class="d-flex flex-column">
+                    <details>
                         {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}
                             <summary>{{userData.username}}</summary>
                         {{else}}            {{!-- Sinon : --}}
                             <summary>Profil</summary>
                         {{/if}}
-                        <hr>                {{!-- Séparation : --}}
                         {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}
                             {{!-- Liens possibles : --}}
                             <a href="../">Profil</a>
@@ -69,7 +68,7 @@
         </main>
 
         {{!-- Pied de page --}}
-        <footer class="">
+        <footer>
             <div id="contacts">
                 <h3>Contacts :</h3>
                 <ul>

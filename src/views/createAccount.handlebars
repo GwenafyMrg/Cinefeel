@@ -1,41 +1,43 @@
 {{!-- Contenu de la page création de compte : --}}
-<div class="container-fluid bg-primary w-50 mx-auto my-4 py-2">
+<div id="create-account-container" class="container-fluid">
 
     {{!-- Formulaire de création de compte : --}}
-    <form method="post" action="/create-account" name="createAccountForm">
+    <form method="post" action="/create-account" name="createAccountForm" id="create-account-form">
 
-        <p class="text-center my-2">Rejoigner la communauté CinéFeel en créant votre compte !</p>
+        <p class="explication-text">Rejoigner la communauté CinéFeel en créant votre compte !</p>
 
         {{!-- Saisir le nom d'utilisateur : --}}
-        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+        <div>
             <label for="username">Nom d'utilisateur :</label>
             <input id="username" name="username" type="text" minlength="3" maxlength="25" required>
         </div>
 
         {{!-- Saisir l'email : --}}
-        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+        <div>
             <label for="email">Adresse email :</label>
             <input id="email" name="email" type="email" maxlength="40" required>
         </div>
 
         {{!-- Saisir le mot de passe : --}}
-        <div class="d-flex flex-column mx-auto my-4 w-75 bg-info p-1">
+        <div>
             <label for="password">Mot de passe :</label>
             <input id="password" name="password" type="password" minlength="4" maxlength="25" required>
         </div>
         
         {{#if error}}   {{!-- Si une erreur est détéctée : --}}
-            <p class="text-center text-danger">{{error}}</p>
+            <div class="error-container">
+                    {{error}}    {{!-- Afficher l'erreur : --}}
+            </div>
         {{/if}}
         
         {{!-- Boutons interactifs : --}}
-        <div class="d-flex justify-content-between mx-auto my-4 w-75">
+        <div class="buttonsDiv">
             {{!-- Retourner à la page d'accueil : --}}
-            <button type="button" class="btn btn-block btn-danger mx-3" onclick="window.location.href='./login'">Retour</button>
+            <button type="button" onclick="window.location.href='./login'">Retour</button>
             {{!-- Réinitialiser le formulaire : --}}
-            <button type="reset" class="btn btn-block btn-warning mx-3">Réinitialiser</button>
+            <button type="reset"> Réinitialiser </button>
             {{!-- Soumettre le formulaire de création de compte : --}}
-            <button type="submit" class="btn btn-block btn-info mx-3">Création du compte</button>
+            <button type="submit"> Création du compte </button>
         </div>
     </form>
 </div>

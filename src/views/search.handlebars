@@ -2,7 +2,7 @@
 <div class="container-fluid d-flex flex-column align-items-center my-3">
 
     {{!-- Conteneur d'explication : --}}
-    <div class="text-left w-75 m-3">
+    <div class="explication-text">
         {{!-- Si une recherche est rentré par l'utilisateur : --}}
         {{#if research}}
             Voici les résultats de la recherche sur "{{research}}" :<br>
@@ -15,7 +15,7 @@
     </div>
 
     {{!-- Conteneur d'affichage des films correspondant à la recherche : --}}
-    <div id="searchMoviesDisplay" class="gridMovies w-100 m-3 bg-danger">
+    <div id="searchMoviesDisplay" class="moviesDisplay">
         {{#each result}}    {{!-- Pour chaque résultat obtenus suite à la recherche : --}}
             {{> movieDisplay}}  {{!-- Afficher le partial suivant : --}}
         {{/each}}
