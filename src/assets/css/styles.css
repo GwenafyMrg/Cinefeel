@@ -467,7 +467,7 @@ hr {
     margin: 10px;
 }
 
-.emotion {
+.emotion, .genre {
     color: var(--black-theator-);
     text-align: center; /* Centrer le texte dans les cases */
     border: 1px solid var(--black-theator-);
@@ -481,7 +481,7 @@ hr {
     gap: 5px;
 }
 
-.emotion-checkbox, #fav-input {
+.emotion-checkbox, #fav-input, .genre-checkbox {
     appearance: none;
     width: 15px;
     height: 15px;
@@ -491,26 +491,16 @@ hr {
     position: relative;
 }
 
-.emotion-checkbox, #fav-input {
-    appearance: none;
-    width: 15px;
-    height: 15px;
-    background-color: var(--white-);
-    border: 1px solid lightgray;
-    transition: transform 0.5s ease-in;
-    position: relative;
-}
-
-.emotion-checkbox:disabled, #fav-input:disabled {
+.emotion-checkbox:disabled, #fav-input:disabled, .genre-checkbox:disabled {
     border: 1px solid var(--black-theator-);
     background-color: lightgray;
 }
 
-.emotion-checkbox:checked, #fav-input:checked {
+.emotion-checkbox:checked, #fav-input:checked, .genre-checkbox:checked {
     transform: rotateY(180deg);
 }
 
-.emotion-checkbox:checked::after, #fav-input:checked::after{
+.emotion-checkbox:checked::after, #fav-input:checked::after, .genre-checkbox:checked::after {
     content: 'X';
     color: var(--black-theator-);
     position: absolute;
@@ -599,6 +589,135 @@ hr {
 
 #review-author {
     text-align: end;
+}
+
+#filters-section {
+    width: 85vw;
+    display: flex;  
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom:10vh;
+}
+
+#filters-form {
+    width: 90%;
+    padding: 15px;
+    color: var(--black-theator-);
+    background-color: var(--white-);
+    display: grid;
+    grid-template-areas:
+        "reset-filters  submit-filters submit-filters"
+        "genre-filter genre-filter genre-filter"
+        "note-filter runtime-filter released-date-filter";
+        gap: 10px;
+}
+
+#genre-options {
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 10px auto;
+
+    div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+#reset-filters, #submit-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: 10vh;
+}
+
+#reset-filters-button, #submit-filters-button {
+    width: 80%;
+    margin: 10px;
+}
+
+#reset-filters {
+    grid-area: reset-filters;
+    text-align: left;
+}
+
+#submit-filters {
+    grid-area: submit-filters;
+    text-align: right;
+}
+
+#genre-filter {
+    grid-area: genre-filter;
+    border-top: 2px solid var(--black-theator-);
+    border-bottom: 2px solid var(--black-theator-);
+    padding: 10px;
+}
+
+#note-filter {
+    grid-area: note-filter;
+}
+
+#runtime-filter {
+    grid-area: runtime-filter;
+}
+
+#released-date-filter {
+    grid-area: released-date-filter;
+}
+
+.filter > input[type="range"] {
+    appearance: none;
+    height: 10px; /* Hauteur de la barre */
+    background: lightgray; /* Couleur de fond de la barre */
+    border-radius: 5px; /* Coins arrondis */
+    cursor:pointer;
+    color: var(--white-);
+}
+
+/* Curseur (thumb) pour Chrome, Safari, Edge */
+.filter > input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: var(--white-); /* Couleur du curseur */
+    border-radius: 50%; /* Rond */
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Effet au survol */
+.filter > input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--crepuscule-); /* Couleur plus foncée */
+    transform: scale(1.5); /* Effet d'agrandissement */
+}
+
+/* Curseur (thumb) pour Firefox */
+.filter > input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    background: var(--white-); /* Couleur du curseur */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Effet au survol pour Firefox */
+.filter > input[type="range"]-moz-range-thumb:hover {
+    background: var(--crepuscule-); /* Couleur plus foncée */
+    transform: scale(1.5); /* Effet d'agrandissement */
+}
+
+.filter > p {
+    font-size: 1.5rem;
+    text-align: start;
+}
+
+.filter {
+    margin: 10px;
 }
 
 /*------------------------------------------------------------------------------------*/

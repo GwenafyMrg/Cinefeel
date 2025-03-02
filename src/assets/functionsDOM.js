@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () { // Au chargement de 
 document.addEventListener("DOMContentLoaded", function () { // Au chargement de la page :
 
     //----- Redirection lors de la suppression des filtres : -----//
-    document.getElementById("resetFilters").addEventListener("click", () => {   // Ajouter un évènement de filtre.
+    document.getElementById("reset-filters-button").addEventListener("click", () => {   // Ajouter un évènement de filtre.
         window.location.href = "/explore-movies";   // Rediriger vers la page de filtre.
     });
 
