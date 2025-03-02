@@ -24,16 +24,16 @@
             <nav id="navbar" class="">
                         
                 {{!-- Liste de films / Redirection vers la page de filtre : --}}
-                <button class="navbar-item" onclick="window.location.href='../explore-movies'">Liste de films</button>
+                <button id="go-to-filters" class="navbar-item" onclick="window.location.href='../explore-movies'">Liste de films</button>
                 
                 {{!-- Formulaire de recherche de film par texte : --}}
                 <form id="searchForm" method="POST" action="/find-movies" class="navbar-item">
                     <input id="searchBar" name="researchValue" type="text" class="w-75" placeholder="Rechercher par un titre ou un réalisateur">
-                    <button type="submit">Rechercher</button>
+                    <button id="submit-movie-search" type="submit">Rechercher</button>
                 </form>
 
                 {{!-- Section profil : --}}
-                <div id="profilSection"class="navbar-item">
+                <div id="profilSection" class="navbar-item">
                     {{!-- Section déroulante : --}}
                     <details>
                         {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}

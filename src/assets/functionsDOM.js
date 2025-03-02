@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {      // Au chargement
 
     //----- Gestion de l'affichage des émotions pour le film : -----//
     // Séléctionner le container contenant les checkboxes.
-    const emotionsContainer = document.getElementById('emotionsContainer');
+    const emotionsContainer = document.getElementById('emotions-container');
 
     // Ajout d'un gestionnaire d'événements pour surveiller les changements sur les checkboxes :
     emotionsContainer.addEventListener('change', (event) => {

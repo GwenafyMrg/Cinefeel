@@ -1,5 +1,6 @@
 :root {
-    --white- : rgba(255, 255, 255, 0.95);
+    --white- : rgb(255, 255, 255);
+    --white-hover- : rgb(215, 215, 215);
     --black-theator- : #2d132c;
     --crepuscule- : #3d2e4f;
     --red-seat- : #801336;
@@ -10,6 +11,21 @@ body, html {
     font-size: 16px;
     width: 100%;
     margin: 0px;
+}
+
+button:not(#submit-movie-search, #go-to-filters) {
+    font-size: 0.8rem;
+    border: 2px ridge var(--white-);
+    border-radius: 25px;
+    box-shadow: 1px 1px 3px black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color 0.5s linear;
+}
+
+button:not(#submit-movie-search, #go-to-filters):hover {
+    background-color: var(--white-hover-);
 }
 
 #homeHeader {
@@ -133,6 +149,28 @@ a {
 
 #profilSection {
     justify-content: right;
+
+    details {
+        max-block-size: auto;
+        z-index: 10;
+        position: absolute; /* On le positionne absolument par rapport à son conteneur parent. */
+        top: 30%;
+        left: 10%;  /* Positionner à 10 % de son parent. */
+        height: auto;
+        border-radius: 15px;
+        background-color: var(--white-);
+    }
+    
+    details > a {
+        display: block;
+        padding: 2px 8px;
+    }
+    
+    summary {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: sticky;
+    }
 }
 
 #parameters-div {
@@ -161,28 +199,6 @@ a {
     justify-content: space-around;
     align-items: center;
 }
-
-details {
-    max-block-size: auto;
-    z-index: 10;
-    position: absolute; /* On le positionne absolument par rapport à son conteneur parent. */
-    top: 30%;
-    left: 10%;  /* Positionner à 10 % de son parent. */
-    height: auto;
-    border-radius: 15px;
-    background-color: var(--white-);
-}
-
-details > a {
-    display: block;
-    padding: 2px 8px;
-}
-
-summary {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: sticky;
-}
   
 #login-container, #create-account-container {
     color: var(--white-);
@@ -196,21 +212,6 @@ summary {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    button {
-        font-size: 0.8rem;
-        border: 2px ridge var(--white-);
-        border-radius: 25px;
-        box-shadow: 1px 1px 3px black;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: background-color 0.5s linear;
-    }
-
-    button:hover {
-        background-color: var(--red-light-);
-    }
 }
     
 #login-form, #create-account-form {
@@ -246,11 +247,11 @@ summary {
             background-color: var(--crepuscule-);
             color: var(--white-);
             flex: auto;
-            transition: background-color 0.5s linear;
+            transition: background 0.5s linear;
         }
 
         input:hover {
-            background-color: var(--red-light-);
+            background: var(--red-light-);
         }
     }
 
@@ -269,8 +270,9 @@ summary {
 }
 
 .error-container {
-    background-color: var(--red-seat-);
-    border: 2px solid red;
+    color: var(--black-theator-);
+    background-color: var(--red-light-);
+    border: 2px solid var(--red-seat-);
     border-radius: 15px;
     margin: 10px;
     margin-top: 15px;
@@ -279,6 +281,7 @@ summary {
     height: 10vh;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -369,6 +372,182 @@ summary {
 hr {
     margin: 2vw;
 }
+
+#register-review {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 70vw;
+
+    .explication-text{
+        width: 90%; 
+    }
+
+    .error-container {
+        width: 100%;
+    }
+}
+
+#review-form {
+    color: var(--black-theator-);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 55vw;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.90);
+
+    #noteInput {
+        appearance: none;
+        height: 10px; /* Hauteur de la barre */
+        background: lightgray; /* Couleur de fond de la barre */
+        border-radius: 5px; /* Coins arrondis */
+        cursor:pointer;
+        color: var(--white-);
+    }
+
+    /* Curseur (thumb) pour Chrome, Safari, Edge */
+    #noteInput::-webkit-slider-thumb {
+        appearance: none;
+        width: 10px;
+        height: 10px;
+        background: var(--white-); /* Couleur du curseur */
+        border-radius: 50%; /* Rond */
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    /* Effet au survol */
+    #noteInput::-webkit-slider-thumb:hover {
+        background: var(--crepuscule-); /* Couleur plus foncée */
+        transform: scale(1.5); /* Effet d'agrandissement */
+    }
+
+    /* Curseur (thumb) pour Firefox */
+    #noteInput::-moz-range-thumb {
+        width: 10px;
+        height: 10px;
+        background: var(--white-); /* Couleur du curseur */
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    /* Effet au survol pour Firefox */
+    #noteInput::-moz-range-thumb:hover {
+        background: var(--crepuscule-); /* Couleur plus foncée */
+        transform: scale(1.5); /* Effet d'agrandissement */
+    }
+}
+
+#review-form-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    margin: 5px;
+}
+
+#emotions-container {
+    display: grid;
+    grid-template-columns: repeat(5, auto); /* 5 colonnes de taille égale */
+    justify-content: center; /* Centrer la grille */
+    gap: 10px;
+    margin: 10px;
+}
+
+.emotion {
+    color: var(--black-theator-);
+    text-align: center; /* Centrer le texte dans les cases */
+    border: 1px solid var(--black-theator-);
+    border-radius: 5px;
+    padding: 10px;
+    background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+}
+
+.emotion-checkbox, #fav-input {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background-color: var(--white-);
+    border: 1px solid lightgray;
+    transition: transform 0.5s ease-in;
+    position: relative;
+}
+
+.emotion-checkbox, #fav-input {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background-color: var(--white-);
+    border: 1px solid lightgray;
+    transition: transform 0.5s ease-in;
+    position: relative;
+}
+
+.emotion-checkbox:disabled, #fav-input:disabled {
+    border: 1px solid var(--black-theator-);
+    background-color: lightgray;
+}
+
+.emotion-checkbox:checked, #fav-input:checked {
+    transform: rotateY(180deg);
+}
+
+.emotion-checkbox:checked::after, #fav-input:checked::after{
+    content: 'X';
+    color: var(--black-theator-);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#comment-container {
+    width: 100%;
+    margin: 5px;    
+
+    textarea {
+        width: 100%;
+        height: 20vh;
+        margin: 5px;
+        transition: outline 0.5s ease-in;
+        border-radius: 0px;
+    }
+
+    textarea:hover {
+        outline: 1px solid var(--crepuscule-);
+    }
+}
+
+#review-form-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+    width: 90%;
+    margin: 5px;
+
+    details {
+        flex: 70;
+        text-align: left;
+        padding: 5px;
+    }
+
+    button {
+        flex:30;
+    }
+}
+
+
 
 /*------------------------------------------------------------------------------------*/
 
@@ -506,16 +685,6 @@ hr {
     width: 100%;
     padding: 7px;
     box-sizing: border-box;
-}
-
-.movieCard button {
-    font-size: 0.8rem;
-    border: 2px ridge var(--white-);
-    border-radius: 25px;
-    box-shadow: 1px 1px 3px black;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .reviewButton {
