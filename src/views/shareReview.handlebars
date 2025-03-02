@@ -30,7 +30,12 @@
             <div id="review-form-header">
                 {{!-- Bouton pour réinitialiser l'avis : --}}
                 <div>
-                    <button type="reset">Effacer</button>
+                    {{#ifnot-or-if userData existingReview}}
+                        <button type="reset" disabled>Effacer</button>
+                    {{!-- Sinon : --}}
+                    {{else}}
+                        <button type="reset">Effacer</button>
+                    {{/ifnot-or-if}}
                 </div>
                 <div>
                     {{!-- Note à attribuer au film : --}}
@@ -121,17 +126,15 @@
     </div>
 </div>
 
-<hr>    {{!-- Séparation : --}}
+{{!-- Séparation : --}}
 
 {{!-- Conteneur d'affichage des avis existants pour ce film : --}}
-<div class="container-fluid d-flex flex-column align-items-center">
-    <div class="feedbackDisplay">
-        {{#if reviews}}     {{!-- Si une donnée sur les avis existe : --}}
-            {{#each reviews}}   {{!-- Pour chaque avis : --}}
-                {{> feedbackDisplay}}   {{!-- Afficher le partial suivant : --}}
-            {{/each}}
-        {{else}}            {{!-- Sinon : --}}
-            <p>Aucun commentaire n'a encore été publié pour ce film.</p>
-        {{/if}}
-    </div>
+<div id="feedback-display">
+    {{#if reviews}}     {{!-- Si une donnée sur les avis existe : --}}
+        {{#each reviews}}   {{!-- Pour chaque avis : --}}
+            {{> feedbackDisplay}}   {{!-- Afficher le partial suivant : --}}
+        {{/each}}
+    {{else}}            {{!-- Sinon : --}}
+        <p>Aucun commentaire n'a encore été publié pour ce film.</p>
+    {{/if}}
 </div>

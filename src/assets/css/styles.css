@@ -13,6 +13,10 @@ body, html {
     margin: 0px;
 }
 
+main {
+    margin-top: 100px; /* 100px taille du homeHeader en hauteur */
+}
+
 button:not(#submit-movie-search, #go-to-filters) {
     font-size: 0.8rem;
     border: 2px ridge var(--white-);
@@ -32,9 +36,15 @@ button:not(#submit-movie-search, #go-to-filters):hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height:100px;           /*Modifier*/
+    width: 100vw;
+    height: 100px;           /*Modifier*/
     background-color: var(--black-theator-);
     border-bottom: 2px solid black;
+    position: fixed; /* Fixe le header en haut de la page */
+    top: 0; /* Le placer tout en haut */
+    left: 0;
+    right: 0;
+    z-index: 100;
 }
 
 #navbar {
@@ -105,16 +115,14 @@ a {
 }
 
 .explication-text {
-    margin-top: 10px;
-    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 30px;
     width: 80vw;
     height: auto;
     text-align:center;
     padding: 10px;
     color: var(--white-);
-    background-color: rgba(45,19,44,0.80);
-    /* background-color: var(--black-theator-); */
-    /* opacity: 0.88; */
+    background-color: var(--black-theator-);
     border-radius: 15px;
     border-bottom: 2px solid black;
     border-right: 2px solid black;
@@ -397,7 +405,7 @@ hr {
     align-items: center;
     width: 55vw;
     padding: 15px;
-    background-color: rgba(255, 255, 255, 0.90);
+    background-color: var(--white-);
 
     #noteInput {
         appearance: none;
@@ -547,7 +555,51 @@ hr {
     }
 }
 
+#feedback-display {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    gap: 3%;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+}
 
+#review-card{
+    width: 100%;    
+    padding: 10px 5px;
+
+    background-color: rgba(255, 255, 255, 0.90);
+    box-sizing: border-box;
+    overflow: hidden;
+    
+    border: 5px solid var(--white-);
+    border-radius: 20px;
+    outline: 1px solid black;
+    box-shadow: 3px 3px 5px var(--black-theator-);
+
+    p {
+        margin: 5px;
+    }
+}
+
+#emotions-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+
+    p {
+        background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
+        color: var(--black-theator-);
+        border: 1px solid var(--black-theator-);
+        border-radius: 30px;
+        padding: 10px;
+    }
+}
+
+#review-author {
+    text-align: end;
+}
 
 /*------------------------------------------------------------------------------------*/
 
