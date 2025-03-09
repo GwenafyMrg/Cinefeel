@@ -1,6 +1,6 @@
 :root {
-    --white-hover- : rgb(215, 215, 215);
     --white- : rgb(248, 245, 242);
+    --white-hover- : rgb(215, 215, 215);
     --black-theator- : rgb(26, 14, 18);
     --crepuscule- : rgb(55, 47, 68);
     --red-seat- : rgb(122, 47, 55);
@@ -19,12 +19,12 @@ main {
 
 button:not(#submit-movie-search, #go-to-filters) {
     font-size: 0.8rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
     border: 2px ridge var(--white-);
     border-radius: 25px;
     box-shadow: 1px 1px 3px black;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     transition: background-color 0.5s linear;
 }
 
@@ -33,43 +33,49 @@ button:not(#submit-movie-search, #go-to-filters):hover {
 }
 
 #homeHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     width: 100vw;
-    height: 100px;           /*Modifier*/
-    background-color: var(--black-theator-);
-    border-bottom: 2px solid black;
+    height: 100px;
     position: fixed; /* Fixe le header en haut de la page */
     top: 0; /* Le placer tout en haut */
     left: 0;
     right: 0;
     z-index: 100;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: var(--black-theator-);
+    border-bottom: 2px solid black;
 }
 
 #navbar {
-    border-top-left-radius: 15px;
-    border-bottom-left-radius: 15px;
-    padding: 1vw;
     width: 75%;
     height: 75%;
+    background-color: var(--crepuscule-);
+
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--crepuscule-);
+
+    padding: 1vw;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
 }
 
 .logo-container {
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
+    cursor:pointer;
     height: 85%;
     width: 10%;
+    background-color: var(--white-);
+
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--white-);
-    cursor:pointer;
+
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
 
 #searchForm {
@@ -79,22 +85,24 @@ button:not(#submit-movie-search, #go-to-filters):hover {
 /* ------------------ */
 
 main {
-    padding: 15px;
     background-image: url("/images/cinema.jpg");
     background-size: cover;
     background-position: center;
+    padding: 15px;
 }
 
 footer {
-    height: auto;
-    padding: 5px 15px;
-    background-color: var(--black-theator-);
     font-size: 0.80rem;
+    height: auto;
+    color: var(--white-);
+    background-color: var(--black-theator-);
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: left;
-    color: var(--white-);
+
+    padding: 5px 15px;
     border-top: 2px solid black;
 }
 
@@ -115,15 +123,16 @@ a {
 }
 
 .explication-text {
+    text-align:center;
+    width: 80vw;
+    height: auto;
+    color: var(--white-);
+    background-color: var(--black-theator-);
+
+    padding: 10px;
     margin: 0 auto;
     margin-top: 20px;
     margin-bottom: 30px;
-    width: 80vw;
-    height: auto;
-    text-align:center;
-    padding: 10px;
-    color: var(--white-);
-    background-color: var(--black-theator-);
     border-radius: 15px;
     border-bottom: 2px solid black;
     border-right: 2px solid black;
@@ -131,49 +140,54 @@ a {
 }
 
 .moviesDisplay {
-    display: grid;  
-    grid-template-columns: repeat(4, minmax(20%, 1fr));
-    box-sizing: border-box;
     overflow: hidden;
     width: 100%;
     height: 100%;
+
+    display: grid;  
+    grid-template-columns: repeat(4, minmax(20%, 1fr));
     justify-content: center;
     align-items: center;
     gap: 15px 15px;
+
+    box-sizing: border-box;
 }
 
 .navbar-item {
-    border-radius: 15px;
-    padding: 5px;
+    height: 100%;   
+    width: 20%;
+    position: relative;
+    background-color: var(--white-);
+
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    height: 100%;   
-    width: 20%;
+
+    padding: 5px;
     border-style:none;
-    background-color: var(--white-);
-    position: relative;
+    border-radius: 15px;
 }
 
 #profilSection {
     justify-content: right;
 
     details {
-        max-block-size: auto;
         z-index: 10;
         position: absolute; /* On le positionne absolument par rapport à son conteneur parent. */
         top: 30%;
         left: 10%;  /* Positionner à 10 % de son parent. */
         height: auto;
-        border-radius: 15px;
         background-color: var(--white-);
+
+        border-radius: 15px;
+        max-block-size: auto;
     }
     
     details > a {
+        color: var(--black-theator-);
         display: block;
         padding: 2px 8px;
-        color: var(--black-theator-);
     }
     
     summary {
@@ -184,70 +198,84 @@ a {
 }
 
 #parameters-div {
-    border: 5px solid var(--black-theator-);
-    border-radius: 15px;
-    background-color: var(--crepuscule-);
     width: 100%;
     height: 50vh;
+    background-color: var(--crepuscule-);
+
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
+
     margin: 10px;
     padding: 15px;
+    border: 5px solid var(--black-theator-);
+    border-radius: 15px;
 }
 
 .parameter {
-    color : var(--white-);
     width: 100%;
     height: auto;
-    border: 1px solid var(--white-);
-    border-radius: 15px;
-    padding: 5px;
-    margin: 0;
+    color : var(--white-);
+
     display: flex;
     justify-content: space-around;
     align-items: center;
+
+    padding: 5px;
+    margin: 0;
+    border: 1px solid var(--white-);
+    border-radius: 15px;
 }
   
 #login-container, #create-account-container {
-    color: var(--white-);
-    border: 5px solid var(--black-theator-);
-    border-radius: 15px;
-    background-color: var(--crepuscule-);
     width: 50vw;
     height: 70vh;
-    padding: 15px;
-    margin-bottom: 10vh;
+    color: var(--white-);
+    background-color: var(--crepuscule-);
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    padding: 15px;
+    margin-bottom: 10vh;
+    border: 5px solid var(--black-theator-);
+    border-radius: 15px;
 }
     
 #login-form, #create-account-form {
+    width: 90%;
+    height: 100%;
 
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    width: 90%;
-    height: 100%;
     gap: 10px;
 
     .explication-text {
         width: 80%;
     }
 
+    .buttonsDiv {
+        background-color:transparent;
+        justify-content: space-evenly;
+        border: none;
+    }
+
     div {
+        width: 75%;
+        background-color: var(--black-theator-);
+
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background-color: var(--black-theator-);
+
+        padding: 10px;
         border: 1px solid black;
         border-radius: 15px;
-        width: 75%;
-        padding: 10px;
 
         label {
             text-align: left;
@@ -265,61 +293,55 @@ a {
             background: var(--white-hover-);
         }
     }
-
-    .buttonsDiv {
-        background-color:transparent;
-        border: none;
-        justify-content: space-evenly;
-    }
 }
 
 #create-account-form .explication-text {
     width: 90%;
     margin-top: 10px;
     margin-bottom: 10px;
-
 }
 
 .error-container {
-    color: var(--red-light-);
-    background-color: var(--white-);
-    border: 2px solid var(--red-light-);
-    border-radius: 15px;
-    margin: 10px;
-    margin-top: 15px;
-    padding: 15px;
-    width: 25vw;
-    height: 10vh;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
+    width: 25vw;
+    height: 10vh;
+    color: var(--red-light-);
+    background-color: var(--white-);
+
     display: flex;
     justify-content: center;
     align-items: center;
+
+    margin: 10px;
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid var(--red-light-);
+    border-radius: 15px;
 }
 
 #badges-container {
-    /* background-color: red; */
+    width: 90vw;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 90vw;
 }
 
 .badgeCard {
+    font-size: 1rem;
+    font-weight: bold;
     background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
-    border: 5px solid var(--black-theator-);
+    
     display: flex;
     justify-content: space-evenly;
     align-items: center;
 
     margin: 10px;
     border-radius: 50px;
-
-    font-size: 1rem;
-    font-weight: bold;
-
+    border: 5px solid var(--black-theator-);
     transition: transform 0.5s ease-out;;
 
     .badge-image-div {
@@ -356,27 +378,29 @@ a {
     }
 }
 
-.details-text {
-    align-self: flex-start ;
+.details-text, .alert-text {
     text-align: left;
     width: 55vw;
+    color: var(--white-);
+}
+
+.details-text {
+    align-self: flex-start ;
     background-color: var(--crepuscule-);
+
+    padding: 15px;
     border: 2px solid var(--white-);
     box-shadow: 1px 1px 3px var(--white-);
-    padding: 15px;
-    color: var(--white-);
     border-top-right-radius: 25px;
     border-bottom-left-radius: 25px;
 }
 
 .alert-text {
-    text-align: left;
-    width: 55vw;
     background-color: var(--red-light-);
+
+    padding: 15px;
     border: 2px solid var(--red-seat-);
     box-shadow: 1px 1px 3px var(--red-seat-);
-    padding: 15px;
-    color: var(--white-);
     border-radius: 25px;
 }
 
@@ -385,11 +409,12 @@ hr {
 }
 
 #register-review {
+    width: 70vw;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 70vw;
 
     .explication-text{
         width: 90%; 
@@ -401,32 +426,34 @@ hr {
 }
 
 #review-form {
+    width: 55vw;
+    background-color: var(--white-);
     color: var(--black-theator-);
+
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    width: 55vw;
+
     padding: 15px;
-    background-color: var(--white-);
 
     #noteInput {
         appearance: none;
+        cursor:pointer;
         height: 10px; /* Hauteur de la barre */
         background: lightgray; /* Couleur de fond de la barre */
-        border-radius: 5px; /* Coins arrondis */
-        cursor:pointer;
         color: var(--white-);
+        border-radius: 5px; /* Coins arrondis */
     }
 
     /* Curseur (thumb) pour Chrome, Safari, Edge */
     #noteInput::-webkit-slider-thumb {
         appearance: none;
+        cursor: pointer;
         width: 10px;
         height: 10px;
         background: var(--white-); /* Couleur du curseur */
         border-radius: 50%; /* Rond */
-        cursor: pointer;
         transition: background 0.3s, transform 0.2s;
     }
 
@@ -438,11 +465,11 @@ hr {
 
     /* Curseur (thumb) pour Firefox */
     #noteInput::-moz-range-thumb {
+        cursor: pointer;
         width: 10px;
         height: 10px;
         background: var(--white-); /* Couleur du curseur */
         border-radius: 50%;
-        cursor: pointer;
         transition: background 0.3s, transform 0.2s;
     }
 
@@ -454,11 +481,11 @@ hr {
 }
 
 #review-form-header {
+    width: 90%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 90%;
     margin: 5px;
 }
 
@@ -467,36 +494,39 @@ hr {
     grid-template-columns: repeat(5, auto); /* 5 colonnes de taille égale */
     justify-content: center; /* Centrer la grille */
     gap: 10px;
+
     margin: 10px;
 }
 
 .emotion, .genre {
-    color: var(--black-theator-);
     text-align: center; /* Centrer le texte dans les cases */
-    border: 1px solid var(--black-theator-);
-    border-radius: 5px;
-    padding: 10px;
+    color: var(--black-theator-);
     background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
+    
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     gap: 5px;
+
+    padding: 10px;
+    border: 1px solid var(--black-theator-);
+    border-radius: 5px;
 }
 
 .emotion-checkbox, #fav-input, .genre-checkbox {
     appearance: none;
     width: 15px;
     height: 15px;
+    position: relative;
     background-color: var(--white-);
     border: 1px solid lightgray;
     transition: transform 0.5s ease-in;
-    position: relative;
 }
 
 .emotion-checkbox:disabled, #fav-input:disabled, .genre-checkbox:disabled {
-    border: 1px solid var(--black-theator-);
     background-color: lightgray;
+    border: 1px solid var(--black-theator-);
 }
 
 .emotion-checkbox:checked, #fav-input:checked, .genre-checkbox:checked {
@@ -505,10 +535,10 @@ hr {
 
 .emotion-checkbox:checked::after, #fav-input:checked::after, .genre-checkbox:checked::after {
     content: 'X';
-    color: var(--black-theator-);
     position: absolute;
     top: 50%;
     left: 50%;
+    color: var(--black-theator-);
     transform: translate(-50%, -50%);
 }
 
@@ -520,8 +550,8 @@ hr {
         width: 100%;
         height: 20vh;
         margin: 5px;
-        transition: outline 0.5s ease-in;
         border-radius: 0px;
+        transition: outline 0.5s ease-in;
     }
 
     textarea:hover {
@@ -530,16 +560,16 @@ hr {
 }
 
 #review-form-footer {
+    width: 90%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     text-align: center;
-    width: 90%;
     margin: 5px;
 
     details {
-        flex: 70;
         text-align: left;
+        flex: 70;
         padding: 5px;
     }
 
@@ -549,26 +579,26 @@ hr {
 }
 
 #feedback-display {
-    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(3, 30%);
     gap: 3%;
+
+    margin: 0 auto;
     margin-top: 10vh;
     margin-bottom: 10vh;
 }
 
 #review-card{
-    width: 100%;    
-    padding: 10px 5px;
-
-    background-color: rgba(255, 255, 255, 0.90);
-    box-sizing: border-box;
     overflow: hidden;
+    width: 100%;    
+    background-color: rgba(255, 255, 255, 0.90);
     
     border: 5px solid var(--white-);
     border-radius: 20px;
     outline: 1px solid black;
+    box-sizing: border-box;
     box-shadow: 3px 3px 5px var(--black-theator-);
+    padding: 10px 5px;
 
     p {
         margin: 5px;
@@ -584,9 +614,9 @@ hr {
     p {
         background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
         color: var(--black-theator-);
+        padding: 10px;
         border: 1px solid var(--black-theator-);
         border-radius: 30px;
-        padding: 10px;
     }
 }
 
@@ -605,22 +635,25 @@ hr {
 
 #filters-form {
     width: 90%;
-    padding: 15px;
     color: var(--black-theator-);
     background-color: var(--white-);
+
     display: grid;
     grid-template-areas:
         "reset-filters  submit-filters submit-filters"
         "genre-filter genre-filter genre-filter"
         "note-filter runtime-filter released-date-filter";
-        gap: 10px;
+    gap: 10px;
+    padding: 15px;
 }
 
 #genre-options {
     width: 90%;
+
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
+
     margin: 10px auto;
 
     div {
@@ -644,13 +677,13 @@ hr {
 }
 
 #reset-filters {
-    grid-area: reset-filters;
     text-align: left;
+    grid-area: reset-filters;
 }
 
 #submit-filters {
-    grid-area: submit-filters;
     text-align: right;
+    grid-area: submit-filters;
 }
 
 #genre-filter {
@@ -674,21 +707,22 @@ hr {
 
 .filter > input[type="range"] {
     appearance: none;
+    cursor:pointer;
     height: 10px; /* Hauteur de la barre */
     background: lightgray; /* Couleur de fond de la barre */
-    border-radius: 5px; /* Coins arrondis */
-    cursor:pointer;
     color: var(--white-);
+    
+    border-radius: 5px; /* Coins arrondis */
 }
 
 /* Curseur (thumb) pour Chrome, Safari, Edge */
 .filter > input[type="range"]::-webkit-slider-thumb {
     appearance: none;
+    cursor: pointer;
     width: 10px;
     height: 10px;
     background: var(--white-); /* Couleur du curseur */
     border-radius: 50%; /* Rond */
-    cursor: pointer;
     transition: background 0.3s, transform 0.2s;
 }
 
@@ -700,11 +734,11 @@ hr {
 
 /* Curseur (thumb) pour Firefox */
 .filter > input[type="range"]::-moz-range-thumb {
+    cursor: pointer;
     width: 10px;
     height: 10px;
     background: var(--white-); /* Couleur du curseur */
     border-radius: 50%;
-    cursor: pointer;
     transition: background 0.3s, transform 0.2s;
 }
 
@@ -714,43 +748,44 @@ hr {
     transform: scale(1.5); /* Effet d'agrandissement */
 }
 
-.filter > p {
-    font-size: 1.5rem;
-    text-align: start;
-}
-
 .filter {
     margin: 10px;
+
+    p{
+        font-size: 1.5rem;
+        text-align: start;
+    }
 }
 
 #container_error {
     height: 100vh;
     width: 100vw;
+    background-color: var(--black-theator-);
+    color: var(--white-);
 
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
-    background-color: var(--black-theator-);
-    color: var(--white-);
 }
 
 #features_error {
-    background-color: var(--crepuscule-);
     width: 40vw;
     height: 90vh;
+    background-color: var(--crepuscule-);
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
 
+    padding: 15px;
     border: 5px solid var(--black-theator-);
 
     img {
+        object-fit: cover;
         height: 90%;
         width: auto;
-        object-fit: cover;
     }
 
     button {
@@ -760,37 +795,41 @@ hr {
 }
 
 #information_error {
-    background-color: var(--crepuscule-);
-    border: 5px solid var(--black-theator-);
     width: 55vw;
     height: 90vh;
+    background-color: var(--crepuscule-);
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 15px;
     gap: 20px;
 
+    border: 5px solid var(--black-theator-);
+
+    #text_error {
+        height: 100%;
+        font-size: 1.5rem;
+    }
+
     #number_error {
+        font-size: 1.5rem;
         width: 60%;
         height: 50%;
-        font-size: 1.5rem;
+        background-color: var(--red-light-);
+
         display: flex;
         flex-direction: column;
-        background-color: var(--red-light-);
+
+        padding: 10px;
         border: 5px solid var(--black-theator-);
         border-radius: 15px;
-        padding: 10px;
 
         span{
             text-align: center;
             font-size: 6rem;
             font-weight: bold;
         }
-    }
-
-    #text_error{
-        height: 100%;
-        font-size: 1.5rem;
     }
 }
 
@@ -800,48 +839,52 @@ hr {
 
 .infoMovie {
     width: 90%;
+    overflow: hidden;
+
     display: grid;
     grid-template-areas: "genre genre"
                         "dir dir"
                         "runtime date";
     justify-items: start;
     column-gap: 5px;
-    overflow: hidden;
 }
 
 .infoMovie > * {
+    font-size: 0.8rem;
     width: 100%;
     height: auto;
-    font-size: 0.8rem;
-    border: 1px solid var(--white-);
-    border-radius: 5px;
-    padding: 5px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    padding: 5px;
     margin: 0;
     margin-top: 5px;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
 }
 
 #movieGenre {
-    /* background-color: red; */
-    width: 100%;
     font-size: 0.8rem;
     white-space: nowrap;    /* Empêche le texte de se mettre sur plusieurs lignes */
     overflow:hidden;       /* Masque le texte qui dépasse */
     text-overflow: ellipsis; /* Ajoute "..." si le texte est coupé */
-    border: 1px solid var(--white-);
-    border-radius: 5px;
-    padding: 5px;
+    width: 100%;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    padding: 5px;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
 }
 
 #movieGenre ul {
+    list-style-type: none;  /* Retire les puces */
     display: flex;
     justify-content: right;
-    list-style-type: none;  /* Retire les puces */
     padding-left: 3px;             /* Retire les marges externes */
     margin: 0;
 }
@@ -859,77 +902,79 @@ hr {
 
 /* Conteneur des cartes */
 .card-container {
+    perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
     height: auto;
     /* background-color: blue; */
     display: grid;          /* Utilise Grid pour superposer les cartes */
     place-items: center;    /* Centre les éléments horizontalement et verticalement */
-    perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
 }
 
 /* Cartes en elle-même */
 .movieCard {
-    grid-area: 1 / 1;                       /* Superpose les cartes sur la même cellule */
+    box-sizing: border-box;
+    overflow: hidden;
     backface-visibility: hidden;            /* Cache l'arrière lors du retournement */
-    transition: transform 0.8s ease-in-out;
+    width: 100%;
+    height: 80vh;
+    background-color: rgba(255, 255, 255, 0.75);
+
+    grid-area: 1 / 1;                       /* Superpose les cartes sur la même cellule */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    height: 80vh;
+
     /* background: linear-gradient(45deg, var(--white-) 10%, rgba(0,0,0,0.85) 55%, var(--white-) 100%); */
     /* opacity: 0.75; */
-    background-color: rgba(255, 255, 255, 0.75);
-    box-sizing: border-box;
-    overflow: hidden;
-    
     /* Bordure de carte */
     border: 5px solid var(--white-);
     border-radius: 20px;
     outline: 1px solid black;
+
+    transition: transform 0.8s ease-in-out;
 }
 
 .movieCard h3 {
-    width: 90%;
-    height: auto;
     font-size: 1.75rem;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    width: 90%;
+    height: auto;
     border-bottom: 2px solid black;
     border-radius: 10px;
 }
   
 .moviePoster {
-    border: 2px var(--white-) solid;
     box-shadow: 1px 1px 3px black;
     object-fit: cover;
-    margin: 5px;
     height: 50%;
+    margin: 5px;
+    border: 2px var(--white-) solid;
 }
 
 .movieNote, .movieEmotions {
     font-size: 0.8rem;
-    margin: 2px;
-    width: 80%;
-    height: auto;
     text-align: left;
-    padding: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 80%;
+    height: auto;
+    padding: 5px;
+    margin: 2px;
     border: 1px solid var(--white-);
     border-radius: 5px;
 }
 
 .buttonsDiv{
+    box-sizing: border-box;
+    width: 100%;
     display: flex;
     justify-content: right;
     align-items: center;
-    width: 100%;
     padding: 7px;
-    box-sizing: border-box;
 }
 
 .reviewButton {
