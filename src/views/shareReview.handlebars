@@ -1,7 +1,7 @@
 {{!-- Contenu de la page de publication d'avis utilisateur : --}}
-<div class="container-fluid d-flex my-4 mx-2">
+<div class="container-fluid d-flex justify-content-between">
     {{!-- Réaffichage du film précédemment séléctionné : --}}
-    <div>
+    <div class="w-25">
         {{#each movie}}         {{!-- Pour le film séléctionné : --}}
             {{> movieDisplay}}  {{!-- Afficher le partial suivant : --}}
         {{/each}}
@@ -128,13 +128,13 @@
 
 {{!-- Séparation : --}}
 
+{{#if reviews}}     {{!-- Si une donnée sur les avis existe : --}}
 {{!-- Conteneur d'affichage des avis existants pour ce film : --}}
-<div id="feedback-display">
-    {{#if reviews}}     {{!-- Si une donnée sur les avis existe : --}}
+    <div id="feedback-display">
         {{#each reviews}}   {{!-- Pour chaque avis : --}}
             {{> feedbackDisplay}}   {{!-- Afficher le partial suivant : --}}
         {{/each}}
-    {{else}}            {{!-- Sinon : --}}
-        <p>Aucun commentaire n'a encore été publié pour ce film.</p>
-    {{/if}}
-</div>
+    </div>
+{{else}}            {{!-- Sinon : --}}
+    <p class="explication-text">Aucun commentaire n'a encore été publié pour ce film.</p>
+{{/if}}

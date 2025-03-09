@@ -1,10 +1,10 @@
 :root {
-    --white- : rgb(255, 255, 255);
     --white-hover- : rgb(215, 215, 215);
-    --black-theator- : #2d132c;
-    --crepuscule- : #3d2e4f;
-    --red-seat- : #801336;
-    --red-light- : #ee4540;
+    --white- : rgb(248, 245, 242);
+    --black-theator- : rgb(26, 14, 18);
+    --crepuscule- : rgb(55, 47, 68);
+    --red-seat- : rgb(122, 47, 55);
+    --red-light- : rgb(209, 77, 62);
 }
 
 body, html {
@@ -115,6 +115,7 @@ a {
 }
 
 .explication-text {
+    margin: 0 auto;
     margin-top: 20px;
     margin-bottom: 30px;
     width: 80vw;
@@ -172,6 +173,7 @@ a {
     details > a {
         display: block;
         padding: 2px 8px;
+        color: var(--black-theator-);
     }
     
     summary {
@@ -211,6 +213,7 @@ a {
 #login-container, #create-account-container {
     color: var(--white-);
     border: 5px solid var(--black-theator-);
+    border-radius: 15px;
     background-color: var(--crepuscule-);
     width: 50vw;
     height: 70vh;
@@ -259,7 +262,7 @@ a {
         }
 
         input:hover {
-            background: var(--red-light-);
+            background: var(--white-hover-);
         }
     }
 
@@ -278,9 +281,9 @@ a {
 }
 
 .error-container {
-    color: var(--black-theator-);
-    background-color: var(--red-light-);
-    border: 2px solid var(--red-seat-);
+    color: var(--red-light-);
+    background-color: var(--white-);
+    border: 2px solid var(--red-light-);
     border-radius: 15px;
     margin: 10px;
     margin-top: 15px;
@@ -718,6 +721,77 @@ hr {
 
 .filter {
     margin: 10px;
+}
+
+#container_error {
+    height: 100vh;
+    width: 100vw;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: var(--black-theator-);
+    color: var(--white-);
+}
+
+#features_error {
+    background-color: var(--crepuscule-);
+    width: 40vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+
+    border: 5px solid var(--black-theator-);
+
+    img {
+        height: 90%;
+        width: auto;
+        object-fit: cover;
+    }
+
+    button {
+        height: 10%;
+        width: 80%;
+    }
+}
+
+#information_error {
+    background-color: var(--crepuscule-);
+    border: 5px solid var(--black-theator-);
+    width: 55vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    gap: 20px;
+
+    #number_error {
+        width: 60%;
+        height: 50%;
+        font-size: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--red-light-);
+        border: 5px solid var(--black-theator-);
+        border-radius: 15px;
+        padding: 10px;
+
+        span{
+            text-align: center;
+            font-size: 6rem;
+            font-weight: bold;
+        }
+    }
+
+    #text_error{
+        height: 100%;
+        font-size: 1.5rem;
+    }
 }
 
 /*------------------------------------------------------------------------------------*/
