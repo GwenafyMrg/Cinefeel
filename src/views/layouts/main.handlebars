@@ -16,33 +16,31 @@
         <title>Cinéfeel</title>
     </head>
     <body>
-        <div class="container-fluid bg-primary">
-            <nav id="navbar" class="container bg-secondary row m-auto py-3 align-items-center justify-content-between">
-            
-                {{!-- Logo : --}}
-                <div class="col-2">
-                    <img src="https://github.com/GwenafyMrg/cinefeel-pictures-repo/blob/main/public/Cinefeel_logo.png?raw=true" alt="Website_logo" onclick="window.location.href='/'" width="100" height="100">
-                </div>
-            
+        <div id="homeHeader" class="">
+            {{!-- Logo : --}}
+            <div class="logo-container">
+                <img src="https://github.com/GwenafyMrg/cinefeel-pictures-repo/blob/main/public/Cinefeel_logo.png?raw=true" alt="Website_logo" onclick="window.location.href='/'" width="100" height="100">
+            </div>
+            <nav id="navbar" class="">
+                        
                 {{!-- Liste de films / Redirection vers la page de filtre : --}}
-                <button class="btn btn-block btn-info col-2" onclick="window.location.href='../explore-movies'">Liste de films</button>
+                <button id="go-to-filters" class="navbar-item" onclick="window.location.href='../explore-movies'">Liste de films</button>
                 
                 {{!-- Formulaire de recherche de film par texte : --}}
-                <form id="searchForm" method="POST" action="/find-movies" class="col-5 d-flex align-items-center justify-content-between bg-info p-1">
+                <form id="searchForm" method="POST" action="/find-movies" class="navbar-item">
                     <input id="searchBar" name="researchValue" type="text" class="w-75" placeholder="Rechercher par un titre ou un réalisateur">
-                    <button type="submit">Rechercher</button>
+                    <button id="submit-movie-search" type="submit">Rechercher</button>
                 </form>
 
                 {{!-- Section profil : --}}
-                <div class="d-flex col-2 bg-info d-flex justify-content-between">
+                <div id="profilSection" class="navbar-item">
                     {{!-- Section déroulante : --}}
-                    <details class="d-flex flex-column">
+                    <details>
                         {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}
                             <summary>{{userData.username}}</summary>
                         {{else}}            {{!-- Sinon : --}}
                             <summary>Profil</summary>
                         {{/if}}
-                        <hr>                {{!-- Séparation : --}}
                         {{#if userData}}    {{!-- Si un utilisateur est connecté : --}}
                             {{!-- Liens possibles : --}}
                             <a href="../">Profil</a>
@@ -70,7 +68,7 @@
         </main>
 
         {{!-- Pied de page --}}
-        <footer class="bg-primary p-2">
+        <footer>
             <div id="contacts">
                 <h3>Contacts :</h3>
                 <ul>

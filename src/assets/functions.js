@@ -91,7 +91,7 @@ async function getMoviesData (movieObj){
             updated_avg_note = sum/nbReview;    // Calculer la note moyenne.
             updated_avg_note = updated_avg_note.toFixed(2); // Arrondir la note moyenne au centième.
 
-            if(!updated_avg_note){      // Si la note est NaN :
+            if(isNaN(updated_avg_note)){      // Si la note est NaN :
                 updated_avg_note = 0;   // Remplacer la valeur NaN par 0.
             }
             // console.log("Note moyenne mise à jour :" ,updated_avg_note);

@@ -1,8 +1,8 @@
 {{!-- Contenu de la page des bagdes : --}}
-<div class="container-fluid d-flex flex-column w-75 my-3">
+<div id="badges-container" class="container-fluid">
 
     {{!-- Conteneur d'explication : --}}
-    <div>
+    <div class="explication-text">
         <p>
             Découvrez votre collection de badges brillamment gagnés après de longues heures de visionnage passionnant. 
             Admirez vos trophées et laissez-vous séduire par les prochains à débloquer.<br>
@@ -11,20 +11,28 @@
     </div>
 
     {{!-- Conteneur d'affichage des badges obtenus : --}}
-    <div class="container bg-secondary my-2">
-        <p>Vous avez obtenu les badges suivants grâce à vos visionnages:</p>
-        {{#each obtainedBadges}}    {{!-- Pour chaque badge obtenue : --}}
-            {{> badgeDisplay}}      {{!-- Afficher le partial suivant : --}}
-        {{/each}}
-    </div>
+    <p class="details-text">Vous avez obtenu les badges suivants grâce à vos visionnages:</p>
+    {{#if obtainedBadges}}
+        <div class="unlockedBadgesDisplay">
+            {{#each obtainedBadges}}    {{!-- Pour chaque badge obtenue : --}}
+                {{> badgeDisplay}}      {{!-- Afficher le partial suivant : --}}
+            {{/each}}
+        </div>
+    {{else}}
+        <p class="alert-text">Vous n'avez pas encore débloqué de badges...</p>
+    {{/if}}
 
     <hr>    {{!-- Séparation : --}}
 
     {{!-- Conteneur d'affichage des badges non obtenus : --}}
-    <div class="container bg-secondary my-2">
-        <p>Les badges suivants sont encore vérouillés, accomplissez les objectifs pour les débloqués :</p>
-        {{#each notObtainedBadges}} {{!-- Pour chaque badge non obtenue : --}}
-            {{> badgeDisplay}}      {{!-- Afficher le partial suivant : --}}
-        {{/each}}
-    </div>
+    <p class="details-text">Les badges suivants sont encore vérouillés, accomplissez des objectifs pour les débloqués :</p>
+    {{#if notObtainedBadges}}
+        <div class="lockedBadgesDisplay">
+            {{#each notObtainedBadges}} {{!-- Pour chaque badge non obtenue : --}}
+                {{> badgeDisplay}}      {{!-- Afficher le partial suivant : --}}
+            {{/each}}
+        </div>
+    {{else}}
+        <p class="alert-text">Vous avez obtenu les badges suivants grâce à vos visionnages:</p>
+    {{/if}}
 </div>

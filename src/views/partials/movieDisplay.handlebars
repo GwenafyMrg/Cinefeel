@@ -1,72 +1,74 @@
 {{!-- Partials / Template d'affichage des films : --}}
-<div class="card-container m-2">
+<div class="card-container">
 
     {{!-- Première face de la carte (recto) : --}}
-    <div id="SimpleMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
+    <div id="SimpleMovieCard" class="movieCard">
         
         {{!-- Afficher le titre du film : --}}
         <h3>{{movie_title}}</h3>  
 
         {{!-- Afficher le poster du film : --}}
-        <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="moviePoster border border-2 my-3">
+        <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="moviePoster">
 
         {{!-- Afficher la note du film : --}}
-        <p id="movieNote" class="bg-info">Note : {{movie_avg_note}}</p>
+        <p class="movieNote"><b>Note :</b> {{movie_avg_note}}</p>
 
         {{!-- Afficher les émotions les plus votées du film : --}}
         {{#if popularEmotions}}     {{!-- Si les émotions populaires existent : --}}
-            <p id="movieEmotions" class="bg-info">Emotions populaires : {{popularEmotions}}</p>
+            <p class="movieEmotions"><b>Emotions populaires :</b> {{popularEmotions}}</p>
         {{else}}    {{!-- Sinon : --}}
-            <p id="movieEmotions" class="bg-info">Avis insuffisants</p>
+            <p class="movieEmotions">Avis insuffisants</p>
         {{/if}}
 
         {{!-- Section des boutons de la carte : --}}
-        <div class="w-100">
+        <div class="buttonsDiv">
             {{!-- Bouton de redirection vers la page d'avis correspondante : --}}
-            <button id="addReviewTo{{movie_id_movie}}" class="btn btn-block btn-success border rounded-circle" onclick="window.location.href='/share-review?movie={{movie_id_movie}}'">Partager un avis</button>
+            <button id="addReviewTo{{movie_id_movie}}" class="reviewButton" onclick="window.location.href='/share-review?movie={{movie_id_movie}}'">Partager un avis</button>
             {{!-- Bouton pour retourner la carte : --}}
-            <button class="switchButton btn btn-block btn-warning border rounded-circle ms-5">Retourner</button>
+            <button class="switchButton">Retourner</button>
         </div>
         
     </div>
 
     {{!-- -------------------------------------------------- --}}
 
-    <br>
     {{!-- Seconde Face de la carte (verso) --}}
-    <div id="DetailedMovieCard" class="movieCard container-fluid bg-primary p-2 d-flex flex-column align-items-center">
+    <div id="DetailedMovieCard" class="movieCard">
         
         {{!-- Afficher le titre du film : --}}
         <h3>{{movie_title}}</h3>  
 
         {{!-- Afficher le poster du film : --}}
-        <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="w-50 mh-50 border border-2 my-4">
+        <img src="{{movie_poster_url}}?raw=true" alt="{{movie_poster_url}}_poster" class="moviePoster">
 
         {{!-- Conteneur des informations détaillées du film : --}}
         <div class="infoMovie">
             {{!-- Afficher les genres du film : --}}
-            <p id="movieGenre" class="bg-info">
+            <div id="movieGenre">
                 {{!-- Si la structure contenant les genres n'est pas vide : --}}
                 {{#if this.Genres}}
+                    <b>Genres: </b>
                     {{!-- Pour chaque genre stocké dans la structure Genre : --}}
-                    {{#each this.Genres}}
-                        {{!-- Afficher le genre : --}}
-                        - {{this.genre_libelle}}
-                    {{/each}}
+                    <ul>
+                        {{#each this.Genres}}
+                            {{!-- Afficher le genre : --}}
+                            <li>{{this.genre_libelle}}</li>
+                        {{/each}}
+                    </ul>
                 {{!-- Sinon : --}}
                 {{else}}
                     Aucun genre associé...
                 {{/if}}
-            </p>
+            </div>
 
             {{!-- Afficher les réalisateurs du film : --}}
-            <p id="movieDir" class="bg-info">
+            <p id="movieDir">
                 {{!-- Si la structure contenant les réalisateurs n'est pas vide : --}}
                 {{#if this.Directors}}
                 {{!-- Pour chaque réalisateur stocké dans la structure Director : --}}
                     {{#each this.Directors}}
                         {{!-- Afficher le réalisateur : --}}
-                        Réalisateur: {{this.director_firstname}} {{this.director_lastname}}
+                        <b>Réalisateur: </b> {{this.director_firstname}} {{this.director_lastname}}
                     {{/each}}
                 {{!-- Sinon : --}}
                 {{else}}
@@ -75,13 +77,15 @@
             </p>
 
             {{!-- Afficher la durée du film : --}}
-            <p id="movieRuntime" class="bg-info">Durée: {{convertRuntime movie_runtime}}</p>
+            <p id="movieRuntime"><b>Durée: </b> {{convertRuntime movie_runtime}}</p>
 
             {{!-- Afficher la date de sortie du film : --}}
-            <p id="movieReleasedDate" class="bg-info">Date de sortie: {{convertDateFormat movie_released_date}}</p>
+            <p id="movieReleasedDate"><b>Sortie:</b> {{convertDateFormat movie_released_date}}</p>
         </div>
 
         {{!-- Bouton pour retourner la carte : --}}
-        <button class="switchButton btn btn-block btn-warning ms-3 border rounded-circle">Retourner</button>
+        <div class="buttonsDiv">
+            <button class="switchButton">Retourner</button>
+        </div>
     </div>      
 </div>

@@ -1,88 +1,1012 @@
-/* Section à commenter */
-
-.switchButton {
-    font-size: small;
-    align-self: self-end;
-    position: absolute;
-    bottom: 2%;
+/* Définition des variables principales : */
+:root {
+    --white- : rgb(248, 245, 242);
+    --white-hover- : rgb(215, 215, 215);
+    --black-theator- : rgb(26, 14, 18);
+    --crepuscule- : rgb(55, 47, 68);
+    --red-seat- : rgb(122, 47, 55);
+    --red-light- : rgb(209, 77, 62);
 }
 
-.moviePoster {
-    max-height: 75%;
-    height: 60%;
+/* ---------- Menu de navigation : ---------- */
+
+body, html {
+    font-size: 16px;    /*Police par défaut du site.*/
+    width: 100%;
+    margin: 0px;        /*Supprimer les marges par défaut des balises html et body.*/
 }
 
-.movieCard p {
-    font-size: small;
-    margin: 2px;
-    padding: 2px;
-    width: 80%;
-    border: 1px solid lightblue;
-    border-radius: 5px;
-    opacity: 80%;
-    position: relative;
+main {
+    background-image: url("/images/cinema.jpg");
+    background-size: cover;
+    background-position: center;
+    padding: 15px;
+    margin-top: 100px; /* marge de 100px (taille du homeHeader en hauteur) */
 }
 
-.movieCard h3 {
-    width: 90%;
-    max-height: 1.5em;
-    overflow:hidden; /* Cache ce qui dépasse */
-    text-overflow:ellipsis; /* "..." */
+/*Tous les boutons à l'exception des boutons de recherche de film (présent dans le homeHeader).*/
+button:not(#submit-movie-search, #go-to-filters) {
+    font-size: 0.8rem;
+    /*Gérer le dépassement du texte éventuel.*/
+    text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    border-bottom: 2px solid black;
-    border-radius: 10px;
+    overflow: hidden;
+    border: 2px ridge var(--white-);
+    border-radius: 25px;
+    box-shadow: 1px 1px 3px black;
+    transition: background-color 0.5s linear;
 }
 
-.movieCard .infoMovie {
+/*Si on passe la souris sur ces boutons (:hover)*/
+button:not(#submit-movie-search, #go-to-filters):hover {
+    background-color: var(--white-hover-);
+}
+
+#homeHeader {
+    width: 100vw;
+    height: 100px;
+    position: fixed;    /* Fixe le homeHeader en haut de la page.*/
+    top: 0;             /* Le placer tout en haut.*/
+    left: 0;            /* Le faire commencer tout à gauche.*/
+    right: 0;           /* Jusqu'à tout à droite.*/
+    z-index: 100;       /* Le placer au dessus de tous les éléments.*/
+
+    /*Modifier sa disposition :*/
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: var(--black-theator-);
+    border-bottom: 2px solid black;
+}
+
+#navbar {
+    width: 75%;
+    height: 75%;
+    background-color: var(--crepuscule-);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 1vw;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.navbar-item {
+    height: 100%;   
+    width: 20%;
+    position: relative;     /* Position normale par rapport au flux du document. */
+    background-color: var(--white-);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    padding: 5px;
+    border-style:none;  /* Suppression de la bordure par défaut. */
+    border-radius: 15px;
+}
+
+.logo-container {
+    cursor:pointer;
+    height: 85%;
+    width: 10%;
+    background-color: var(--white-);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+#searchForm {
+    width: 50%;
+}
+
+#profilSection {
+    justify-content: right;
+
+    details {
+        z-index: 10;
+        position: absolute;     /* Positionner par rapport à son conteneur parent. */
+        top: 30%;               /* Positionner à 30% en haut de son parent. */
+        left: 10%;              /* Positionner à 10% à gauche de son parent. */
+        height: auto;
+        background-color: var(--white-);
+
+        border-radius: 15px;
+        max-block-size: auto;
+    }
+    
+    details > a {
+        color: var(--black-theator-);
+        display: block;     /* Modifier le type de conteneur des liens dans la balise <details>. */
+        padding: 2px 8px;
+    }
+    
+    summary {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* ---------- Pied de page : ---------- */
+
+footer {
+    font-size: 0.80rem;
+    height: auto;
+    color: var(--white-);
+    background-color: var(--black-theator-);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+
+    padding: 5px 15px;
+    border-top: 2px solid black;
+}
+
+/*Personnalisation des balises <h3> présent uniquement dans la balise <footer> :*/
+footer h3 {
+    font-size: 1rem;
+    font-weight: bold;  /*Mise en gras*/
+}
+
+footer p , footer li{
+    font-size: 0.75rem;
+}
+
+a {
+    font-weight: bold;
+    font-style: italic;         /*Mise en italique*/
+    text-decoration: none;      /*Supprimer la mise en forme par défaut des liens. */
+    color: var(--red-seat-);
+}
+
+/* ---------- Page d'accueil / Affichage des films : ---------- */
+
+.explication-text {
+    text-align:center;      /*Aligner le texte. */
+    width: 80vw;
+    height: auto;
+    color: var(--white-);
+    background-color: var(--black-theator-);
+
+    padding: 10px;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    border-radius: 15px;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+    box-shadow: 5px 5px 10px gray;  /*Ajouter un effet d'ombre autour du composant. */
+}
+
+.moviesDisplay {
+    overflow: hidden;   /*Masquer en cas de dépassement.*/
+    /* Occuper toute la largeur disponible du composant parent. */
+    width: 100%;
+    height: 100%;
+
+    /* Modifier la disposition en grille : */
+    display: grid;  
+    grid-template-columns: repeat(4, minmax(20%, 1fr)); /* Réaliser 4 colonnes occupant 20% du conteneur parent. */
+    justify-content: center;
+    align-items: center;
+    gap: 15px 15px;         /* Espacement entre les éléments de la grille. */
+
+    box-sizing: border-box; /* La taille du container est calculé en incluant sa bordure. */
+}
+
+/* ---------- Page des paramètres : ---------- */
+
+#parameters-div {
+    width: 100%;
+    height: 50vh;
+    background-color: var(--crepuscule-);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    margin: 10px;
+    padding: 15px;
+    border: 5px solid var(--black-theator-);
+    border-radius: 15px;
+}
+
+.parameter {
+    width: 100%;
+    height: auto;
+    color : var(--white-);
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    padding: 5px;
+    margin: 0;
+    border: 1px solid var(--white-);
+    border-radius: 15px;
+}
+
+/* ---------- Page de connexion et création de compte : ---------- */
+  
+/* Conteneur de connexion et de création de compte :*/
+#login-container, #create-account-container {
+    width: 50vw;
+    height: 70vh;
+    color: var(--white-);
+    background-color: var(--crepuscule-);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 15px;
+    margin-bottom: 10vh;
+    border: 5px solid var(--black-theator-);
+    border-radius: 15px;
+}
+    
+/* Formulaire de connexion et de création de compte :*/
+#login-form, #create-account-form {
+    width: 90%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 10px;
+
+    .explication-text {
+        width: 80%;
+    }
+
+    .buttonsDiv {
+        background-color: transparent;  /* Couleur de fond transparente. */
+        justify-content: space-evenly;  /* Espacements égaux entre les éléments à l'horizontale. */
+        border: none;                   /* Supprimer les bordures par défaut des boutons. */
+    }
+
+    div {
+        width: 75%;
+        background-color: var(--black-theator-);
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 15px;
+
+        label {
+            text-align: left;   /* Alignement de l'élément sur la gauche du conteneur. */
+            flex: 30%;          /* S'étale sur 30% du conteneur. */
+        }
+
+        input {
+            background-color: var(--crepuscule-);
+            color: var(--white-);
+            flex: auto;
+            /* Transition de la couleur de fond à vitesse linéaire sur 0.5 secondes. */
+            transition: background 0.5s linear;
+        }
+
+        /* Changer la couleur de fond du bouton quand on le survol. */
+        input:hover {
+            background: var(--white-hover-);
+        }
+    }
+}
+
+#create-account-form .explication-text {
+    width: 90%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.error-container {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    width: 25vw;
+    height: 10vh;
+    color: var(--red-light-);
+    background-color: var(--white-);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 10px;
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid var(--red-light-);
+    border-radius: 15px;
+}
+
+/* ---------- Page des badges : ---------- */
+
+#badges-container {
+    width: 90vw;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.badgeCard {
+    font-size: 1rem;
+    font-weight: bold;
+    /* Couleur de fond en dégradé en forme d'éllipse. */
+    background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
+    
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    margin: 10px;
+    border-radius: 50px;
+    border: 5px solid var(--black-theator-);
+    transition: transform 0.5s ease-out;;
+
+    .badge-image-div {
+        flex: 0 0 20%;
+    }
+    
+    .badge-picture {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        transition : transform 1s ease-out;
+    }
+    
+    .badge-picture:hover {
+        transform: scale(1.5);  /* Zoom de x1.5 sur la taille initiale de l'image. */
+    }
+}
+
+.badgeCard:hover {
+    transform: scale(1.05);     /* Zoom de x1.05 sur la taille initiale du conteneur. */
+}
+
+.lockedBadgesDisplay .badgeCard {
+    background: none;
+    background-color: rgba(105,105,105,0.90);
+    filter:blur(5px);       /* Ajouter une effet de flou sur le conteneur. */
+
+    .badge-picture{
+        filter:blur(20px);  /* Ajouter une effet de flou sur le conteneur. */
+    }
+
+    .badge-picture:hover {
+        transform: none;    /* Désactiver le zoom sur l'image quand le conteneur de badge est dit "vérouillé". */
+    }
+}
+
+.details-text, .alert-text {
+    text-align: left;
+    width: 55vw;
+    color: var(--white-);
+}
+
+.details-text {
+    align-self: flex-start ;
+    background-color: var(--crepuscule-);
+
+    padding: 15px;
+    border: 2px solid var(--white-);
+    box-shadow: 1px 1px 3px var(--white-);
+    border-top-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+}
+
+.alert-text {
+    background-color: var(--red-light-);
+
+    padding: 15px;
+    border: 2px solid var(--red-seat-);
+    box-shadow: 1px 1px 3px var(--red-seat-);
+    border-radius: 25px;
+}
+
+/* Accentuer la séparation de la balise :*/
+hr {
+    margin: 2vw;
+}
+
+/* ---------- Page des avis : ---------- */
+
+#register-review {
+    width: 70vw;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .explication-text{
+        width: 90%; 
+    }
+
+    .error-container {
+        width: 100%;
+    }
+}
+
+#review-form {
+    width: 55vw;
+    background-color: var(--white-);
+    color: var(--black-theator-);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    padding: 15px;
+
+    /* Personnalisation de la jauge pour la note à donner :*/
+    #noteInput {
+        appearance: none;   /* Supprimer l'apparence par défaut. */
+        cursor:pointer;     /* Modifier la souris lors du survol du conteneur. */
+        height: 10px;       /* Hauteur de la barre */
+        background: lightgray;  /* Couleur de fond de la barre */
+        color: var(--white-);
+        border-radius: 5px;        /* Arrondir les coins de la bordure. */
+    }
+
+    /* Curseur pour Chrome, Safari, Edge : */
+    #noteInput::-webkit-slider-thumb {
+        appearance: none;
+        cursor: pointer;
+        width: 10px;
+        height: 10px;
+        background: var(--white-);  /* Couleur du curseur */
+        border-radius: 50%;         /* Arrondir de sorte à former un cercle. */
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    /* Effet au survol pour Chrome, Safari, Edge : */
+    #noteInput::-webkit-slider-thumb:hover {
+        background: var(--crepuscule-); /* Couleur plus foncée du curseur. */
+        transform: scale(1.5);          /* Effet d'agrandissement */
+    }
+
+    /* Curseur pour Firefox */
+    #noteInput::-moz-range-thumb {
+        cursor: pointer;
+        width: 10px;
+        height: 10px;
+        background: var(--white-); /* Couleur du curseur */
+        border-radius: 50%;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    /* Effet au survol pour Firefox */
+    #noteInput::-moz-range-thumb:hover {
+        background: var(--crepuscule-); /* Couleur plus foncée */
+        transform: scale(1.5); /* Effet d'agrandissement */
+    }
+}
+
+#review-form-header {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+}
+
+#emotions-container {
+    display: grid;
+    grid-template-columns: repeat(5, auto); /* 5 colonnes de même taille. */
+    justify-content: center;                /* Centrer la grille. */
+    gap: 10px;
+    margin: 10px;
+}
+
+.emotion, .genre {
+    text-align: center;
+    color: var(--black-theator-);
+    background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+
+    padding: 10px;
+    border: 1px solid var(--black-theator-);
+    border-radius: 5px;
+}
+
+.emotion-checkbox, #fav-input, .genre-checkbox {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    position: relative;
+    background-color: var(--white-);
+    border: 1px solid lightgray;
+    transition: transform 0.5s ease-in;
+}
+
+.emotion-checkbox:disabled, #fav-input:disabled, .genre-checkbox:disabled {
+    background-color: lightgray;    /* Accentué l'effet désactivé. */
+    border: 1px solid var(--black-theator-);
+}
+
+.emotion-checkbox:checked, #fav-input:checked, .genre-checkbox:checked {
+    transform: rotateY(180deg);
+}
+
+.emotion-checkbox:checked::after, #fav-input:checked::after, .genre-checkbox:checked::after {
+    content: 'X';       /* Contenu à afficher dans la case quand elle est cochée. */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: var(--black-theator-);
+    transform: translate(-50%, -50%);   /* Placer le contenu au centre de la case. */
+}
+
+#comment-container {
+    width: 100%;
+    margin: 5px;    
+
+    textarea {
+        width: 100%;
+        height: 20vh;
+        margin: 5px;
+        border-radius: 0px;
+        transition: outline 0.5s ease-in;
+    }
+
+    textarea:hover {
+        outline: 1px solid var(--crepuscule-);  /* Bordure extérieur à la bordure. */
+    }
+}
+
+#review-form-footer {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+    margin: 5px;
+
+    details {
+        text-align: left;
+        flex: 70;
+        padding: 5px;
+    }
+
+    button {
+        flex:30;
+    }
+}
+
+/* ---------- Afficher les commentaires : ---------- */
+
+#feedback-display {
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    gap: 3%;
+
+    margin: 0 auto;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+}
+
+#review-card{
+    overflow: hidden;
+    width: 100%;    
+    background-color: rgba(255, 255, 255, 0.90);
+    
+    padding: 10px 5px;
+    border: 5px solid var(--white-);
+    border-radius: 20px;
+    outline: 1px solid black;
+    box-sizing: border-box;
+    box-shadow: 3px 3px 5px var(--black-theator-);
+
+    p {
+        margin: 5px;
+    }
+}
+
+#emotions-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;        /* Gérer les dépassement avec la disposition flex. */
+
+    p {
+        background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
+        color: var(--black-theator-);
+        padding: 10px;
+        border: 1px solid var(--black-theator-);
+        border-radius: 30px;
+    }
+}
+
+#review-author {
+    text-align: end;
+}
+
+/* ---------- Page des filtres : ---------- */
+
+#filters-section {
+    width: 85vw;            /* Prendre 85% de la largeur totale de la fenêtre pour la largeur du conteneur. */
+    display: flex;  
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10vh;    /* Prendre 10% de la hauteur totale de la fenêtre pour la marge. */
+}
+
+#filters-form {
+    width: 90%;
+    color: var(--black-theator-);
+    background-color: var(--white-);
 
     display: grid;
+    grid-template-areas:    /* Définition spécifiques de la grille. */
+        "reset-filters  submit-filters submit-filters"
+        "genre-filter genre-filter genre-filter"
+        "note-filter runtime-filter released-date-filter";
+    gap: 10px;
+
+    padding: 15px;
+}
+
+#genre-options {
+    width: 90%;
+
+    display: grid;      /* Modifier la disposition en grille. */
+    grid-template-columns: repeat(5, 1fr);  /* Créer 5 colonnes de même taille. */
+    gap: 10px;
+
+    margin: 10px auto;
+
+    div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+#reset-filters, #submit-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: 10vh;
+}
+
+#reset-filters-button, #submit-filters-button {
+    width: 80%;
+    margin: 10px;
+}
+
+/* Définitions des noms de chaque élément pour la grille : */
+#reset-filters {
+    text-align: left;
+    grid-area: reset-filters;
+}
+
+#submit-filters {
+    text-align: right;
+    grid-area: submit-filters;
+}
+
+#genre-filter {
+    grid-area: genre-filter;
+    border-top: 2px solid var(--black-theator-);
+    border-bottom: 2px solid var(--black-theator-);
+    padding: 10px;
+}
+
+#note-filter {grid-area: note-filter;}
+#runtime-filter {grid-area: runtime-filter;}
+#released-date-filter {grid-area: released-date-filter;}
+
+.filter > input[type="range"] { /* Pour toutes les balises <input> de type "range". */
+    appearance: none;
+    cursor:pointer;
+    height: 10px;
+    background: lightgray;
+    color: var(--white-);
+    
+    border-radius: 5px;
+}
+
+/* Curseur pour Chrome, Safari, Edge */
+.filter > input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    background: var(--white-);
+    border-radius: 50%;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Effet au survol pour Chrome, Safari, Edge */
+.filter > input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--crepuscule-); /* Couleur plus foncée */
+    transform: scale(1.5); /* Effet d'agrandissement */
+}
+
+/* Curseur pour Firefox */
+.filter > input[type="range"]::-moz-range-thumb {
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    background: var(--white-); /* Couleur du curseur */
+    border-radius: 50%;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Effet au survol pour Firefox */
+.filter > input[type="range"]-moz-range-thumb:hover {
+    background: var(--crepuscule-); /* Couleur plus foncée */
+    transform: scale(1.5);          /* Effet d'agrandissement */
+}
+
+.filter {
+    margin: 10px;
+
+    p{
+        font-size: 1.5rem;
+        text-align: start;
+    }
+}
+
+/* ---------- Page des erreurs : ---------- */
+
+#container_error { 
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--black-theator-);
+    color: var(--white-);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#features_error {
+    width: 40vw;
+    height: 90vh;
+    background-color: var(--crepuscule-);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px;
+    border: 5px solid var(--black-theator-);
+
+    img {
+        object-fit: cover;
+        height: 90%;
+        width: auto;
+    }
+
+    button {
+        height: 10%;
+        width: 80%;
+    }
+}
+
+#information_error {
+    width: 55vw;
+    height: 90vh;
+    background-color: var(--crepuscule-);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    gap: 20px;
+
+    border: 5px solid var(--black-theator-);
+
+    #text_error {
+        height: 100%;
+        font-size: 1.5rem;
+    }
+
+    #number_error {
+        font-size: 1.5rem;
+        width: 60%;
+        height: 50%;
+        background-color: var(--red-light-);
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 10px;
+        border: 5px solid var(--black-theator-);
+        border-radius: 15px;
+
+        span{
+            text-align: center;
+            font-size: 6rem;
+            font-weight: bold;
+        }
+    }
+}
+
+/* ---------- Affichage des films : ---------- */
+
+.infoMovie {
+    width: 90%;
+    overflow: hidden;
+
+    display: grid;
+    /* Organisation spécifique de la grille. */
     grid-template-areas: "genre genre"
                         "dir dir"
                         "runtime date";
-    justify-items: center;
-    column-gap: 3px;
-    row-gap: 2px;
+    justify-items: start;
+    column-gap: 5px;
 }
 
+.infoMovie > * {
+    font-size: 0.8rem;
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 5px;
+    margin: 0;
+    margin-top: 5px;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
+}
+
+#movieGenre {
+    font-size: 0.8rem;
+    white-space: nowrap;        /* Empêcher le texte de se placer sur plusieurs lignes. */
+    overflow:hidden;            /* Masque le texte qui dépasse. */
+    text-overflow: ellipsis;    /* Ajoute "..." si le texte est coupé. */
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 5px;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
+}
+
+#movieGenre ul {
+    list-style-type: none;      /* Retirer les puces. */
+    display: flex;
+    justify-content: right;
+    padding-left: 3px;
+    margin: 0;
+}
+
+#movieGenre li {
+    margin-right: 5px;
+}
+
+/* Définition des noms de chaque élément pour la grille : */
 #movieGenre{grid-area: genre;}
 #movieDir{grid-area: dir;}
 #movieRuntime{grid-area: runtime;}
 #movieReleasedDate{grid-area: date;}
 
-.infoMovie p {
-    width: 100%;
-    text-indent: 2px;
-}
 
-.gridMovies {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-}
+/* ---------- Gestion de l'animation des cartes : ---------- */
 
-/*--------------------------------- Gestion de l'animation des cartes: ---------------------------------------*/
-
-/* Conteneur des cartes */
+/* Conteneur des cartes : */
 .card-container {
-    display: grid;          /* Utilise Grid pour superposer les cartes */
-    place-items: center;    /* Centre les éléments horizontalement et verticalement */
     perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
+    height: auto;
+    display: grid;          /* Utiliser la disposition Grid pour superposer les cartes */
+    place-items: center;    /* Centre les éléments horizontalement et verticalement */
 }
 
-/* Cartes en elle-même */
+/* Cartes en elles-même : */
 .movieCard {
-    grid-area: 1 / 1;                       /* Superpose les cartes sur la même cellule */
-    backface-visibility: hidden;            /* Cache l'arrière lors du retournement */
-    transition: transform 0.8s ease-in-out;
-    display: flex;
+    box-sizing: border-box;
+    overflow: hidden;
+    backface-visibility: hidden;    /* Cacher l'arrière lors du retournement */
     width: 100%;
-    height: 450px;
+    height: 80vh;
+    background-color: rgba(255, 255, 255, 0.75);
 
-    /* Bordure de carte */
-    border: 5px solid white;
+    grid-area: 1 / 1;               /* Superposer les cartes sur la même cellule */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    /* background: linear-gradient(45deg, var(--white-) 10%, rgba(0,0,0,0.85) 55%, var(--white-) 100%); */
+    /* opacity: 0.75; */
+
+    /* Bordure de carte : */
+    border: 5px solid var(--white-);
     border-radius: 20px;
     outline: 1px solid black;
+
+    transition: transform 0.8s ease-in-out;
+}
+
+.movieCard h3 {
+    font-size: 1.75rem;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 90%;
+    height: auto;
+    border-bottom: 2px solid black;
+    border-radius: 10px;
+}
+  
+.moviePoster {
+    box-shadow: 1px 1px 3px black;
+    object-fit: cover;
+    height: 50%;
+    margin: 5px;
+    border: 2px var(--white-) solid;
+}
+
+.movieNote, .movieEmotions {
+    font-size: 0.8rem;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 80%;
+    height: auto;
+    padding: 5px;
+    margin: 2px;
+    border: 1px solid var(--white-);
+    border-radius: 5px;
+}
+
+.buttonsDiv{
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    padding: 7px;
+}
+
+.reviewButton {
+    background-color: var(--white-);
+    margin-right: auto;
+}
+
+.switchButton {
+    background-color: var(--white-);
 }
 
 /* Position initiale des cartes */
@@ -94,7 +1018,7 @@
     transform: rotateY(180deg); /* Masqué au début */
 }
 
-/* Position après retournement */
+/* Position après le retournement des cartes :*/
 .flipped #SimpleMovieCard {
     transform: rotateY(-180deg);
 }

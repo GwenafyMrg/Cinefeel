@@ -1,12 +1,12 @@
 {{!-- Partials / Template d'affichage des badges : --}}
-<div class="container-fluid d-flex flex-row justify-content-between p-2 card bg-light w-100">
+<div class="badgeCard">
     <div>   {{!-- Conteneur pour le numéro de série du badge : --}}
         <p>Badge {{badge_serial_nb}} de sa série.</p>
     </div>
     <div> {{!-- Conteneur de la condition d'obtention du badge : --}}
         <p>{{badge_distinction}}.</p>
     </div>
-    <div>   {{!-- Conteneur pour l'image du badge : --}}
-        <img src="{{badge_url}}?raw=true" alt="Image du badge que vous avez obtenu." class="w-25">
+    <div class="badge-image-div">   {{!-- Conteneur pour l'image du badge : --}}
+        <img src="{{badge_url}}?raw=true" alt="Image du badge que vous avez obtenu." class="badge-picture">
     </div>
 </div>
