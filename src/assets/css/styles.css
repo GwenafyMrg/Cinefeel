@@ -1,3 +1,4 @@
+/* Définition des variables principales : */
 :root {
     --white- : rgb(248, 245, 242);
     --white-hover- : rgb(215, 215, 215);
@@ -7,18 +8,26 @@
     --red-light- : rgb(209, 77, 62);
 }
 
+/* ---------- Menu de navigation : ---------- */
+
 body, html {
-    font-size: 16px;
+    font-size: 16px;    /*Police par défaut du site.*/
     width: 100%;
-    margin: 0px;
+    margin: 0px;        /*Supprimer les marges par défaut des balises html et body.*/
 }
 
 main {
-    margin-top: 100px; /* 100px taille du homeHeader en hauteur */
+    background-image: url("/images/cinema.jpg");
+    background-size: cover;
+    background-position: center;
+    padding: 15px;
+    margin-top: 100px; /* marge de 100px (taille du homeHeader en hauteur) */
 }
 
+/*Tous les boutons à l'exception des boutons de recherche de film (présent dans le homeHeader).*/
 button:not(#submit-movie-search, #go-to-filters) {
     font-size: 0.8rem;
+    /*Gérer le dépassement du texte éventuel.*/
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -28,6 +37,7 @@ button:not(#submit-movie-search, #go-to-filters) {
     transition: background-color 0.5s linear;
 }
 
+/*Si on passe la souris sur ces boutons (:hover)*/
 button:not(#submit-movie-search, #go-to-filters):hover {
     background-color: var(--white-hover-);
 }
@@ -35,12 +45,13 @@ button:not(#submit-movie-search, #go-to-filters):hover {
 #homeHeader {
     width: 100vw;
     height: 100px;
-    position: fixed; /* Fixe le header en haut de la page */
-    top: 0; /* Le placer tout en haut */
-    left: 0;
-    right: 0;
-    z-index: 100;
+    position: fixed;    /* Fixe le homeHeader en haut de la page.*/
+    top: 0;             /* Le placer tout en haut.*/
+    left: 0;            /* Le faire commencer tout à gauche.*/
+    right: 0;           /* Jusqu'à tout à droite.*/
+    z-index: 100;       /* Le placer au dessus de tous les éléments.*/
 
+    /*Modifier sa disposition :*/
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -64,6 +75,22 @@ button:not(#submit-movie-search, #go-to-filters):hover {
     border-bottom-left-radius: 15px;
 }
 
+.navbar-item {
+    height: 100%;   
+    width: 20%;
+    position: relative;     /* Position normale par rapport au flux du document. */
+    background-color: var(--white-);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    padding: 5px;
+    border-style:none;  /* Suppression de la bordure par défaut. */
+    border-radius: 15px;
+}
+
 .logo-container {
     cursor:pointer;
     height: 85%;
@@ -82,14 +109,34 @@ button:not(#submit-movie-search, #go-to-filters):hover {
     width: 50%;
 }
 
-/* ------------------ */
+#profilSection {
+    justify-content: right;
 
-main {
-    background-image: url("/images/cinema.jpg");
-    background-size: cover;
-    background-position: center;
-    padding: 15px;
+    details {
+        z-index: 10;
+        position: absolute;     /* Positionner par rapport à son conteneur parent. */
+        top: 30%;               /* Positionner à 30% en haut de son parent. */
+        left: 10%;              /* Positionner à 10% à gauche de son parent. */
+        height: auto;
+        background-color: var(--white-);
+
+        border-radius: 15px;
+        max-block-size: auto;
+    }
+    
+    details > a {
+        color: var(--black-theator-);
+        display: block;     /* Modifier le type de conteneur des liens dans la balise <details>. */
+        padding: 2px 8px;
+    }
+    
+    summary {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
+
+/* ---------- Pied de page : ---------- */
 
 footer {
     font-size: 0.80rem;
@@ -106,9 +153,10 @@ footer {
     border-top: 2px solid black;
 }
 
+/*Personnalisation des balises <h3> présent uniquement dans la balise <footer> :*/
 footer h3 {
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: bold;  /*Mise en gras*/
 }
 
 footer p , footer li{
@@ -117,13 +165,15 @@ footer p , footer li{
 
 a {
     font-weight: bold;
-    font-style: italic;
-    text-decoration: none;
+    font-style: italic;         /*Mise en italique*/
+    text-decoration: none;      /*Supprimer la mise en forme par défaut des liens. */
     color: var(--red-seat-);
 }
 
+/* ---------- Page d'accueil / Affichage des films : ---------- */
+
 .explication-text {
-    text-align:center;
+    text-align:center;      /*Aligner le texte. */
     width: 80vw;
     height: auto;
     color: var(--white-);
@@ -136,66 +186,26 @@ a {
     border-radius: 15px;
     border-bottom: 2px solid black;
     border-right: 2px solid black;
-    box-shadow: 5px 5px 10px gray;
+    box-shadow: 5px 5px 10px gray;  /*Ajouter un effet d'ombre autour du composant. */
 }
 
 .moviesDisplay {
-    overflow: hidden;
+    overflow: hidden;   /*Masquer en cas de dépassement.*/
+    /* Occuper toute la largeur disponible du composant parent. */
     width: 100%;
     height: 100%;
 
+    /* Modifier la disposition en grille : */
     display: grid;  
-    grid-template-columns: repeat(4, minmax(20%, 1fr));
+    grid-template-columns: repeat(4, minmax(20%, 1fr)); /* Réaliser 4 colonnes occupant 20% du conteneur parent. */
     justify-content: center;
     align-items: center;
-    gap: 15px 15px;
+    gap: 15px 15px;         /* Espacement entre les éléments de la grille. */
 
-    box-sizing: border-box;
+    box-sizing: border-box; /* La taille du container est calculé en incluant sa bordure. */
 }
 
-.navbar-item {
-    height: 100%;   
-    width: 20%;
-    position: relative;
-    background-color: var(--white-);
-
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-
-    padding: 5px;
-    border-style:none;
-    border-radius: 15px;
-}
-
-#profilSection {
-    justify-content: right;
-
-    details {
-        z-index: 10;
-        position: absolute; /* On le positionne absolument par rapport à son conteneur parent. */
-        top: 30%;
-        left: 10%;  /* Positionner à 10 % de son parent. */
-        height: auto;
-        background-color: var(--white-);
-
-        border-radius: 15px;
-        max-block-size: auto;
-    }
-    
-    details > a {
-        color: var(--black-theator-);
-        display: block;
-        padding: 2px 8px;
-    }
-    
-    summary {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        position: sticky;
-    }
-}
+/* ---------- Page des paramètres : ---------- */
 
 #parameters-div {
     width: 100%;
@@ -227,7 +237,10 @@ a {
     border: 1px solid var(--white-);
     border-radius: 15px;
 }
+
+/* ---------- Page de connexion et création de compte : ---------- */
   
+/* Conteneur de connexion et de création de compte :*/
 #login-container, #create-account-container {
     width: 50vw;
     height: 70vh;
@@ -245,6 +258,7 @@ a {
     border-radius: 15px;
 }
     
+/* Formulaire de connexion et de création de compte :*/
 #login-form, #create-account-form {
     width: 90%;
     height: 100%;
@@ -260,9 +274,9 @@ a {
     }
 
     .buttonsDiv {
-        background-color:transparent;
-        justify-content: space-evenly;
-        border: none;
+        background-color: transparent;  /* Couleur de fond transparente. */
+        justify-content: space-evenly;  /* Espacements égaux entre les éléments à l'horizontale. */
+        border: none;                   /* Supprimer les bordures par défaut des boutons. */
     }
 
     div {
@@ -278,17 +292,19 @@ a {
         border-radius: 15px;
 
         label {
-            text-align: left;
-            flex: 30%;
+            text-align: left;   /* Alignement de l'élément sur la gauche du conteneur. */
+            flex: 30%;          /* S'étale sur 30% du conteneur. */
         }
 
         input {
             background-color: var(--crepuscule-);
             color: var(--white-);
             flex: auto;
+            /* Transition de la couleur de fond à vitesse linéaire sur 0.5 secondes. */
             transition: background 0.5s linear;
         }
 
+        /* Changer la couleur de fond du bouton quand on le survol. */
         input:hover {
             background: var(--white-hover-);
         }
@@ -321,6 +337,8 @@ a {
     border-radius: 15px;
 }
 
+/* ---------- Page des badges : ---------- */
+
 #badges-container {
     width: 90vw;
 
@@ -333,6 +351,7 @@ a {
 .badgeCard {
     font-size: 1rem;
     font-weight: bold;
+    /* Couleur de fond en dégradé en forme d'éllipse. */
     background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
     
     display: flex;
@@ -356,25 +375,25 @@ a {
     }
     
     .badge-picture:hover {
-        transform: scale(1.5);
+        transform: scale(1.5);  /* Zoom de x1.5 sur la taille initiale de l'image. */
     }
 }
 
 .badgeCard:hover {
-    transform: scale(1.05);
+    transform: scale(1.05);     /* Zoom de x1.05 sur la taille initiale du conteneur. */
 }
 
 .lockedBadgesDisplay .badgeCard {
     background: none;
     background-color: rgba(105,105,105,0.90);
-    filter:blur(5px);
+    filter:blur(5px);       /* Ajouter une effet de flou sur le conteneur. */
 
     .badge-picture{
-        filter:blur(20px);
+        filter:blur(20px);  /* Ajouter une effet de flou sur le conteneur. */
     }
 
     .badge-picture:hover {
-        transform: none;
+        transform: none;    /* Désactiver le zoom sur l'image quand le conteneur de badge est dit "vérouillé". */
     }
 }
 
@@ -404,9 +423,12 @@ a {
     border-radius: 25px;
 }
 
+/* Accentuer la séparation de la balise :*/
 hr {
     margin: 2vw;
 }
+
+/* ---------- Page des avis : ---------- */
 
 #register-review {
     width: 70vw;
@@ -437,33 +459,34 @@ hr {
 
     padding: 15px;
 
+    /* Personnalisation de la jauge pour la note à donner :*/
     #noteInput {
-        appearance: none;
-        cursor:pointer;
-        height: 10px; /* Hauteur de la barre */
-        background: lightgray; /* Couleur de fond de la barre */
+        appearance: none;   /* Supprimer l'apparence par défaut. */
+        cursor:pointer;     /* Modifier la souris lors du survol du conteneur. */
+        height: 10px;       /* Hauteur de la barre */
+        background: lightgray;  /* Couleur de fond de la barre */
         color: var(--white-);
-        border-radius: 5px; /* Coins arrondis */
+        border-radius: 5px;        /* Arrondir les coins de la bordure. */
     }
 
-    /* Curseur (thumb) pour Chrome, Safari, Edge */
+    /* Curseur pour Chrome, Safari, Edge : */
     #noteInput::-webkit-slider-thumb {
         appearance: none;
         cursor: pointer;
         width: 10px;
         height: 10px;
-        background: var(--white-); /* Couleur du curseur */
-        border-radius: 50%; /* Rond */
+        background: var(--white-);  /* Couleur du curseur */
+        border-radius: 50%;         /* Arrondir de sorte à former un cercle. */
         transition: background 0.3s, transform 0.2s;
     }
 
-    /* Effet au survol */
+    /* Effet au survol pour Chrome, Safari, Edge : */
     #noteInput::-webkit-slider-thumb:hover {
-        background: var(--crepuscule-); /* Couleur plus foncée */
-        transform: scale(1.5); /* Effet d'agrandissement */
+        background: var(--crepuscule-); /* Couleur plus foncée du curseur. */
+        transform: scale(1.5);          /* Effet d'agrandissement */
     }
 
-    /* Curseur (thumb) pour Firefox */
+    /* Curseur pour Firefox */
     #noteInput::-moz-range-thumb {
         cursor: pointer;
         width: 10px;
@@ -491,15 +514,14 @@ hr {
 
 #emotions-container {
     display: grid;
-    grid-template-columns: repeat(5, auto); /* 5 colonnes de taille égale */
-    justify-content: center; /* Centrer la grille */
+    grid-template-columns: repeat(5, auto); /* 5 colonnes de même taille. */
+    justify-content: center;                /* Centrer la grille. */
     gap: 10px;
-
     margin: 10px;
 }
 
 .emotion, .genre {
-    text-align: center; /* Centrer le texte dans les cases */
+    text-align: center;
     color: var(--black-theator-);
     background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
     
@@ -525,7 +547,7 @@ hr {
 }
 
 .emotion-checkbox:disabled, #fav-input:disabled, .genre-checkbox:disabled {
-    background-color: lightgray;
+    background-color: lightgray;    /* Accentué l'effet désactivé. */
     border: 1px solid var(--black-theator-);
 }
 
@@ -534,12 +556,12 @@ hr {
 }
 
 .emotion-checkbox:checked::after, #fav-input:checked::after, .genre-checkbox:checked::after {
-    content: 'X';
+    content: 'X';       /* Contenu à afficher dans la case quand elle est cochée. */
     position: absolute;
     top: 50%;
     left: 50%;
     color: var(--black-theator-);
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);   /* Placer le contenu au centre de la case. */
 }
 
 #comment-container {
@@ -555,7 +577,7 @@ hr {
     }
 
     textarea:hover {
-        outline: 1px solid var(--crepuscule-);
+        outline: 1px solid var(--crepuscule-);  /* Bordure extérieur à la bordure. */
     }
 }
 
@@ -578,6 +600,8 @@ hr {
     }
 }
 
+/* ---------- Afficher les commentaires : ---------- */
+
 #feedback-display {
     display: grid;
     grid-template-columns: repeat(3, 30%);
@@ -593,12 +617,12 @@ hr {
     width: 100%;    
     background-color: rgba(255, 255, 255, 0.90);
     
+    padding: 10px 5px;
     border: 5px solid var(--white-);
     border-radius: 20px;
     outline: 1px solid black;
     box-sizing: border-box;
     box-shadow: 3px 3px 5px var(--black-theator-);
-    padding: 10px 5px;
 
     p {
         margin: 5px;
@@ -609,7 +633,7 @@ hr {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    flex-wrap: wrap;
+    flex-wrap: wrap;        /* Gérer les dépassement avec la disposition flex. */
 
     p {
         background: radial-gradient(ellipse, var(--red-light-), var(--red-seat-));
@@ -624,13 +648,15 @@ hr {
     text-align: end;
 }
 
+/* ---------- Page des filtres : ---------- */
+
 #filters-section {
-    width: 85vw;
+    width: 85vw;            /* Prendre 85% de la largeur totale de la fenêtre pour la largeur du conteneur. */
     display: flex;  
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom:10vh;
+    margin-bottom: 10vh;    /* Prendre 10% de la hauteur totale de la fenêtre pour la marge. */
 }
 
 #filters-form {
@@ -639,19 +665,20 @@ hr {
     background-color: var(--white-);
 
     display: grid;
-    grid-template-areas:
+    grid-template-areas:    /* Définition spécifiques de la grille. */
         "reset-filters  submit-filters submit-filters"
         "genre-filter genre-filter genre-filter"
         "note-filter runtime-filter released-date-filter";
     gap: 10px;
+
     padding: 15px;
 }
 
 #genre-options {
     width: 90%;
 
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: grid;      /* Modifier la disposition en grille. */
+    grid-template-columns: repeat(5, 1fr);  /* Créer 5 colonnes de même taille. */
     gap: 10px;
 
     margin: 10px auto;
@@ -676,6 +703,7 @@ hr {
     margin: 10px;
 }
 
+/* Définitions des noms de chaque élément pour la grille : */
 #reset-filters {
     text-align: left;
     grid-area: reset-filters;
@@ -693,46 +721,38 @@ hr {
     padding: 10px;
 }
 
-#note-filter {
-    grid-area: note-filter;
-}
+#note-filter {grid-area: note-filter;}
+#runtime-filter {grid-area: runtime-filter;}
+#released-date-filter {grid-area: released-date-filter;}
 
-#runtime-filter {
-    grid-area: runtime-filter;
-}
-
-#released-date-filter {
-    grid-area: released-date-filter;
-}
-
-.filter > input[type="range"] {
+.filter > input[type="range"] { /* Pour toutes les balises <input> de type "range". */
     appearance: none;
     cursor:pointer;
-    height: 10px; /* Hauteur de la barre */
-    background: lightgray; /* Couleur de fond de la barre */
+    height: 10px;
+    background: lightgray;
     color: var(--white-);
     
-    border-radius: 5px; /* Coins arrondis */
+    border-radius: 5px;
 }
 
-/* Curseur (thumb) pour Chrome, Safari, Edge */
+/* Curseur pour Chrome, Safari, Edge */
 .filter > input[type="range"]::-webkit-slider-thumb {
     appearance: none;
     cursor: pointer;
     width: 10px;
     height: 10px;
-    background: var(--white-); /* Couleur du curseur */
-    border-radius: 50%; /* Rond */
+    background: var(--white-);
+    border-radius: 50%;
     transition: background 0.3s, transform 0.2s;
 }
 
-/* Effet au survol */
+/* Effet au survol pour Chrome, Safari, Edge */
 .filter > input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--crepuscule-); /* Couleur plus foncée */
     transform: scale(1.5); /* Effet d'agrandissement */
 }
 
-/* Curseur (thumb) pour Firefox */
+/* Curseur pour Firefox */
 .filter > input[type="range"]::-moz-range-thumb {
     cursor: pointer;
     width: 10px;
@@ -745,7 +765,7 @@ hr {
 /* Effet au survol pour Firefox */
 .filter > input[type="range"]-moz-range-thumb:hover {
     background: var(--crepuscule-); /* Couleur plus foncée */
-    transform: scale(1.5); /* Effet d'agrandissement */
+    transform: scale(1.5);          /* Effet d'agrandissement */
 }
 
 .filter {
@@ -757,7 +777,9 @@ hr {
     }
 }
 
-#container_error {
+/* ---------- Page des erreurs : ---------- */
+
+#container_error { 
     height: 100vh;
     width: 100vw;
     background-color: var(--black-theator-);
@@ -833,15 +855,14 @@ hr {
     }
 }
 
-/*------------------------------------------------------------------------------------*/
-
-/* Section à commenter */
+/* ---------- Affichage des films : ---------- */
 
 .infoMovie {
     width: 90%;
     overflow: hidden;
 
     display: grid;
+    /* Organisation spécifique de la grille. */
     grid-template-areas: "genre genre"
                         "dir dir"
                         "runtime date";
@@ -867,9 +888,9 @@ hr {
 
 #movieGenre {
     font-size: 0.8rem;
-    white-space: nowrap;    /* Empêche le texte de se mettre sur plusieurs lignes */
-    overflow:hidden;       /* Masque le texte qui dépasse */
-    text-overflow: ellipsis; /* Ajoute "..." si le texte est coupé */
+    white-space: nowrap;        /* Empêcher le texte de se placer sur plusieurs lignes. */
+    overflow:hidden;            /* Masque le texte qui dépasse. */
+    text-overflow: ellipsis;    /* Ajoute "..." si le texte est coupé. */
     width: 100%;
 
     display: flex;
@@ -882,10 +903,10 @@ hr {
 }
 
 #movieGenre ul {
-    list-style-type: none;  /* Retire les puces */
+    list-style-type: none;      /* Retirer les puces. */
     display: flex;
     justify-content: right;
-    padding-left: 3px;             /* Retire les marges externes */
+    padding-left: 3px;
     margin: 0;
 }
 
@@ -893,32 +914,33 @@ hr {
     margin-right: 5px;
 }
 
+/* Définition des noms de chaque élément pour la grille : */
 #movieGenre{grid-area: genre;}
 #movieDir{grid-area: dir;}
 #movieRuntime{grid-area: runtime;}
 #movieReleasedDate{grid-area: date;}
 
-/*--------------------------------- Gestion de l'animation des cartes: ---------------------------------------*/
 
-/* Conteneur des cartes */
+/* ---------- Gestion de l'animation des cartes : ---------- */
+
+/* Conteneur des cartes : */
 .card-container {
     perspective: 1000px;    /* Nécessaire pour l'effet de rotation 3D */
     height: auto;
-    /* background-color: blue; */
-    display: grid;          /* Utilise Grid pour superposer les cartes */
+    display: grid;          /* Utiliser la disposition Grid pour superposer les cartes */
     place-items: center;    /* Centre les éléments horizontalement et verticalement */
 }
 
-/* Cartes en elle-même */
+/* Cartes en elles-même : */
 .movieCard {
     box-sizing: border-box;
     overflow: hidden;
-    backface-visibility: hidden;            /* Cache l'arrière lors du retournement */
+    backface-visibility: hidden;    /* Cacher l'arrière lors du retournement */
     width: 100%;
     height: 80vh;
     background-color: rgba(255, 255, 255, 0.75);
 
-    grid-area: 1 / 1;                       /* Superpose les cartes sur la même cellule */
+    grid-area: 1 / 1;               /* Superposer les cartes sur la même cellule */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -926,7 +948,8 @@ hr {
 
     /* background: linear-gradient(45deg, var(--white-) 10%, rgba(0,0,0,0.85) 55%, var(--white-) 100%); */
     /* opacity: 0.75; */
-    /* Bordure de carte */
+
+    /* Bordure de carte : */
     border: 5px solid var(--white-);
     border-radius: 20px;
     outline: 1px solid black;
@@ -995,7 +1018,7 @@ hr {
     transform: rotateY(180deg); /* Masqué au début */
 }
 
-/* Position après retournement */
+/* Position après le retournement des cartes :*/
 .flipped #SimpleMovieCard {
     transform: rotateY(-180deg);
 }
