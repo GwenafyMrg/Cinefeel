@@ -158,15 +158,18 @@ async function getMoviesData (movieObj){
                 // Si b.count - a.count > 0 --> b est plus grand que a donc b est placé avant.
                 // Si b.count - a.count < 0 --> a est plus grand que b donc a est placé avant.
 
-                // console.log("Votes globales:", votesCount);
+                console.log("Votes globales:", votesCount);
         
                 // Récupérer les 3 premières valeurs (les émotions les plus votées).
-                upVotes = [votesCount[0].name, votesCount[1].name, votesCount[2].name];
-                // console.log(upVotes);
+                
+                upVotes = [];
+                if (votesCount[0]) upVotes.push(votesCount[0].name);
+                if (votesCount[1]) upVotes.push(votesCount[1].name);
+                if (votesCount[2]) upVotes.push(votesCount[2].name);
+                console.log(upVotes);
 
                 // Insérer les 3 émotions les plus upVote dans la structure du film concerné toujours.
                 movie.popularEmotions = upVotes;
-
             }
             // S'il n'y a pas de vote, ne rien faire de plus.
         }
@@ -174,6 +177,7 @@ async function getMoviesData (movieObj){
             console.error("Erreur lors du calcul des émotions les plus votées :", err);
             movieObj.error = err;   // Retourner l'erreur depuis l'objet movieObj.
         }
+        console.log(movie);
     }     
     return movieObj;    // Retourner l'objet disposant des données de notes et des votes des films.
 }
