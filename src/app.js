@@ -909,12 +909,12 @@ app.get("/share-review", async (req,res) => {
         }
     }
     else{   //Sinon (Si on accède à la page share-review directement depuis l'URL) :
-        console.error("Chemin d'accès anormal :", err);
-        res.status(err.status || 404);
+        console.error("Chemin d'accès anormal :");
+        res.status( 404);
         res.render("error", {
             layout : false, 
-            code_error : err.status || 404, 
-            desc_error : "Le chemin d'accès utilisé est incorrecte... " + err
+            code_error : 404, 
+            desc_error : "Le chemin d'accès utilisé est incorrecte... "
         });
     }
 });
